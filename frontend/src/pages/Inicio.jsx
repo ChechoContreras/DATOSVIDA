@@ -12,7 +12,7 @@ export default function Inicio() {
       </p>
 
       <div className="pagina-inicio__accesos">
-        <Link to="/indicadores" className="tarjeta-acceso">
+        <Link to="/app/indicadores" className="tarjeta-acceso">
           <span className="tarjeta-acceso__icono">📊</span>
           <div>
             <h2>Consultar IPM</h2>
@@ -20,7 +20,7 @@ export default function Inicio() {
           </div>
         </Link>
 
-        <Link to="/mapa" className="tarjeta-acceso">
+        <Link to="/app/mapa" className="tarjeta-acceso">
           <span className="tarjeta-acceso__icono">🗺️</span>
           <div>
             <h2>Mapa de territorios</h2>

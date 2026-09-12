@@ -2,9 +2,9 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 const ITEMS = [
-  { to: "/", etiqueta: "Inicio", icono: "🏠", fin: true },
-  { to: "/indicadores", etiqueta: "Consultar IPM", icono: "📊" },
-  { to: "/mapa", etiqueta: "Mapa de territorios", icono: "🗺️" },
+  { to: "/app", etiqueta: "Inicio", icono: "🏠", fin: true },
+  { to: "/app/indicadores", etiqueta: "Consultar IPM", icono: "📊" },
+  { to: "/app/mapa", etiqueta: "Mapa de territorios", icono: "🗺️" },
 ];
 
 export default function Sidebar() {
