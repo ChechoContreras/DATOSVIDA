@@ -54,9 +54,9 @@ Abre `http://localhost:5173`.
 
 | Correo                        | Contraseña      | Rol            |
 |--------------------------------|-----------------|----------------|
-| admin@datavida.gov.co         | Admin123!       | Administrador  |
-| analista@datavida.gov.co      | Analista123!    | Analista       |
-| usuario@datavida.gov.co       | Usuario123!     | Usuario        |
+| sergio@datavida.gov           | 12345678        | Administrador  |
+| analista1@datavida.gov.co     | 12345678        | Analista       |
+| usuario@datavida.gov.co       | 12345678        | Usuario        |
 
 ## Endpoints por microservicio
 
