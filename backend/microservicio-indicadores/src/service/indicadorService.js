@@ -32,8 +32,13 @@ function obtenerCatalogoIndicadores() {
   return repository.listarIndicadores();
 }
 
+function obtenerPeriodos() {
+  return repository.listarPeriodos();
+}
+
 module.exports = {
   obtenerIndicadores,
   obtenerMunicipios,
   obtenerCatalogoIndicadores,
+  obtenerPeriodos,
 };

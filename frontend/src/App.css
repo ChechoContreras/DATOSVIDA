@@ -8,17 +8,60 @@
   --texto: #22291f;
   --gris-borde: #d8d2c4;
   --rojo-error: #9c3b3b;
+
   --fuente-cuerpo: "Inter", "Helvetica Neue", Arial, sans-serif;
   --fuente-titulo: "Sora", "Helvetica Neue", Arial, sans-serif;
+
+  /* Alias usados por los estilos de Sidebar/Inicio/Indicadores/Mapa
+     (mismo sistema de color, nombres distintos) */
+  --verde-petroleo: var(--verde-oscuro);
+  --verde-petroleo-hover: #142e29;
+  --dorado: #d68c3e;
+  --dorado-claro: #f2d65f;
+  --menta: #8fd0ab;
+  --color-texto: var(--texto);
+  --color-error: var(--rojo-error);
+  --color-blanco: #ffffff;
+  --blanco: #ffffff;
+  --fuente-texto: var(--fuente-cuerpo);
+  --fuente-base: var(--fuente-cuerpo);
+  --fuente-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --sombra-suave: 0 4px 12px rgba(28, 58, 52, 0.06);
+  --sombra-media: 0 10px 24px rgba(28, 58, 52, 0.12);
+}
+
+/* =========================================================
+   CONFIGURACIÓN GENERAL
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
+  margin: 0;
   background: var(--arena);
   color: var(--texto);
   font-family: var(--fuente-cuerpo);
 }
 
-/* ---------- Estructura general: sidebar + contenido ---------- */
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+a {
+  text-decoration: none;
+}
+
+/* =========================================================
+   ESTRUCTURA GENERAL
+   ========================================================= */
 
 .app-shell {
   display: flex;
@@ -32,7 +75,9 @@ body {
   padding: 2.5rem 3rem;
 }
 
-/* ---------- Sidebar ---------- */
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
 
 .sidebar {
   background: var(--verde-oscuro);
@@ -120,7 +165,9 @@ body {
   text-align: center;
 }
 
-/* ---------- Página Inicio ---------- */
+/* =========================================================
+   PÁGINA INICIO
+   ========================================================= */
 
 .pagina-inicio__etiqueta,
 .pagina-consulta__etiqueta {
@@ -189,7 +236,9 @@ body {
   line-height: 1.4;
 }
 
-/* ---------- Página Consultar IPM ---------- */
+/* =========================================================
+   PÁGINA CONSULTAR IPM
+   ========================================================= */
 
 .pagina-consulta__encabezado {
   margin-bottom: 1.75rem;
@@ -268,7 +317,9 @@ body {
   color: var(--rojo-error);
 }
 
-/* ---------- Gráfico ---------- */
+/* =========================================================
+   GRÁFICO
+   ========================================================= */
 
 .grafico-contenedor {
   background: white;
@@ -279,7 +330,9 @@ body {
   margin-bottom: 2rem;
 }
 
-/* ---------- Tarjetas de resultados (reemplaza la tabla) ---------- */
+/* =========================================================
+   TARJETAS DE RESULTADOS
+   ========================================================= */
 
 .tarjetas-grid {
   display: grid;
@@ -337,7 +390,9 @@ body {
   color: #5a6a63;
 }
 
-/* ---------- Página Mapa (placeholder) ---------- */
+/* =========================================================
+   PÁGINA MAPA
+   ========================================================= */
 
 .pagina-mapa p {
   max-width: 60ch;
@@ -345,302 +400,24 @@ body {
   color: var(--verde-medio);
 }
 
-/* ---------- Landing pública ---------- */
+/* =========================================================
+   RESPONSIVE GENERAL
+   ========================================================= */
 
-.landing {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
+@media (max-width: 1050px) {
+  .app-contenido {
+    padding: 2rem;
+  }
 }
 
-.landing__nav {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 1.1rem 3rem;
-  background: rgba(28, 58, 52, 0.55);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+@media (max-width: 800px) {
+  .sidebar--abierto {
+    width: 210px;
+  }
 }
 
-.landing__logo {
-  height: 38px;
-  display: block;
-}
-
-.landing__boton-login {
-  border: 1.5px solid rgba(255, 255, 255, 0.55);
-  color: white;
-  padding: 0.5rem 1.4rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.landing__boton-login:hover {
-  background: white;
-  color: var(--verde-oscuro);
-  border-color: white;
-}
-
-/* ---- Hero ---- */
-
-.landing__hero {
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  margin-top: -73px;
-  padding-top: 73px;
-  min-height: 92vh;
-  display: flex;
-  align-items: center;
-}
-
-.landing__hero-contenido {
-  max-width: 760px;
-  padding: 4rem 3rem;
-}
-
-.landing__badge {
-  display: inline-block;
-  background: rgba(181, 121, 58, 0.22);
-  border: 1px solid rgba(217, 154, 78, 0.55);
-  color: #f0d3ac;
-  font-size: 0.8rem;
-  font-weight: 500;
-  padding: 0.4rem 1rem;
-  border-radius: 999px;
-  margin-bottom: 1.5rem;
-  letter-spacing: 0.02em;
-}
-
-.landing__hero h1 {
-  font-family: var(--fuente-titulo);
-  font-weight: 700;
-  font-size: clamp(2.1rem, 4.4vw, 3.4rem);
-  color: white;
-  line-height: 1.18;
-  margin: 0 0 1.4rem;
-  letter-spacing: -0.01em;
-}
-
-.landing__hero h1 em {
-  font-style: normal;
-  color: var(--ocre-claro, #d99a4e);
-}
-
-.landing__descripcion {
-  font-size: 1.08rem;
-  line-height: 1.7;
-  color: #d7ded9;
-  max-width: 60ch;
-  margin: 0 0 2.25rem;
-}
-
-.landing__acciones {
-  display: flex;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.landing__boton-primario {
-  display: inline-block;
-  background: var(--ocre);
-  color: white;
-  padding: 0.85rem 2.1rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 600;
-  box-shadow: 0 8px 24px rgba(181, 121, 58, 0.35);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.landing__boton-primario:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 28px rgba(181, 121, 58, 0.45);
-}
-
-.landing__boton-ghost {
-  display: inline-flex;
-  align-items: center;
-  color: white;
-  padding: 0.85rem 1.6rem;
-  border-radius: 999px;
-  text-decoration: none;
-  font-size: 1rem;
-  font-weight: 500;
-  border: 1.5px solid rgba(255, 255, 255, 0.35);
-  transition: border-color 0.15s ease, background 0.15s ease;
-}
-
-.landing__boton-ghost:hover {
-  border-color: white;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-/* ---- Características ---- */
-
-.landing__caracteristicas {
-  background: var(--arena);
-  padding: 5rem 3rem;
-  text-align: center;
-}
-
-.landing__seccion-etiqueta {
-  color: var(--ocre);
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  margin: 0 0 0.6rem;
-}
-
-.landing__seccion-titulo {
-  font-family: var(--fuente-titulo);
-  font-weight: 700;
-  font-size: clamp(1.5rem, 2.6vw, 2rem);
-  color: var(--verde-oscuro);
-  max-width: 40ch;
-  margin: 0 auto 3rem;
-}
-
-.landing__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.75rem;
-  max-width: 1000px;
-  margin: 0 auto;
-  text-align: left;
-}
-
-.landing__tarjeta {
-  background: white;
-  border: 1px solid var(--gris-borde);
-  border-radius: 14px;
-  padding: 2rem 1.75rem;
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-}
-
-.landing__tarjeta:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 16px 32px rgba(28, 58, 52, 0.1);
-}
-
-.landing__tarjeta-icono {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 12px;
-  background: var(--verde-suave);
-  font-size: 1.4rem;
-  margin-bottom: 1.1rem;
-}
-
-.landing__tarjeta h3 {
-  font-family: var(--fuente-titulo);
-  font-size: 1.05rem;
-  color: var(--verde-oscuro);
-  margin: 0 0 0.5rem;
-}
-
-.landing__tarjeta p {
-  margin: 0;
-  font-size: 0.92rem;
-  color: #5a6a63;
-  line-height: 1.55;
-}
-
-.landing__footer {
-  text-align: center;
-  padding: 1.5rem;
-  font-size: 0.82rem;
-  color: #8a8578;
-  background: var(--arena);
-}
-
-/* ---------- Login ---------- */
-
-.login {
-  min-height: 100vh;
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--verde-oscuro);
-}
-
-.login__tarjeta {
-  background: white;
-  padding: 2.5rem;
-  border-radius: 10px;
-  width: 100%;
-  max-width: 380px;
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-}
-
-.login__marca {
-  font-family: var(--fuente-titulo);
-  color: var(--ocre);
-  margin: 0 0 0.5rem;
-  font-size: 0.95rem;
-}
-
-.login__tarjeta h1 {
-  font-family: var(--fuente-titulo);
-  color: var(--verde-oscuro);
-  margin: 0 0 0.4rem;
-  font-size: 1.5rem;
-}
-
-.login__subtitulo {
-  color: #5a6a63;
-  font-size: 0.9rem;
-  margin: 0 0 1.25rem;
-}
-
-.login__tarjeta label {
-  font-size: 0.85rem;
-  color: var(--verde-medio);
-  margin-top: 0.5rem;
-}
-
-.login__tarjeta input {
-  padding: 0.6rem;
-  border: 1px solid var(--gris-borde);
-  border-radius: 5px;
-  font-size: 0.95rem;
-  margin-top: 0.3rem;
-}
-
-.login__tarjeta button {
-  margin-top: 1.5rem;
-  background: var(--ocre);
-  color: white;
-  border: none;
-  padding: 0.7rem;
-  border-radius: 5px;
-  font-size: 0.95rem;
-  cursor: pointer;
-}
-
-.login__tarjeta button:hover {
-  background: #9c6529;
-}
-
-.login__nota {
-  margin-top: 1.25rem;
-  font-size: 0.78rem;
-  color: #8a8578;
-  line-height: 1.4;
+@media (max-width: 500px) {
+  .app-contenido {
+    padding: 1.5rem;
+  }
 }

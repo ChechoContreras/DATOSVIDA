@@ -1,0 +1,1057 @@
+/* =========================================================
+   LANDING
+   ========================================================= */
+
+.landing {
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+
+/* =========================================================
+   NAVEGACIÓN
+   ========================================================= */
+
+.landing__nav {
+  position: absolute;
+  top: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 100px);
+  max-width: 1250px;
+  min-height: 72px;
+  padding: 10px 14px 10px 30px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  background: var(--arena);
+
+  border: 1px solid var(--gris-borde);
+  border-radius: 50px;
+
+  box-shadow: 0 12px 35px rgba(28, 58, 52, 0.12);
+
+  z-index: 20;
+}
+
+
+/* =========================================================
+   LOGO + NOMBRE DATAVIDA
+   ========================================================= */
+
+.landing__marca {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.landing__logo {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  display: block;
+}
+
+.landing__nombre {
+  color: var(--ocre);
+  font-family: var(--fuente-cuerpo);
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.3px;
+}
+
+
+/* =========================================================
+   MENÚ
+   ========================================================= */
+
+.landing__menu {
+  display: flex;
+  align-items: center;
+}
+
+.landing__menu a {
+  padding: 9px 23px;
+  color: var(--verde-oscuro);
+  font-size: 14px;
+  font-weight: 500;
+  border-right: 1px solid var(--gris-borde);
+  transition: all 0.3s ease;
+}
+
+.landing__menu a:last-child {
+  border-right: none;
+}
+
+.landing__menu a:hover {
+  color: var(--ocre);
+}
+
+
+/* =========================================================
+   BOTÓN INGRESAR
+   ========================================================= */
+
+.landing__boton-login {
+  border: none;
+  padding: 14px 28px;
+  border-radius: 30px;
+
+  background: var(--ocre);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.landing__boton-login:hover {
+  background: #9f6730;
+  color: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(181, 121, 58, 0.3);
+}
+
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.landing__hero {
+  position: relative;
+  min-height: 760px;
+
+  padding: 180px 8% 100px;
+
+  display: flex;
+  align-items: center;
+
+  overflow: hidden;
+
+  background-color: var(--arena);
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.landing__hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background:
+    linear-gradient(
+      90deg,
+      rgba(21, 46, 41, 0.92) 0%,
+      rgba(21, 46, 41, 0.78) 38%,
+      rgba(21, 46, 41, 0.35) 70%,
+      rgba(21, 46, 41, 0.15) 100%
+    );
+
+  z-index: 1;
+}
+
+.landing__hero::after {
+  content: "";
+  position: absolute;
+
+  width: 650px;
+  height: 650px;
+
+  right: -220px;
+  top: 80px;
+
+  border-radius: 50%;
+
+  background: rgba(181, 121, 58, 0.12);
+
+  border: 1px solid rgba(255, 255, 255, 0.08);
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   CONTENIDO HERO
+   ========================================================= */
+
+.landing__hero-contenido {
+  position: relative;
+  z-index: 5;
+
+  width: 58%;
+  max-width: 720px;
+}
+
+
+/* =========================================================
+   BADGE
+   ========================================================= */
+
+.landing__badge {
+  display: inline-block;
+
+  margin: 0 0 18px;
+  padding: 8px 14px;
+
+  color: var(--ocre-suave);
+
+  background: rgba(181, 121, 58, 0.18);
+
+  border: 1px solid rgba(240, 224, 203, 0.35);
+
+  border-radius: 20px;
+
+  font-family: var(--fuente-cuerpo);
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   TÍTULO HERO
+   ========================================================= */
+
+.landing__hero h1 {
+  margin: 0;
+
+  color: #ffffff;
+
+  font-family: var(--fuente-titulo);
+
+  font-size: clamp(50px, 5.5vw, 78px);
+
+  line-height: 1.04;
+  font-weight: 400;
+
+  letter-spacing: -2.5px;
+}
+
+.landing__hero h1 em {
+  color: var(--ocre-suave);
+  font-style: normal;
+}
+
+
+/* =========================================================
+   DESCRIPCIÓN
+   ========================================================= */
+
+.landing__descripcion {
+  max-width: 560px;
+
+  margin: 30px 0 35px;
+
+  color: rgba(255, 255, 255, 0.84);
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 16px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   ACCIONES
+   ========================================================= */
+
+.landing__acciones {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+
+/* =========================================================
+   BOTÓN PRINCIPAL
+   ========================================================= */
+
+.landing__boton-primario {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 15px 32px;
+
+  border-radius: 30px;
+
+  background: var(--ocre);
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.landing__boton-primario:hover {
+  background: #9f6730;
+  color: #ffffff;
+
+  transform: translateY(-3px);
+
+  box-shadow: 0 10px 25px rgba(181, 121, 58, 0.3);
+}
+
+
+/* =========================================================
+   BOTÓN CONOCER MÁS
+   ========================================================= */
+
+.landing__boton-ghost {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 14px 25px;
+
+  border: 1px solid rgba(255, 255, 255, 0.45);
+
+  border-radius: 30px;
+
+  background: rgba(255, 255, 255, 0.08);
+
+  color: #ffffff;
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.landing__boton-ghost:hover {
+  border-color: var(--ocre-suave);
+
+  background: rgba(255, 255, 255, 0.14);
+
+  color: var(--ocre-suave);
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   CARACTERÍSTICAS / SERVICIOS
+   ========================================================= */
+
+.landing__caracteristicas {
+  position: relative;
+
+  padding: 115px 8%;
+
+  text-align: center;
+
+  background: var(--arena);
+}
+
+.landing__caracteristicas::before {
+  content: "";
+
+  display: block;
+
+  width: 70px;
+  height: 2px;
+
+  margin: 0 auto 35px;
+
+  background: var(--ocre);
+}
+
+
+/* =========================================================
+   ETIQUETA DE SECCIÓN
+   ========================================================= */
+
+.landing__seccion-etiqueta {
+  display: inline-block;
+
+  margin: 0 0 18px;
+
+  color: var(--ocre);
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 11px;
+  font-weight: 700;
+
+  letter-spacing: 3px;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   TÍTULO DE SECCIÓN
+   ========================================================= */
+
+.landing__seccion-titulo {
+  margin: 0;
+
+  color: var(--verde-oscuro);
+
+  font-family: var(--fuente-titulo);
+
+  font-size: clamp(40px, 4vw, 58px);
+
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+
+/* =========================================================
+   GRID
+   ========================================================= */
+
+.landing__grid {
+  max-width: 1100px;
+
+  margin: 75px auto 0;
+
+  display: grid;
+
+  grid-template-columns: repeat(3, 1fr);
+}
+
+
+/* =========================================================
+   TARJETAS
+   ========================================================= */
+
+.landing__tarjeta {
+  padding: 20px 45px;
+
+  border-right: 1px solid var(--gris-borde);
+
+  transition: transform 0.3s ease;
+}
+
+.landing__tarjeta:last-child {
+  border-right: none;
+}
+
+.landing__tarjeta:hover {
+  transform: translateY(-5px);
+}
+
+
+/* =========================================================
+   ICONOS
+   ========================================================= */
+
+.landing__tarjeta-icono {
+  width: 64px;
+  height: 64px;
+
+  margin: 0 auto 25px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 50%;
+
+  background: var(--verde-suave);
+
+  border: 1px solid #bfd8cf;
+
+  color: var(--verde-medio);
+}
+
+.landing__tarjeta-icono svg {
+  width: 30px;
+  height: 30px;
+
+  color: var(--verde-medio);
+}
+
+
+/* =========================================================
+   TÍTULOS TARJETAS
+   ========================================================= */
+
+.landing__tarjeta h3 {
+  margin: 0 0 15px;
+
+  color: var(--verde-oscuro);
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 19px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   TEXTO TARJETAS
+   ========================================================= */
+
+.landing__tarjeta p {
+  margin: 0;
+
+  color: #526560;
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+
+/* =========================================================
+   SOBRE DATAVIDA
+   ========================================================= */
+
+.landing__informacion {
+  position: relative;
+
+  min-height: 620px;
+
+  padding: 100px 8%;
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  align-items: center;
+
+  gap: 90px;
+
+  background: var(--arena);
+
+  overflow: hidden;
+}
+
+.landing__informacion::before {
+  content: "";
+
+  position: absolute;
+
+  width: 600px;
+  height: 600px;
+
+  left: -350px;
+  bottom: -350px;
+
+  border: 1px solid var(--gris-borde);
+
+  border-radius: 50%;
+}
+
+.landing__informacion::after {
+  content: "";
+
+  position: absolute;
+
+  width: 430px;
+  height: 430px;
+
+  left: -250px;
+  bottom: -250px;
+
+  border: 1px solid rgba(47, 93, 82, 0.35);
+
+  border-radius: 50%;
+}
+
+
+/* =========================================================
+   VISUAL
+   ========================================================= */
+
+.landing__informacion-visual {
+  position: relative;
+
+  min-height: 430px;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 25px;
+
+  background: #ffffff;
+
+  border: 1px solid var(--gris-borde);
+
+  box-shadow: 0 15px 35px rgba(28, 58, 52, 0.10);
+
+  overflow: hidden;
+}
+
+.landing__informacion-visual::before {
+  content: "";
+
+  position: absolute;
+
+  width: 280px;
+  height: 280px;
+
+  right: -120px;
+  top: -120px;
+
+  border-radius: 50%;
+
+  background: rgba(47, 93, 82, 0.12);
+}
+
+.landing__informacion-visual::after {
+  content: "";
+
+  position: absolute;
+
+  width: 180px;
+  height: 180px;
+
+  left: -90px;
+  bottom: -90px;
+
+  border-radius: 50%;
+
+  background: rgba(181, 121, 58, 0.10);
+}
+
+
+/* =========================================================
+   GRÁFICO
+   ========================================================= */
+
+.landing__grafico-grande {
+  position: relative;
+
+  width: 70%;
+  height: 270px;
+
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: center;
+
+  gap: 25px;
+
+  border-bottom: 1px solid #b7c7c3;
+
+  z-index: 2;
+}
+
+
+/* =========================================================
+   BARRAS
+   ========================================================= */
+
+.landing__barra {
+  width: 55px;
+
+  border-radius: 8px 8px 0 0;
+
+  background: var(--ocre);
+}
+
+.landing__barra--1 {
+  height: 90px;
+  background: #b7c7c3;
+}
+
+.landing__barra--2 {
+  height: 150px;
+  background: #c7ddd6;
+}
+
+.landing__barra--3 {
+  height: 205px;
+  background: var(--verde-medio);
+}
+
+.landing__barra--4 {
+  height: 245px;
+  background: var(--ocre);
+}
+
+
+/* =========================================================
+   TEXTO SOBRE DATAVIDA
+   ========================================================= */
+
+.landing__informacion-texto {
+  position: relative;
+  z-index: 3;
+}
+
+.landing__informacion-texto .landing__seccion-etiqueta {
+  color: var(--verde-medio);
+}
+
+.landing__informacion-texto h2 {
+  margin: 0 0 25px;
+
+  color: var(--verde-oscuro);
+
+  font-family: var(--fuente-titulo);
+
+  font-size: clamp(40px, 4vw, 58px);
+
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.landing__informacion-texto p:not(.landing__seccion-etiqueta) {
+  max-width: 500px;
+
+  margin-bottom: 30px;
+
+  color: #526560;
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 15px;
+
+  line-height: 1.9;
+}
+
+
+/* =========================================================
+   BOTÓN SECUNDARIO
+   ========================================================= */
+
+.landing__boton-secundario {
+  display: inline-flex;
+
+  padding: 14px 29px;
+
+  border: 1px solid var(--ocre);
+
+  border-radius: 30px;
+
+  background: transparent;
+
+  color: var(--verde-oscuro);
+
+  font-size: 14px;
+  font-weight: 600;
+
+  text-decoration: none;
+
+  transition: all 0.3s ease;
+}
+
+.landing__boton-secundario:hover {
+  background: var(--ocre);
+
+  color: #ffffff;
+
+  transform: translateY(-2px);
+}
+
+
+/* =========================================================
+   INFORMACIÓN EXTRA
+   ========================================================= */
+
+.landing__informacion-extra {
+  position: relative;
+
+  padding: 110px 8%;
+
+  text-align: center;
+
+  background: var(--verde-oscuro);
+
+  color: #ffffff;
+}
+
+.landing__informacion-extra .landing__seccion-etiqueta {
+  color: var(--ocre-suave);
+}
+
+.landing__informacion-extra h2 {
+  margin: 0 auto 25px;
+
+  color: #ffffff;
+
+  font-family: var(--fuente-titulo);
+
+  font-size: clamp(40px, 4vw, 58px);
+
+  line-height: 1.1;
+  font-weight: 400;
+}
+
+.landing__informacion-extra > p:last-child {
+  max-width: 650px;
+
+  margin: 0 auto;
+
+  color: rgba(255, 255, 255, 0.78);
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 15px;
+
+  line-height: 1.9;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.landing__footer {
+  padding: 28px 8%;
+
+  background: #152e29;
+
+  text-align: center;
+}
+
+.landing__footer p {
+  margin: 0;
+
+  color: rgba(255, 255, 255, 0.65);
+
+  font-family: var(--fuente-cuerpo);
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET GRANDE
+   ========================================================= */
+
+@media (max-width: 1050px) {
+
+  .landing__nav {
+    width: calc(100% - 60px);
+  }
+
+  .landing__menu a {
+    padding: 9px 15px;
+  }
+
+  .landing__hero-contenido {
+    width: 60%;
+    max-width: 680px;
+  }
+
+  .landing__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .landing__tarjeta {
+    padding: 20px 25px;
+  }
+
+  .landing__informacion {
+    gap: 50px;
+
+    padding-left: 5%;
+    padding-right: 5%;
+  }
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 800px) {
+
+  .landing__nav {
+    width: calc(100% - 30px);
+    padding: 12px 18px;
+  }
+
+  .landing__menu {
+    display: none;
+  }
+
+  .landing__logo {
+    width: 42px;
+    height: 42px;
+  }
+
+  .landing__nombre {
+    font-size: 17px;
+  }
+
+
+  /* HERO */
+
+  .landing__hero {
+    min-height: 850px;
+
+    padding: 170px 30px 70px;
+
+    display: block;
+
+    text-align: center;
+  }
+
+  .landing__hero-contenido {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+  }
+
+  .landing__descripcion {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .landing__acciones {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+
+  /* CARACTERÍSTICAS */
+
+  .landing__caracteristicas {
+    padding: 90px 30px;
+  }
+
+  .landing__grid {
+    grid-template-columns: 1fr;
+    gap: 35px;
+  }
+
+  .landing__tarjeta {
+    padding: 25px 30px;
+
+    border-right: none;
+
+    border-bottom: 1px solid var(--gris-borde);
+  }
+
+  .landing__tarjeta:last-child {
+    border-bottom: none;
+  }
+
+
+  /* INFORMACIÓN */
+
+  .landing__informacion {
+    grid-template-columns: 1fr;
+
+    gap: 50px;
+
+    padding: 80px 30px;
+  }
+
+  .landing__informacion-visual {
+    min-height: 380px;
+  }
+
+  .landing__grafico-grande {
+    width: 75%;
+  }
+}
+
+
+/* =========================================================
+   MÓVIL PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 500px) {
+
+  .landing__nav {
+    top: 20px;
+    padding: 10px 14px;
+  }
+
+  .landing__logo {
+    width: 38px;
+    height: 38px;
+  }
+
+  .landing__nombre {
+    font-size: 16px;
+  }
+
+  .landing__boton-login {
+    padding: 11px 19px;
+    font-size: 13px;
+  }
+
+
+  /* HERO */
+
+  .landing__hero {
+    min-height: 780px;
+
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .landing__hero h1 {
+    font-size: 43px;
+    letter-spacing: -1.5px;
+  }
+
+  .landing__descripcion {
+    font-size: 14px;
+  }
+
+
+  /* BOTONES */
+
+  .landing__acciones {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .landing__boton-primario,
+  .landing__boton-ghost {
+    width: 100%;
+  }
+
+
+  /* SECCIONES */
+
+  .landing__caracteristicas,
+  .landing__informacion {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .landing__seccion-titulo,
+  .landing__informacion-texto h2,
+  .landing__informacion-extra h2 {
+    font-size: 38px;
+  }
+
+
+  /* GRÁFICO */
+
+  .landing__informacion-visual {
+    min-height: 330px;
+  }
+
+  .landing__grafico-grande {
+    width: 80%;
+    gap: 12px;
+  }
+
+  .landing__barra {
+    width: 40px;
+  }
+}

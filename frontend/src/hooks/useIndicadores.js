@@ -3,23 +3,31 @@ import {
   consultarIndicadores,
   obtenerMunicipios,
   obtenerCatalogoIndicadores,
+  obtenerPeriodos,
 } from "../services/indicadoresService";
 
 /**
  * Encapsula el estado de carga/error y las llamadas a Services,
  * siguiendo el rol de "Hooks" definido en la arquitectura frontend.
+ *
+ * No dispara la búsqueda automáticamente al montar: la página decide
+ * cuándo consultar (por ejemplo, al hacer clic en "Consultar"), y
+ * mientras tanto se muestra un estado vacío inicial.
  */
 export function useIndicadores() {
   const [datos, setDatos] = useState([]);
   const [municipios, setMunicipios] = useState([]);
   const [catalogoIndicadores, setCatalogoIndicadores] = useState([]);
-  const [cargando, setCargando] = useState(true);
+  const [periodos, setPeriodos] = useState([]);
+  const [cargando, setCargando] = useState(false);
   const [error, setError] = useState(null);
   const [mensaje, setMensaje] = useState("");
+  const [haBuscado, setHaBuscado] = useState(false);
 
   useEffect(() => {
     obtenerMunicipios().then(setMunicipios).catch(() => {});
     obtenerCatalogoIndicadores().then(setCatalogoIndicadores).catch(() => {});
+    obtenerPeriodos().then(setPeriodos).catch(() => {});
   }, []);
 
   const buscar = useCallback(async (filtros) => {
@@ -36,12 +44,27 @@ export function useIndicadores() {
       setDatos([]);
     } finally {
       setCargando(false);
+      setHaBuscado(true);
     }
   }, []);
 
-  useEffect(() => {
-    buscar({});
-  }, [buscar]);
+  const limpiar = useCallback(() => {
+    setDatos([]);
+    setError(null);
+    setMensaje("");
+    setHaBuscado(false);
+  }, []);
 
-  return { datos, municipios, catalogoIndicadores, cargando, error, mensaje, buscar };
+  return {
+    datos,
+    municipios,
+    catalogoIndicadores,
+    periodos,
+    cargando,
+    error,
+    mensaje,
+    haBuscado,
+    buscar,
+    limpiar,
+  };
 }

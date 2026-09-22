@@ -67,8 +67,17 @@ function listarIndicadores() {
   return indicadores;
 }
 
+/**
+ * Periodos disponibles según los valores registrados (para poblar
+ * el filtro de Periodo en el frontend, en vez de una lista fija).
+ */
+function listarPeriodos() {
+  return [...new Set(valoresIndicador.map((v) => v.periodo))].sort();
+}
+
 module.exports = {
   consultarValores,
   listarMunicipios,
   listarIndicadores,
+  listarPeriodos,
 };

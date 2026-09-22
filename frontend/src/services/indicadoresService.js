@@ -23,3 +23,8 @@ export async function obtenerCatalogoIndicadores() {
   const { data } = await api.get("/catalogo-indicadores");
   return data;
 }
+
+export async function obtenerPeriodos() {
+  const { data } = await api.get("/periodos");
+  return data;
+}

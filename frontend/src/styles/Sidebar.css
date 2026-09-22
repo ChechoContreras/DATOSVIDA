@@ -1,0 +1,397 @@
+/* =========================================
+   BARRA LATERAL - DATAVIDA
+   IDENTIDAD VISUAL
+   ========================================= */
+
+.barra-lateral {
+  width: 250px;
+  min-width: 250px;
+  min-height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  background:
+    linear-gradient(
+      180deg,
+      #0b2925 0%,
+      #0f2e2a 55%,
+      #0c2723 100%
+    );
+
+  color: var(--blanco);
+  box-sizing: border-box;
+
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* =========================================
+   LOGO
+   ========================================= */
+
+.barra-lateral-logo {
+  height: 88px;
+
+  display: flex;
+  align-items: center;
+
+  padding: 0 24px;
+
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+
+  box-sizing: border-box;
+}
+
+.logo-datavida-interno {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  cursor: pointer;
+
+  color: var(--blanco);
+}
+
+.logo-datavida-interno img {
+  width: 40px;
+  height: 40px;
+
+  object-fit: contain;
+  display: block;
+}
+
+.logo-datavida-interno span {
+  font-family: var(--fuente-titulo);
+
+  font-size: 22px;
+  font-weight: 700;
+
+  letter-spacing: -0.5px;
+
+  color: #e0a24f;
+}
+
+/* =========================================
+   NAVEGACIÓN
+   ========================================= */
+
+.navegacion-lateral {
+  flex: 1;
+
+  padding: 27px 13px;
+
+  overflow-y: auto;
+
+  box-sizing: border-box;
+}
+
+.titulo-navegacion {
+  margin: 0 12px 13px;
+
+  font-family: var(--fuente-texto);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 1.6px;
+
+  color: rgba(255, 255, 255, 0.40);
+
+  text-transform: uppercase;
+}
+
+.lista-navegacion {
+  display: flex;
+  flex-direction: column;
+
+  gap: 5px;
+}
+
+/* =========================================
+   ELEMENTOS
+   ========================================= */
+
+.elemento-navegacion {
+  position: relative;
+
+  width: 100%;
+  min-height: 46px;
+
+  display: flex;
+  align-items: center;
+
+  gap: 13px;
+
+  padding: 0 13px;
+
+  border: 1px solid transparent;
+  border-radius: 11px;
+
+  background: transparent;
+
+  color: rgba(255, 255, 255, 0.66);
+
+  font-family: var(--fuente-texto);
+
+  font-size: 12px;
+  font-weight: 500;
+
+  text-align: left;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.elemento-navegacion:hover {
+  background: rgba(63, 167, 150, 0.09);
+
+  border-color: rgba(63, 167, 150, 0.10);
+
+  color: #ffffff;
+
+  transform: translateX(2px);
+}
+
+/* =========================================
+   ELEMENTO ACTIVO
+   ========================================= */
+
+.elemento-navegacion.activo {
+  background:
+    linear-gradient(
+      90deg,
+      rgba(214, 140, 62, 0.98),
+      rgba(224, 162, 79, 0.90)
+    );
+
+  border-color: rgba(255, 214, 153, 0.16);
+
+  color: #ffffff;
+
+  font-weight: 600;
+
+  box-shadow:
+    0 7px 18px rgba(214, 140, 62, 0.16);
+}
+
+.elemento-navegacion.activo:hover {
+  transform: translateX(0);
+
+  background:
+    linear-gradient(
+      90deg,
+      #d68c3e,
+      #e0a24f
+    );
+}
+
+/* =========================================
+   ICONOS
+   ========================================= */
+
+.icono-navegacion {
+  width: 20px;
+  height: 20px;
+
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: currentColor;
+}
+
+.icono-navegacion svg {
+  width: 19px;
+  height: 19px;
+
+  display: block;
+}
+
+/* =========================================
+   TEXTO
+   ========================================= */
+
+.texto-navegacion {
+  white-space: nowrap;
+}
+
+/* =========================================
+   PARTE INFERIOR
+   ========================================= */
+
+.barra-lateral-inferior {
+  padding: 14px 13px 16px;
+
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+
+  box-sizing: border-box;
+}
+
+.barra-lateral-inferior .elemento-navegacion {
+  margin-bottom: 4px;
+}
+
+.barra-lateral-inferior
+.elemento-navegacion:last-child {
+  margin-bottom: 0;
+}
+
+/* =========================================
+   CERRAR SESIÓN
+   ========================================= */
+
+.elemento-navegacion.cerrar-sesion {
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.elemento-navegacion.cerrar-sesion:hover {
+  color: #ffffff;
+
+  background: rgba(201, 92, 92, 0.10);
+
+  border-color: rgba(201, 92, 92, 0.08);
+
+  transform: translateX(2px);
+}
+
+/* =========================================
+   SCROLL
+   ========================================= */
+
+.navegacion-lateral::-webkit-scrollbar {
+  width: 4px;
+}
+
+.navegacion-lateral::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.navegacion-lateral::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+
+  border-radius: 10px;
+}
+
+.navegacion-lateral::-webkit-scrollbar-thumb:hover {
+  background: rgba(63, 167, 150, 0.40);
+}
+
+/* =========================================
+   TABLET GRANDE
+   ========================================= */
+
+@media (max-width: 1000px) {
+  .barra-lateral {
+    width: 220px;
+    min-width: 220px;
+  }
+
+  .barra-lateral-logo {
+    padding: 0 20px;
+  }
+
+  .logo-datavida-interno span {
+    font-size: 21px;
+  }
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 800px) {
+  .barra-lateral {
+    width: 75px;
+    min-width: 75px;
+  }
+
+  .barra-lateral-logo {
+    height: 80px;
+
+    justify-content: center;
+
+    padding: 0;
+  }
+
+  .logo-datavida-interno span {
+    display: none;
+  }
+
+  .logo-datavida-interno img {
+    width: 42px;
+    height: 42px;
+  }
+
+  .titulo-navegacion {
+    display: none;
+  }
+
+  .navegacion-lateral {
+    padding: 20px 10px;
+  }
+
+  .elemento-navegacion {
+    justify-content: center;
+
+    padding: 0;
+
+    gap: 0;
+  }
+
+  .texto-navegacion {
+    display: none;
+  }
+
+  .barra-lateral-inferior {
+    padding: 10px;
+  }
+}
+
+/* =========================================
+   MÓVIL
+   ========================================= */
+
+@media (max-width: 500px) {
+  .barra-lateral {
+    width: 64px;
+    min-width: 64px;
+  }
+
+  .barra-lateral-logo {
+    height: 70px;
+  }
+
+  .logo-datavida-interno img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .navegacion-lateral {
+    padding: 15px 7px;
+  }
+
+  .elemento-navegacion {
+    min-height: 42px;
+  }
+
+  .icono-navegacion svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .barra-lateral-inferior {
+    padding: 7px;
+  }
+}

@@ -1,0 +1,1416 @@
+/* =========================================
+   DATAVIDA
+   VISUALIZACIÓN
+   MAPA DE TERRITORIOS PDET
+   ========================================= */
+
+.pagina-mapa {
+  width: 100%;
+  min-height: 100%;
+  padding: 0;
+  color: var(--color-texto);
+}
+
+/* =========================================
+   ENCABEZADO
+   ========================================= */
+
+.encabezado-mapa {
+  width: 100%;
+  margin-bottom: 22px;
+}
+.pagina-mapa__etiqueta {
+  display: inline-block;
+  margin: 0 0 7px;
+  color: #dca83e !important;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.encabezado-mapa h1 {
+  margin: 0 0 8px;
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+  font-size: 24px;
+  line-height: 1.25;
+  font-weight: 700;
+}
+
+.descripcion-mapa {
+  max-width: 720px;
+  margin: 0;
+  color: #6f7f7c;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   FILTROS
+   ========================================= */
+
+.filtros-mapa {
+  width: 100%;
+  margin-bottom: 24px;
+  padding: 20px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.28);
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #fbfdfc 48%,
+      #eef7f3 100%
+    );
+
+  box-shadow: var(--sombra-suave);
+}
+
+.filtros-mapa__contenido {
+  display: flex;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+/* =========================================
+   CAMPOS
+   ========================================= */
+
+.campo-mapa {
+  flex: 1;
+  min-width: 180px;
+}
+
+.campo-mapa label {
+  display: block;
+  margin-bottom: 7px;
+  color: #536560;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.campo-mapa select {
+  width: 100%;
+  height: 43px;
+  padding: 0 13px;
+  box-sizing: border-box;
+
+  border: 1px solid #d2dfda;
+  border-radius: 11px;
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--verde-petroleo);
+
+  font-family: var(--fuente-base);
+  font-size: 13px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.campo-mapa select:hover {
+  border-color: #9fc5bc;
+  background: #ffffff;
+}
+
+.campo-mapa select:focus {
+  border-color: var(--menta);
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(63, 167, 150, 0.12);
+}
+
+/* =========================================
+   BOTÓN CONSULTAR
+   ========================================= */
+
+.boton-consultar-mapa {
+  min-height: 43px;
+  padding: 0 22px;
+
+  border: none;
+  border-radius: 11px;
+
+  background: var(--verde-petroleo);
+  color: var(--blanco);
+
+  font-family: var(--fuente-base);
+  font-size: 13px;
+  font-weight: 600;
+
+  white-space: nowrap;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.boton-consultar-mapa:hover {
+  background: var(--verde-petroleo-hover);
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 16px rgba(15, 46, 42, 0.15);
+}
+
+.boton-consultar-mapa:active {
+  transform: translateY(0);
+}
+
+/* =========================================
+   CONTENIDO PRINCIPAL
+   ========================================= */
+
+.contenido-mapa {
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 2fr)
+    minmax(280px, 0.85fr);
+
+  gap: 24px;
+}
+
+/* =========================================
+   TARJETA MAPA
+   ========================================= */
+
+.tarjeta-mapa-pdet {
+  position: relative;
+  min-width: 0;
+  padding: 24px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.30);
+  border-radius: 18px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #ffffff 52%,
+      #f4faf7 76%,
+      #e8f5f0 100%
+    );
+
+  box-shadow: var(--sombra-suave);
+}
+
+/* =========================================
+   ENCABEZADO MAPA
+   ========================================= */
+
+.encabezado-tarjeta-mapa {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+
+  gap: 20px;
+  margin-bottom: 18px;
+}
+
+.encabezado-tarjeta-mapa h2 {
+  margin: 0 0 5px;
+
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+
+  font-size: 16px;
+  line-height: 1.4;
+  font-weight: 600;
+}
+
+.encabezado-tarjeta-mapa p {
+  margin: 0;
+
+  color: #7a8986;
+  font-size: 11px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   LEYENDA MAPA
+   ========================================= */
+
+.leyenda-mapa-pdet {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+
+  flex-wrap: wrap;
+  gap: 10px;
+
+  color: #6f7f7c;
+  font-size: 10px;
+}
+
+.leyenda-mapa-pdet span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  white-space: nowrap;
+}
+
+.leyenda-mapa-pdet i {
+  width: 10px;
+  height: 10px;
+
+  display: inline-block;
+
+  border-radius: 50%;
+}
+
+/* =========================================
+   CONTENEDOR MAPA
+   ========================================= */
+
+.contenedor-mapa-pdet {
+  position: relative;
+
+  min-height: 520px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  overflow: hidden;
+
+  border-radius: 15px;
+
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      #ffffff 0%,
+      #f5f9f7 58%,
+      #eaf4f0 100%
+    );
+}
+
+/* =========================================
+   SVG COLOMBIA
+   ========================================= */
+
+.mapa-colombia-pdet {
+  width: 100%;
+  max-width: 510px;
+  height: auto;
+
+  display: block;
+
+  filter:
+    drop-shadow(
+      0 7px 12px rgba(15, 46, 42, 0.08)
+    );
+}
+
+/* =========================================
+   DEPARTAMENTOS
+   ========================================= */
+
+.departamento-pdet {
+  cursor: pointer;
+
+  transition:
+    opacity 0.2s ease,
+    filter 0.2s ease;
+}
+
+.departamento-pdet:hover {
+  opacity: 1;
+
+  filter:
+    brightness(1.05)
+    drop-shadow(
+      0 2px 3px rgba(15, 46, 42, 0.20)
+    );
+}
+
+/* =========================================
+   INFORMACIÓN SOBRE MAPA
+   ========================================= */
+
+.informacion-mapa-pdet {
+  position: absolute;
+
+  left: 18px;
+  bottom: 18px;
+
+  width: 210px;
+  min-height: 145px;
+
+  padding: 17px 18px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.25);
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.98) 0%,
+      rgba(249, 253, 251, 0.98) 55%,
+      rgba(232, 246, 240, 0.98) 100%
+    );
+
+  box-shadow:
+    0 12px 28px rgba(15, 46, 42, 0.13),
+    0 2px 8px rgba(15, 46, 42, 0.06);
+
+  backdrop-filter: blur(8px);
+}
+
+.informacion-mapa-pdet p {
+  margin: 0 0 4px;
+
+  color: #84928f;
+  font-size: 9px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.informacion-mapa-pdet h3 {
+  margin: 0 0 10px;
+
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.informacion-mapa-pdet strong {
+  display: block;
+  margin-bottom: 3px;
+
+  color: var(--verde-petroleo);
+
+  font-size: 22px;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.informacion-mapa-pdet span {
+  display: block;
+  max-width: 150px;
+
+  color: #7b8986;
+
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+/* =========================================
+   CERRAR INFORMACIÓN
+   ========================================= */
+
+.cerrar-informacion-mapa {
+  position: absolute;
+
+  top: 9px;
+  right: 10px;
+
+  width: 24px;
+  height: 24px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: none;
+  border-radius: 50%;
+
+  background: #eef4f2;
+  color: #647570;
+
+  font-size: 17px;
+  line-height: 1;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.cerrar-informacion-mapa:hover {
+  background: #dce9e5;
+  color: var(--verde-petroleo);
+}
+
+/* =========================================
+   PANEL DERECHO
+   ========================================= */
+
+.panel-mapa-pdet {
+  min-width: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 20px;
+}
+
+/* =========================================
+   TARJETA INFO PDET
+   ========================================= */
+
+.tarjeta-info-pdet {
+  padding: 22px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.30);
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fbfdfc 55%,
+      #edf7f3 100%
+    );
+
+  box-shadow: var(--sombra-suave);
+}
+
+.tarjeta-info-pdet__etiqueta {
+  display: inline-flex;
+  align-items: center;
+
+  min-height: 24px;
+  padding: 0 9px;
+  margin-bottom: 12px;
+
+  border-radius: 999px;
+
+  background: #e6f3ef;
+  color: var(--verde-petroleo);
+
+  font-size: 9px;
+  font-weight: 700;
+
+  letter-spacing: 0.06em;
+}
+
+.tarjeta-info-pdet h2 {
+  margin: 0 0 9px;
+
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+.tarjeta-info-pdet p {
+  margin: 0;
+
+  color: #6f7f7c;
+
+  font-size: 11px;
+  line-height: 1.7;
+}
+
+/* =========================================
+   TARJETA SELECCIÓN
+   ========================================= */
+
+.tarjeta-seleccion-pdet {
+  padding: 21px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.30);
+  border-radius: 17px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f7fbf9 58%,
+      #edf7f3 100%
+    );
+
+  box-shadow: var(--sombra-suave);
+}
+
+.tarjeta-seleccion-pdet > span {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #879591;
+
+  font-size: 9px;
+  font-weight: 600;
+
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.tarjeta-seleccion-pdet h3 {
+  margin: 0 0 13px;
+
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+
+  font-size: 15px;
+}
+
+.valor-pdet {
+  margin-bottom: 5px;
+
+  color: var(--dorado);
+
+  font-size: 27px;
+  font-weight: 700;
+}
+
+.tarjeta-seleccion-pdet p {
+  margin: 0;
+
+  color: #788783;
+
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+/* =========================================
+   SECCIONES ESTADÍSTICAS
+   ========================================= */
+
+.seccion-estadisticas,
+.seccion-evolucion {
+  width: 100%;
+  margin-top: 28px;
+}
+
+/* =========================================
+   ENCABEZADOS ESTADÍSTICAS
+   ========================================= */
+
+.encabezado-estadisticas {
+  margin-bottom: 16px;
+}
+
+.estadistica-etiqueta {
+  margin: 0 0 7px;
+
+  color: var(--dorado);
+
+  font-size: 10px;
+  font-weight: 700;
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.encabezado-estadisticas h2 {
+  margin: 0 0 7px;
+
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+
+  font-size: 19px;
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.encabezado-estadisticas > p:last-child {
+  margin: 0;
+
+  color: #71817e;
+
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   COMPARACIÓN
+   ========================================= */
+
+.tarjetas-comparacion {
+  display: grid;
+
+  grid-template-columns:
+    repeat(3, minmax(0, 1fr));
+
+  gap: 15px;
+}
+
+.tarjeta-comparacion {
+  position: relative;
+
+  min-width: 0;
+
+  padding: 18px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(63, 167, 150, 0.30);
+  border-radius: 15px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fbfdfc 55%,
+      #eef7f3 100%
+    );
+
+  box-shadow: var(--sombra-suave);
+
+  overflow: hidden;
+
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.tarjeta-comparacion:hover {
+  transform: translateY(-2px);
+
+  border-color: rgba(63, 167, 150, 0.48);
+
+  box-shadow:
+    0 10px 24px rgba(15, 46, 42, 0.09);
+}
+
+.comparacion-superior {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.comparacion-superior span {
+  color: #536560;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* =========================================
+   PORCENTAJES NEGROS
+   ========================================= */
+
+.comparacion-superior strong {
+  color: #202b29 !important;
+
+  font-size: 18px;
+  font-weight: 700;
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   BARRA COMPARACIÓN
+   ========================================= */
+
+.barra-comparacion {
+  width: 100%;
+  height: 7px;
+
+  overflow: hidden;
+
+  border-radius: 999px;
+
+  background: #deebe7;
+}
+
+.barra-comparacion__relleno {
+  height: 100%;
+
+  border-radius: 999px;
+
+  transition: width 0.5s ease;
+}
+
+/* =========================================
+   COLORES VARIADOS DE BARRAS
+   ========================================= */
+
+.tarjeta-comparacion:nth-child(1)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #3fa796,
+    #63c3ad
+  );
+}
+
+.tarjeta-comparacion:nth-child(2)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #d5a438,
+    #e7c35d
+  );
+}
+
+.tarjeta-comparacion:nth-child(3)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #d9786a,
+    #e79b8f
+  );
+}
+
+.tarjeta-comparacion:nth-child(4)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #6598c9,
+    #8ab5dc
+  );
+}
+
+.tarjeta-comparacion:nth-child(5)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #9378bd,
+    #b29bd1
+  );
+}
+
+.tarjeta-comparacion:nth-child(6)
+.barra-comparacion__relleno {
+  background: linear-gradient(
+    90deg,
+    #d3934e,
+    #e5b76f
+  );
+}
+
+/* =========================================
+   EVOLUCIÓN
+   ========================================= */
+
+.tarjeta-evolucion {
+  position: relative;
+
+  width: 100%;
+
+  padding: 22px;
+  box-sizing: border-box;
+
+  border: 1px solid #9edbd0;
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #f9fdfc 45%,
+      #edf8f4 100%
+    );
+
+  box-shadow:
+    0 12px 30px rgba(36, 67, 61, 0.08);
+}
+
+/* =========================================
+   RESUMEN EVOLUCIÓN
+   ========================================= */
+
+.resumen-evolucion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid #dceae5;
+}
+
+.resumen-evolucion span {
+  color: #71817e;
+
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.resumen-evolucion strong {
+  color: var(--dorado);
+
+  font-size: 25px;
+  font-weight: 700;
+}
+
+/* =========================================
+   NUEVO GRÁFICO DE EVOLUCIÓN
+   ========================================= */
+
+/*
+   IMPORTANTE:
+
+   Se eliminan las líneas diagonales anteriores.
+   Ahora cada periodo tiene:
+   - una línea vertical
+   - un punto
+   - un valor
+   - una posición independiente
+
+   Esto evita que las líneas atraviesen
+   los textos y años.
+*/
+
+.grafico-evolucion {
+  position: relative;
+
+  width: 100%;
+  height: 270px;
+
+  margin-top: 18px;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   ÁREA DEL GRÁFICO
+   ========================================= */
+
+.linea-grafico {
+  position: relative;
+
+  width: calc(100% - 30px);
+  height: 205px;
+
+  margin: 0 auto;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, 1fr);
+
+  align-items: stretch;
+
+  border-bottom: 1px solid #dfe9e5;
+}
+
+/* =========================================
+   LÍNEAS HORIZONTALES DE REFERENCIA
+   ========================================= */
+
+.linea-grafico::before,
+.linea-grafico::after {
+  content: "";
+
+  position: absolute;
+
+  left: 0;
+  right: 0;
+
+  height: 1px;
+
+  background: #e6efec;
+
+  pointer-events: none;
+
+  z-index: 0;
+}
+
+.linea-grafico::before {
+  top: 30%;
+}
+
+.linea-grafico::after {
+  top: 60%;
+}
+
+/* =========================================
+   PUNTOS
+   ========================================= */
+
+.punto-evolucion {
+  position: relative;
+
+  width: 100%;
+  height: 100%;
+
+  flex-shrink: 0;
+
+  z-index: 2;
+}
+
+/* =========================================
+   POSICIONES DE LOS DATOS
+
+   Valores más altos aparecen más arriba.
+   Valores más bajos más abajo.
+   ========================================= */
+
+.punto-evolucion:nth-child(1) {
+  --posicion-punto: 32%;
+}
+
+.punto-evolucion:nth-child(2) {
+  --posicion-punto: 39%;
+}
+
+.punto-evolucion:nth-child(3) {
+  --posicion-punto: 45%;
+}
+
+.punto-evolucion:nth-child(4) {
+  --posicion-punto: 52%;
+}
+
+.punto-evolucion:nth-child(5) {
+  --posicion-punto: 59%;
+}
+
+/* =========================================
+   LÍNEA VERTICAL DEL PUNTO
+   ========================================= */
+
+.punto-evolucion::before {
+  content: "";
+
+  position: absolute;
+
+  left: 50%;
+
+  top: var(--posicion-punto);
+
+  width: 2px;
+
+  height: calc(100% - var(--posicion-punto));
+
+  transform: translateX(-50%);
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(63, 167, 150, 0.35),
+      rgba(63, 167, 150, 0.08)
+    );
+
+  z-index: 1;
+}
+
+/* =========================================
+   OCULTAR ANTIGUAS LÍNEAS DIAGONALES
+   ========================================= */
+
+.linea-conexion {
+  display: none !important;
+}
+
+/* =========================================
+   CÍRCULO
+   ========================================= */
+
+.punto-evolucion__circulo {
+  position: absolute;
+
+  left: 50%;
+  top: var(--posicion-punto);
+
+  width: 13px;
+  height: 13px;
+
+  transform: translate(-50%, -50%);
+
+  border: 3px solid #ffffff;
+  border-radius: 50%;
+
+  background: #3fa796;
+
+  box-shadow:
+    0 3px 9px rgba(63, 167, 150, 0.28);
+
+  z-index: 4;
+}
+
+/* =========================================
+   COLORES DE LOS PUNTOS
+   ========================================= */
+
+.punto-evolucion:nth-child(1)
+.punto-evolucion__circulo {
+  background: #3fa796;
+}
+
+.punto-evolucion:nth-child(2)
+.punto-evolucion__circulo {
+  background: #dca83e;
+}
+
+.punto-evolucion:nth-child(3)
+.punto-evolucion__circulo {
+  background: #d9786a;
+}
+
+.punto-evolucion:nth-child(4)
+.punto-evolucion__circulo {
+  background: #6d9dcc;
+}
+
+.punto-evolucion:nth-child(5)
+.punto-evolucion__circulo {
+  background: #9b82c4;
+}
+
+/* =========================================
+   VALOR DEL PUNTO
+   ========================================= */
+
+.valor-evolucion {
+  position: absolute;
+
+  left: 50%;
+  top: calc(var(--posicion-punto) - 26px);
+
+  transform: translateX(-50%);
+
+  color: #202b29 !important;
+
+  font-size: 11px;
+  font-weight: 700;
+
+  white-space: nowrap;
+
+  z-index: 5;
+}
+
+/* =========================================
+   PERIODOS
+   ========================================= */
+
+.periodo-evolucion {
+  position: absolute;
+
+  left: 50%;
+  bottom: 8px;
+
+  transform: translateX(-50%);
+
+  color: #71817e;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+/* =========================================
+   VALORES ABAJO
+   ========================================= */
+
+.valores-evolucion {
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, 1fr);
+
+  gap: 10px;
+
+  margin-top: 10px;
+}
+
+.dato-evolucion {
+  display: flex;
+
+  flex-direction: column;
+  align-items: center;
+
+  gap: 3px;
+}
+
+.dato-evolucion span {
+  color: #879591;
+
+  font-size: 9px;
+}
+
+.dato-evolucion strong {
+  color: #202b29;
+
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 1100px) {
+
+  .contenido-mapa {
+    grid-template-columns: 1fr;
+  }
+
+  .panel-mapa-pdet {
+    display: grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .contenedor-mapa-pdet {
+    min-height: 500px;
+  }
+
+  .tarjetas-comparacion {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   TABLET PEQUEÑA
+   ========================================= */
+
+@media (max-width: 750px) {
+
+  .filtros-mapa {
+    padding: 17px;
+  }
+
+  .filtros-mapa__contenido {
+    display: grid;
+
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .campo-mapa {
+    min-width: 0;
+  }
+
+  .boton-consultar-mapa {
+    width: 100%;
+  }
+
+  .encabezado-tarjeta-mapa {
+    flex-direction: column;
+  }
+
+  .leyenda-mapa-pdet {
+    justify-content: flex-start;
+  }
+
+  .panel-mapa-pdet {
+    grid-template-columns: 1fr;
+  }
+
+  .tarjetas-comparacion {
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .grafico-evolucion {
+    height: 245px;
+  }
+
+  .linea-grafico {
+    height: 185px;
+  }
+}
+
+/* =========================================
+   MÓVIL
+   ========================================= */
+
+@media (max-width: 520px) {
+
+  .pagina-mapa {
+    width: 100%;
+  }
+
+  .encabezado-mapa h1 {
+    font-size: 20px;
+  }
+
+  .descripcion-mapa {
+    font-size: 12px;
+  }
+
+  .filtros-mapa {
+    padding: 15px;
+    border-radius: 14px;
+  }
+
+  .filtros-mapa__contenido {
+    grid-template-columns: 1fr;
+
+    gap: 13px;
+  }
+
+  .contenido-mapa {
+    gap: 16px;
+  }
+
+  .tarjeta-mapa-pdet {
+    padding: 17px;
+    border-radius: 14px;
+  }
+
+  .encabezado-tarjeta-mapa h2 {
+    font-size: 14px;
+  }
+
+  .leyenda-mapa-pdet {
+    gap: 8px;
+  }
+
+  .contenedor-mapa-pdet {
+    min-height: 390px;
+    border-radius: 12px;
+  }
+
+  .mapa-colombia-pdet {
+    max-width: 95%;
+  }
+
+  .informacion-mapa-pdet {
+    left: 10px;
+    bottom: 10px;
+
+    width: 185px;
+    min-height: 130px;
+
+    padding: 14px;
+
+    border-radius: 14px;
+  }
+
+  .informacion-mapa-pdet strong {
+    font-size: 20px;
+  }
+
+  .tarjeta-info-pdet,
+  .tarjeta-seleccion-pdet {
+    padding: 17px;
+    border-radius: 14px;
+  }
+
+  /* =====================================
+     COMPARACIÓN
+     ===================================== */
+
+  .seccion-estadisticas,
+  .seccion-evolucion {
+    margin-top: 22px;
+  }
+
+  .encabezado-estadisticas h2 {
+    font-size: 17px;
+  }
+
+  .tarjetas-comparacion {
+    grid-template-columns: 1fr;
+
+    gap: 12px;
+  }
+
+  .tarjeta-comparacion {
+    padding: 15px;
+  }
+
+  .comparacion-superior strong {
+    color: #202b29 !important;
+    font-size: 17px;
+  }
+
+  /* =====================================
+     EVOLUCIÓN
+     ===================================== */
+
+  .tarjeta-evolucion {
+    padding: 17px;
+    border-radius: 14px;
+  }
+
+  .resumen-evolucion strong {
+    color: var(--dorado);
+    font-size: 21px;
+  }
+
+  .grafico-evolucion {
+    height: 215px;
+    margin-top: 15px;
+  }
+
+  .linea-grafico {
+    width: calc(100% - 10px);
+    height: 165px;
+  }
+
+  .valor-evolucion {
+    top: calc(var(--posicion-punto) - 22px);
+
+    font-size: 9px;
+  }
+
+  .punto-evolucion__circulo {
+    width: 9px;
+    height: 9px;
+
+    border-width: 2px;
+  }
+
+  .periodo-evolucion {
+    bottom: 5px;
+
+    font-size: 9px;
+  }
+
+  .valores-evolucion {
+    display: none;
+  }
+}
+
+/* =========================================
+   MÓVILES MUY PEQUEÑOS
+   ========================================= */
+
+@media (max-width: 360px) {
+
+  .contenedor-mapa-pdet {
+    min-height: 330px;
+  }
+
+  .informacion-mapa-pdet {
+    width: 165px;
+  }
+
+  .leyenda-mapa-pdet {
+    font-size: 9px;
+  }
+
+  .encabezado-estadisticas h2 {
+    font-size: 16px;
+  }
+
+  .grafico-evolucion {
+    height: 200px;
+  }
+
+  .linea-grafico {
+    height: 150px;
+  }
+
+  .valor-evolucion {
+    font-size: 8px;
+  }
+}

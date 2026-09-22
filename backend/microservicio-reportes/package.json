@@ -1,0 +1,21 @@
+{
+  "name": "microservicio-reportes",
+  "version": "1.0.0",
+  "description": "Microservicio de Reportes - DATAVIDA (RF-15 Generar y exportar reportes)",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "axios": "^1.7.2",
+    "cors": "^2.8.5",
+    "exceljs": "^4.4.0",
+    "express": "^4.19.2",
+    "pdfkit": "^0.15.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}

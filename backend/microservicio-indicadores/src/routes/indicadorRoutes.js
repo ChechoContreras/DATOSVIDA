@@ -29,4 +29,13 @@ router.get("/catalogo-indicadores", (req, res) => {
   res.status(200).json(service.obtenerCatalogoIndicadores());
 });
 
+/**
+ * GET /api/periodos
+ * Lista los periodos disponibles según los datos registrados
+ * (para poblar el filtro de Periodo en el frontend).
+ */
+router.get("/periodos", (req, res) => {
+  res.status(200).json(service.obtenerPeriodos());
+});
+
 module.exports = router;

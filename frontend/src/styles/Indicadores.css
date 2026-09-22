@@ -1,0 +1,705 @@
+/* =========================================
+   PAGINA INDICADORES
+   ========================================= */
+
+.pagina-indicadores {
+  width: 100%;
+  max-width: 1500px;
+  margin: 0 auto;
+  padding-bottom: 30px;
+  box-sizing: border-box;
+}
+
+/* =========================================
+   ENCABEZADO
+   ========================================= */
+
+.encabezado-indicadores {
+  margin-bottom: 28px;
+}
+
+/* CONSULTA TERRITORIAL - AMARILLO */
+.etiqueta-pagina-indicadores {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #d68c3e;
+  font-family: var(--fuente-texto);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.8px;
+  text-transform: uppercase;
+}
+
+/* INDICADORES - VERDE */
+.encabezado-indicadores h1 {
+  margin: 0;
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.8px;
+}
+
+.encabezado-indicadores p {
+  max-width: 700px;
+  margin: 9px 0 0;
+  color: #6f7f7c;
+  font-family: var(--fuente-texto);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =========================================
+   PANEL DE FILTROS
+   ========================================= */
+
+.panel-filtros-indicadores {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  padding: 26px;
+  border: 1px solid rgba(222, 191, 104, 0.45);
+  border-radius: 20px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffffff 0%,
+      #fffef8 35%,
+      #fff9df 68%,
+      #f8f3d9 100%
+    );
+
+  box-shadow:
+    0 12px 32px rgba(36, 67, 61, 0.07),
+    0 3px 10px rgba(214, 140, 62, 0.07);
+
+  overflow: hidden;
+}
+
+/* =========================================
+   DETALLE DECORATIVO AMARILLO
+   ========================================= */
+
+.panel-filtros-indicadores::before {
+  content: "";
+  position: absolute;
+  top: -80px;
+  right: -70px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(229, 193, 70, 0.16) 0%,
+      rgba(229, 193, 70, 0.05) 48%,
+      transparent 72%
+    );
+
+  pointer-events: none;
+}
+
+/* =========================================
+   TITULO DEL PANEL
+   ========================================= */
+
+.titulo-panel-indicadores {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 13px;
+
+  margin-bottom: 24px;
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid rgba(213, 199, 139, 0.35);
+}
+
+.icono-titulo-filtros {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: 11px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #fff4bd 0%,
+      #f5d967 100%
+    );
+
+  color: #8c6b00;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 5px 12px rgba(214, 140, 62, 0.12);
+}
+
+.icono-titulo-filtros svg {
+  width: 20px;
+  height: 20px;
+}
+
+.titulo-panel-indicadores h2 {
+  margin: 0;
+  color: var(--verde-petroleo);
+  font-family: var(--fuente-titulo);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.titulo-panel-indicadores p {
+  margin: 4px 0 0;
+  color: #7a8986;
+  font-family: var(--fuente-texto);
+  font-size: 11px;
+  line-height: 1.4;
+}
+
+/* =========================================
+   GRID DE FILTROS
+   ========================================= */
+
+.grid-filtros-indicadores {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(5, minmax(0, 1fr));
+
+  gap: 18px;
+}
+
+/* =========================================
+   CAMPOS
+   ========================================= */
+
+.campo-indicadores {
+  min-width: 0;
+  width: 100%;
+}
+
+.campo-indicadores label {
+  display: block;
+
+  margin-bottom: 8px;
+
+  color: #526560;
+  font-family: var(--fuente-texto);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.campo-indicadores select {
+  width: 100%;
+  height: 46px;
+
+  box-sizing: border-box;
+
+  padding: 0 13px;
+
+  border: 1px solid #d8dfc9;
+  border-radius: 11px;
+
+  outline: none;
+
+  background: rgba(255, 255, 255, 0.78);
+
+  color: var(--verde-petroleo);
+
+  font-family: var(--fuente-base);
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+}
+
+.campo-indicadores select:hover {
+  border-color: #d2b94c;
+  background: #ffffff;
+  transform: translateY(-1px);
+}
+
+.campo-indicadores select:focus {
+  border-color: #d68c3e;
+  background: #ffffff;
+
+  box-shadow:
+    0 0 0 3px rgba(214, 140, 62, 0.12),
+    0 4px 12px rgba(36, 67, 61, 0.05);
+}
+
+.campo-indicadores select:disabled {
+  opacity: 0.5;
+  background: #eef3f1;
+  cursor: not-allowed;
+}
+
+/* =========================================
+   BOTONES
+   ========================================= */
+
+.acciones-filtros-indicadores {
+  position: relative;
+  z-index: 1;
+
+  display: flex;
+  align-items: center;
+  gap: 11px;
+
+  margin-top: 22px;
+  padding-top: 20px;
+
+  border-top: 1px solid rgba(213, 199, 139, 0.35);
+}
+
+.boton-consultar-indicadores,
+.boton-limpiar-indicadores {
+  min-height: 42px;
+
+  padding: 0 20px;
+
+  border-radius: 10px;
+
+  font-family: var(--fuente-base);
+  font-size: 12px;
+
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* =========================================
+   CONSULTAR
+   ========================================= */
+
+.boton-consultar-indicadores {
+  border: 1px solid #d68c3e;
+
+  background:
+    linear-gradient(
+      135deg,
+      #dca83e 0%,
+      #c98b2d 100%
+    );
+
+  color: var(--color-blanco);
+
+  font-weight: 600;
+
+  box-shadow:
+    0 5px 13px rgba(214, 140, 62, 0.18);
+}
+
+.boton-consultar-indicadores:hover {
+  background:
+    linear-gradient(
+      135deg,
+      #e5b34a 0%,
+      #d49a32 100%
+    );
+
+  border-color: #d49a32;
+
+  transform: translateY(-1px);
+
+  box-shadow:
+    0 7px 17px rgba(214, 140, 62, 0.24);
+}
+
+.boton-consultar-indicadores:active {
+  transform: translateY(0);
+}
+
+/* =========================================
+   LIMPIAR
+   ========================================= */
+
+.boton-limpiar-indicadores {
+  border: 1px solid #d7e0dc;
+
+  background: rgba(255, 255, 255, 0.82);
+
+  color: #526560;
+
+  font-weight: 500;
+}
+
+.boton-limpiar-indicadores:hover {
+  background: #ffffff;
+
+  border-color: #c5cec9;
+
+  transform: translateY(-1px);
+}
+
+/* =========================================
+   ESTADOS
+   ========================================= */
+
+.estado-indicadores {
+  position: relative;
+
+  width: 100%;
+  min-height: 300px;
+
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  padding: 50px 30px;
+
+  border: 1px solid rgba(222, 191, 104, 0.38);
+
+  border-radius: 20px;
+
+  background:
+    radial-gradient(
+      circle at 15% 15%,
+      rgba(247, 220, 113, 0.22) 0%,
+      rgba(247, 220, 113, 0.06) 28%,
+      transparent 50%
+    ),
+    linear-gradient(
+      145deg,
+      #ffffff 0%,
+      #fffef8 38%,
+      #fff9df 70%,
+      #f4f0d9 100%
+    );
+
+  box-shadow:
+    0 14px 38px rgba(36, 67, 61, 0.07),
+    0 4px 12px rgba(214, 140, 62, 0.06);
+
+  text-align: center;
+
+  overflow: hidden;
+}
+
+/* =========================================
+   BRILLO DECORATIVO
+   ========================================= */
+
+.estado-indicadores::after {
+  content: "";
+
+  position: absolute;
+
+  width: 240px;
+  height: 240px;
+
+  right: -100px;
+  bottom: -120px;
+
+  border-radius: 50%;
+
+  background:
+    radial-gradient(
+      circle,
+      rgba(214, 173, 48, 0.12) 0%,
+      transparent 70%
+    );
+
+  pointer-events: none;
+}
+
+/* =========================================
+   ICONOS DE ESTADO
+   ========================================= */
+
+.icono-estado-indicadores,
+.icono-alerta-indicadores {
+  position: relative;
+  z-index: 1;
+
+  width: 66px;
+  height: 66px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin-bottom: 18px;
+
+  border-radius: 17px;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 6px 16px rgba(36, 67, 61, 0.07);
+}
+
+/* =========================================
+   ESTADO NORMAL
+   ========================================= */
+
+.icono-estado-indicadores {
+  background:
+    linear-gradient(
+      145deg,
+      #fff6c9 0%,
+      #f2d65f 100%
+    );
+
+  color: #8b6c00;
+}
+
+/* =========================================
+   ALERTA
+   ========================================= */
+
+.icono-alerta-indicadores {
+  background:
+    linear-gradient(
+      145deg,
+      #fff0c5 0%,
+      #f4d26a 100%
+    );
+
+  color: #876500;
+}
+
+.icono-estado-indicadores svg,
+.icono-alerta-indicadores svg {
+  width: 30px;
+  height: 30px;
+}
+
+/* =========================================
+   TEXTO DE LOS ESTADOS
+   ========================================= */
+
+.estado-indicadores h2 {
+  position: relative;
+  z-index: 1;
+
+  max-width: 600px;
+
+  margin: 0;
+
+  color: var(--verde-petroleo);
+
+  font-family: var(--fuente-titulo);
+  font-size: 17px;
+  font-weight: 600;
+
+  line-height: 1.35;
+}
+
+.estado-indicadores p {
+  position: relative;
+  z-index: 1;
+
+  max-width: 480px;
+
+  margin: 8px 0 0;
+
+  color: #72817e;
+
+  font-family: var(--fuente-texto);
+  font-size: 12px;
+
+  line-height: 1.7;
+}
+
+.estado-indicadores p strong {
+  color: var(--verde-petroleo);
+  font-weight: 600;
+}
+
+/* =========================================
+   CARGANDO
+   ========================================= */
+
+.estado-cargando-indicadores {
+  min-height: 270px;
+}
+
+.spinner-indicadores {
+  width: 38px;
+  height: 38px;
+
+  margin-bottom: 18px;
+
+  border: 3px solid #eadfae;
+  border-top-color: #d68c3e;
+
+  border-radius: 50%;
+
+  animation:
+    girar-indicadores
+    0.8s linear infinite;
+}
+
+@keyframes girar-indicadores {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* =========================================
+   SIN RESULTADOS
+   ========================================= */
+
+.estado-sin-resultados {
+  min-height: 300px;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (max-width: 1200px) {
+  .grid-filtros-indicadores {
+    grid-template-columns:
+      repeat(3, minmax(0, 1fr));
+  }
+}
+
+/* =========================================
+   TABLET
+   ========================================= */
+
+@media (max-width: 750px) {
+  .encabezado-indicadores h1 {
+    font-size: 28px;
+  }
+
+  .panel-filtros-indicadores {
+    padding: 21px;
+    border-radius: 18px;
+  }
+
+  .grid-filtros-indicadores {
+    grid-template-columns:
+      repeat(2, minmax(0, 1fr));
+
+    gap: 15px;
+  }
+
+  .estado-indicadores {
+    min-height: 270px;
+    padding: 42px 24px;
+    border-radius: 18px;
+  }
+}
+
+/* =========================================
+   MÓVIL
+   ========================================= */
+
+@media (max-width: 520px) {
+  .pagina-indicadores {
+    padding-bottom: 20px;
+  }
+
+  .encabezado-indicadores {
+    margin-bottom: 21px;
+  }
+
+  .encabezado-indicadores h1 {
+    font-size: 26px;
+  }
+
+  .encabezado-indicadores p {
+    font-size: 12px;
+  }
+
+  .panel-filtros-indicadores {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .titulo-panel-indicadores {
+    align-items: flex-start;
+
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+  }
+
+  .titulo-panel-indicadores h2 {
+    font-size: 14px;
+  }
+
+  .grid-filtros-indicadores {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .acciones-filtros-indicadores {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .boton-consultar-indicadores,
+  .boton-limpiar-indicadores {
+    width: 100%;
+  }
+
+  .estado-indicadores {
+    min-height: 250px;
+
+    padding: 35px 18px;
+
+    border-radius: 16px;
+  }
+
+  .estado-indicadores h2 {
+    font-size: 15px;
+  }
+
+  .estado-indicadores p {
+    font-size: 11px;
+  }
+}
+/* ---------- Lista de checkboxes de municipios (Comparar) ---------- */
+.lista-checks-municipios {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.check-municipio {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--verde-petroleo);
+  background: white;
+  border: 1px solid var(--gris-borde);
+  border-radius: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+.check-municipio input {
+  width: auto;
+}
