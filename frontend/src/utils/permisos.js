@@ -18,6 +18,7 @@ export const PERMISOS_POR_PANTALLA = {
   comparar: ["Analista"],
   estadisticas: ["Analista"],
   predicciones: ["Analista"],
+  variables: ["Analista"],
   recomendaciones: ["Analista", "Usuario"],
   reportes: ["Analista", "Usuario"],
   usuarios: ["Administrador"],

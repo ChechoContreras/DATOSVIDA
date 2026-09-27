@@ -10,4 +10,13 @@ async function consultarValoresIndicadores(filtros = {}) {
   return data.datos || [];
 }
 
-module.exports = { consultarValoresIndicadores };
+/**
+ * Trae todos los valores registrados, sin filtro. Se usa para calcular
+ * correlaciones entre indicadores cruzando municipios (RF-13 apoyo:
+ * "correlaciones e impacto de variables priorizadas").
+ */
+async function consultarTodosLosValores() {
+  return consultarValoresIndicadores({});
+}
+
+module.exports = { consultarValoresIndicadores, consultarTodosLosValores };

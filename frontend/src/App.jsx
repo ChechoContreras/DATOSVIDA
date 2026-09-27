@@ -12,6 +12,7 @@ import GestionUsuarios from "./pages/GestionUsuarios";
 import Comparar from "./pages/Comparar";
 import AnalisisEstadistico from "./pages/AnalisisEstadistico";
 import PrediccionesIA from "./pages/PrediccionesIA";
+import AnalisisVariables from "./pages/AnalisisVariables";
 import Recomendaciones from "./pages/Recomendaciones";
 import Reportes from "./pages/Reportes";
 
@@ -45,6 +46,10 @@ function App() {
 
           <Route element={<RutaConPermiso pantallaId="predicciones" />}>
             <Route path="predicciones" element={<PrediccionesIA />} />
+          </Route>
+
+          <Route element={<RutaConPermiso pantallaId="variables" />}>
+            <Route path="variables" element={<AnalisisVariables />} />
           </Route>
 
           <Route element={<RutaConPermiso pantallaId="recomendaciones" />}>

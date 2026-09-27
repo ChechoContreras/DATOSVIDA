@@ -13,4 +13,13 @@ async function obtenerRecomendaciones({ municipioCodigo, indicadorId }) {
   return data;
 }
 
-export { generarPrediccion, obtenerRecomendaciones };
+/** Correlación de Pearson entre indicadores + variables priorizadas por impacto. */
+async function obtenerCorrelaciones({ indicadorIdA, indicadorIdB } = {}) {
+  const params = {};
+  if (indicadorIdA) params.indicadorIdA = indicadorIdA;
+  if (indicadorIdB) params.indicadorIdB = indicadorIdB;
+  const { data } = await iaApi.get("/ia/correlaciones", { params });
+  return data;
+}
+
+export { generarPrediccion, obtenerRecomendaciones, obtenerCorrelaciones };

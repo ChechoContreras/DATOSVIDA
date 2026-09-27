@@ -36,6 +36,10 @@ export default function AppLayout() {
         navigate("/app/predicciones");
         break;
 
+      case "variables":
+        navigate("/app/variables");
+        break;
+
       case "recomendaciones":
         navigate("/app/recomendaciones");
         break;
@@ -83,6 +87,10 @@ export default function AppLayout() {
 
     if (ruta.startsWith("/app/predicciones")) {
       return "predicciones";
+    }
+
+    if (ruta.startsWith("/app/variables")) {
+      return "variables";
     }
 
     if (ruta.startsWith("/app/recomendaciones")) {

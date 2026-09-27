@@ -22,6 +22,20 @@ router.get("/recomendaciones", async (req, res) => {
   }
 });
 
+/**
+ * GET /api/ia/correlaciones?indicadorIdA=&indicadorIdB=
+ * Sin parámetros: matriz de correlación entre todos los indicadores +
+ * ranking de variables priorizadas. Con ambos parámetros: solo ese par.
+ */
+router.get("/correlaciones", async (req, res) => {
+  try {
+    const resultado = await service.calcularCorrelaciones(req.query || {});
+    res.status(200).json(resultado);
+  } catch (err) {
+    res.status(400).json({ mensaje: err.message, codigo: err.codigo });
+  }
+});
+
 router.get("/predicciones/historial", (req, res) => {
   res.status(200).json(service.obtenerHistorialPredicciones());
 });

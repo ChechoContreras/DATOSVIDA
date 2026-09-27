@@ -129,6 +129,25 @@ const elementosNavegacion = [
   },
 
   {
+  id: "variables",
+  etiqueta: "Análisis de variables",
+  icono: (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="6" cy="18" r="2" />
+      <circle cx="18" cy="6" r="2" />
+      <path d="m8 16.5 8-11" />
+    </svg>
+  ),
+},
+
+  {
     id: "recomendaciones",
     etiqueta: "Recomendaciones",
     icono: (
