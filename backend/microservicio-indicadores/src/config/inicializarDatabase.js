@@ -4,29 +4,32 @@ const pool = require("./database");
  * Inicializa la base de datos del Microservicio de Indicadores.
  *
  * Los datos iniciales corresponden a resultados PDET 2025
- * calculados a partir de los microdatos oficiales del DANE.
+ * procesados a partir de los microdatos del DANE.
  */
 async function inicializarDatabase() {
-  // 1. Eliminar estructura anterior del prototipo.
-  // CASCADE elimina también la tabla de valores que dependía
-  // de los municipios de prueba.
+  // 1. Eliminar la estructura anterior.
+  //
+  // En esta etapa de desarrollo recreamos estas tablas para
+  // sustituir completamente los datos de prueba anteriores.
   await pool.query(`
     DROP TABLE IF EXISTS valores_indicador CASCADE;
     DROP TABLE IF EXISTS municipios CASCADE;
+    DROP TABLE IF EXISTS indicadores CASCADE;
+    DROP TABLE IF EXISTS territorios CASCADE;
   `);
 
-  // 2. Territorios o grupos territoriales
+  // 2. Crear tabla de territorios.
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS territorios (
+    CREATE TABLE territorios (
       codigo VARCHAR(30) PRIMARY KEY,
       nombre VARCHAR(200) NOT NULL,
       tipo VARCHAR(100) NOT NULL
     );
   `);
 
-  // 3. Catálogo de indicadores
+  // 3. Crear catálogo de indicadores.
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS indicadores (
+    CREATE TABLE indicadores (
       id SERIAL PRIMARY KEY,
       codigo VARCHAR(100) UNIQUE NOT NULL,
       nombre VARCHAR(250) NOT NULL,
@@ -36,9 +39,9 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 4. Valores de los indicadores
+  // 4. Crear tabla de valores de indicadores.
   await pool.query(`
-    CREATE TABLE IF NOT EXISTS valores_indicador (
+    CREATE TABLE valores_indicador (
       id SERIAL PRIMARY KEY,
       territorio_codigo VARCHAR(30) NOT NULL,
       indicador_id INTEGER NOT NULL,
@@ -56,35 +59,37 @@ async function inicializarDatabase() {
         REFERENCES indicadores(id),
 
       CONSTRAINT valor_unico
-        UNIQUE (territorio_codigo, indicador_id, periodo)
+        UNIQUE (
+          territorio_codigo,
+          indicador_id,
+          periodo
+        )
     );
   `);
 
-  // 5. Eliminar los indicadores anteriores del prototipo.
-  // En este momento todavía no existen valores asociados
-  // porque valores_indicador acaba de ser recreada.
+  // 5. Registrar el territorio PDET.
   await pool.query(`
-    DELETE FROM indicadores;
-  `);
-
-  // 6. Registrar el universo territorial identificado
-  // por los microdatos PDET.
-  await pool.query(`
-    INSERT INTO territorios (codigo, nombre, tipo)
+    INSERT INTO territorios (
+      codigo,
+      nombre,
+      tipo
+    )
     VALUES (
       'PDET-CO',
       'PDET Colombia',
       'Programas de Desarrollo con Enfoque Territorial'
-    )
-    ON CONFLICT (codigo) DO UPDATE SET
-      nombre = EXCLUDED.nombre,
-      tipo = EXCLUDED.tipo;
+    );
   `);
 
-  // 7. Catálogo de indicadores PDET 2025
+  // 6. Crear catálogo de indicadores PDET 2025.
   await pool.query(`
-    INSERT INTO indicadores
-      (codigo, nombre, unidad, dimension, fuente)
+    INSERT INTO indicadores (
+      codigo,
+      nombre,
+      unidad,
+      dimension,
+      fuente
+    )
     VALUES
       (
         'IPM',
@@ -190,22 +195,19 @@ async function inicializarDatabase() {
         '%',
         'Vivienda',
         'DANE - Índice de Pobreza Multidimensional 2025'
-      )
-    ON CONFLICT (codigo) DO NOTHING;
+      );
   `);
 
-  // 8. Valores PDET 2025 obtenidos mediante
-  // procesamiento ponderado de los microdatos DANE.
+  // 7. Cargar valores PDET 2025.
   await pool.query(`
-    INSERT INTO valores_indicador
-      (
-        territorio_codigo,
-        indicador_id,
-        periodo,
-        valor,
-        fuente,
-        fecha_actualizacion
-      )
+    INSERT INTO valores_indicador (
+      territorio_codigo,
+      indicador_id,
+      periodo,
+      valor,
+      fuente,
+      fecha_actualizacion
+    )
     SELECT
       'PDET-CO',
       i.id,
@@ -233,18 +235,20 @@ async function inicializarDatabase() {
     ) AS d(codigo, valor)
 
     INNER JOIN indicadores i
-      ON i.codigo = d.codigo
-
-    ON CONFLICT (territorio_codigo, indicador_id, periodo)
-    DO UPDATE SET
-      valor = EXCLUDED.valor,
-      fuente = EXCLUDED.fuente,
-      fecha_actualizacion = EXCLUDED.fecha_actualizacion;
+      ON i.codigo = d.codigo;
   `);
 
-  console.log("Estructura PostgreSQL verificada correctamente.");
-  console.log("Datos PDET 2025 cargados correctamente.");
-  console.log("Fuente: DANE - Índice de Pobreza Multidimensional 2025.");
+  console.log(
+    "Estructura PostgreSQL verificada correctamente."
+  );
+
+  console.log(
+    "Datos PDET 2025 cargados correctamente."
+  );
+
+  console.log(
+    "Fuente: DANE - Índice de Pobreza Multidimensional 2025."
+  );
 }
 
 module.exports = inicializarDatabase;
