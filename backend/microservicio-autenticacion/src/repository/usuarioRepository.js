@@ -1,110 +1,224 @@
-/**
- * Capa Repository (prototipo con datos de prueba en memoria).
- *
- * IMPORTANTE: en la arquitectura definitiva, esta es la única capa con
- * acceso directo a PostgreSQL. Por ahora simula esa persistencia en
- * memoria del proceso, para poder entregar el microservicio funcional
- * mientras no hay base de datos montada.
- */
-
+const pool = require("../config/database");
 const { hashearContrasena } = require("../util/passwordUtil");
 
-let siguienteId = 4;
+/**
+ * Repository de usuarios.
+ *
+ * Esta capa es la encargada del acceso directo a PostgreSQL.
+ * Los servicios no acceden directamente a la base de datos.
+ */
 
-const usuarios = [
-  {
-    id: 1,
-    nombre: "Ana Administradora",
-    correo: "admin@datavida.co",
-    contrasenaHash: hashearContrasena("Admin123!"),
-    rol: "Administrador",
-    estado: "activo",
-    fechaCreacion: "2026-08-01",
-  },
-  {
-    id: 2,
-    nombre: "Andrés Analista",
-    correo: "analista@datavida.co",
-    contrasenaHash: hashearContrasena("Analista123!"),
-    rol: "Analista",
-    estado: "activo",
-    fechaCreacion: "2026-08-01",
-  },
-  {
-    id: 3,
-    nombre: "Úrsula Usuaria",
-    correo: "usuario@datavida.co",
-    contrasenaHash: hashearContrasena("Usuario123!"),
-    rol: "Usuario",
-    estado: "activo",
-    fechaCreacion: "2026-08-01",
-  },
-];
+function mapearUsuario(fila) {
+  if (!fila) return null;
 
-/** Log de auditoría en memoria (RNF-06 Trazabilidad y auditoría). */
-const auditoria = [];
-
-function registrarAuditoria({ accion, usuarioObjetivoId, ejecutadoPor }) {
-  auditoria.push({
-    id: auditoria.length + 1,
-    accion,
-    usuarioObjetivoId,
-    ejecutadoPor,
-    fecha: new Date().toISOString(),
-  });
+  return {
+    id: fila.id,
+    nombre: fila.nombre,
+    correo: fila.correo,
+    contrasenaHash: fila.contrasena_hash,
+    rol: fila.rol,
+    estado: fila.estado,
+    fechaCreacion: fila.fecha_creacion,
+  };
 }
 
-function buscarPorCorreo(correo) {
-  return usuarios.find((u) => u.correo.toLowerCase() === correo.toLowerCase());
-}
-
-function buscarPorId(id) {
-  return usuarios.find((u) => u.id === Number(id));
-}
-
-function listar({ busqueda } = {}) {
-  if (!busqueda) return usuarios;
-  const texto = busqueda.toLowerCase();
-  return usuarios.filter(
-    (u) =>
-      u.nombre.toLowerCase().includes(texto) ||
-      u.correo.toLowerCase().includes(texto)
+async function registrarAuditoria({
+  accion,
+  usuarioObjetivoId,
+  ejecutadoPor,
+}) {
+  await pool.query(
+    `
+      INSERT INTO auditoria
+        (accion, usuario_objetivo_id, ejecutado_por)
+      VALUES ($1, $2, $3)
+    `,
+    [accion, usuarioObjetivoId || null, ejecutadoPor || null]
   );
 }
 
-function crear({ nombre, correo, contrasena, rol }) {
-  const nuevo = {
-    id: siguienteId++,
-    nombre,
-    correo,
-    contrasenaHash: hashearContrasena(contrasena),
-    rol,
-    estado: "activo",
-    fechaCreacion: new Date().toISOString().slice(0, 10),
-  };
-  usuarios.push(nuevo);
-  return nuevo;
+async function buscarPorCorreo(correo) {
+  const resultado = await pool.query(
+    `
+      SELECT
+        id,
+        nombre,
+        correo,
+        contrasena_hash,
+        rol,
+        estado,
+        fecha_creacion
+      FROM usuarios
+      WHERE LOWER(correo) = LOWER($1)
+      LIMIT 1
+    `,
+    [correo]
+  );
+
+  return mapearUsuario(resultado.rows[0]);
 }
 
-function actualizar(id, cambios) {
-  const usuario = buscarPorId(id);
-  if (!usuario) return null;
-  if (cambios.nombre !== undefined) usuario.nombre = cambios.nombre;
-  if (cambios.correo !== undefined) usuario.correo = cambios.correo;
-  if (cambios.rol !== undefined) usuario.rol = cambios.rol;
-  if (cambios.contrasena) usuario.contrasenaHash = hashearContrasena(cambios.contrasena);
-  return usuario;
+async function buscarPorId(id) {
+  const resultado = await pool.query(
+    `
+      SELECT
+        id,
+        nombre,
+        correo,
+        contrasena_hash,
+        rol,
+        estado,
+        fecha_creacion
+      FROM usuarios
+      WHERE id = $1
+      LIMIT 1
+    `,
+    [id]
+  );
+
+  return mapearUsuario(resultado.rows[0]);
 }
 
-function cambiarEstado(id, estado) {
-  const usuario = buscarPorId(id);
-  if (!usuario) return null;
-  usuario.estado = estado;
-  return usuario;
+async function listar({ busqueda } = {}) {
+  let resultado;
+
+  if (busqueda) {
+    resultado = await pool.query(
+      `
+        SELECT
+          id,
+          nombre,
+          correo,
+          contrasena_hash,
+          rol,
+          estado,
+          fecha_creacion
+        FROM usuarios
+        WHERE nombre ILIKE $1
+           OR correo ILIKE $1
+        ORDER BY id
+      `,
+      [`%${busqueda}%`]
+    );
+  } else {
+    resultado = await pool.query(
+      `
+        SELECT
+          id,
+          nombre,
+          correo,
+          contrasena_hash,
+          rol,
+          estado,
+          fecha_creacion
+        FROM usuarios
+        ORDER BY id
+      `
+    );
+  }
+
+  return resultado.rows.map(mapearUsuario);
 }
 
-function contarAdministradoresActivos() {
-  return usuarios.filter((u) => u.rol === "Administrador" && u.estado === "activo").length;
+async function crear({ nombre, correo, contrasena, rol }) {
+  const contrasenaHash = hashearContrasena(contrasena);
+
+  const resultado = await pool.query(
+    `
+      INSERT INTO usuarios
+        (nombre, correo, contrasena_hash, rol, estado)
+      VALUES ($1, $2, $3, $4, 'activo')
+      RETURNING
+        id,
+        nombre,
+        correo,
+        contrasena_hash,
+        rol,
+        estado,
+        fecha_creacion
+    `,
+    [nombre, correo, contrasenaHash, rol]
+  );
+
+  return mapearUsuario(resultado.rows[0]);
+}
+
+async function actualizar(id, cambios) {
+  const usuario = await buscarPorId(id);
+
+  if (!usuario) {
+    return null;
+  }
+
+  const nombre =
+    cambios.nombre !== undefined ? cambios.nombre : usuario.nombre;
+
+  const correo =
+    cambios.correo !== undefined ? cambios.correo : usuario.correo;
+
+  const rol =
+    cambios.rol !== undefined ? cambios.rol : usuario.rol;
+
+  const contrasenaHash = cambios.contrasena
+    ? hashearContrasena(cambios.contrasena)
+    : usuario.contrasenaHash;
+
+  const resultado = await pool.query(
+    `
+      UPDATE usuarios
+      SET
+        nombre = $1,
+        correo = $2,
+        rol = $3,
+        contrasena_hash = $4
+      WHERE id = $5
+      RETURNING
+        id,
+        nombre,
+        correo,
+        contrasena_hash,
+        rol,
+        estado,
+        fecha_creacion
+    `,
+    [nombre, correo, rol, contrasenaHash, id]
+  );
+
+  return mapearUsuario(resultado.rows[0]);
+}
+
+async function cambiarEstado(id, estado) {
+  const resultado = await pool.query(
+    `
+      UPDATE usuarios
+      SET estado = $1
+      WHERE id = $2
+      RETURNING
+        id,
+        nombre,
+        correo,
+        contrasena_hash,
+        rol,
+        estado,
+        fecha_creacion
+    `,
+    [estado, id]
+  );
+
+  return mapearUsuario(resultado.rows[0]);
+}
+
+async function contarAdministradoresActivos() {
+  const resultado = await pool.query(
+    `
+      SELECT COUNT(*)::INTEGER AS total
+      FROM usuarios
+      WHERE rol = 'Administrador'
+        AND estado = 'activo'
+    `
+  );
+
+  return resultado.rows[0].total;
 }
 
 module.exports = {
@@ -116,5 +230,4 @@ module.exports = {
   cambiarEstado,
   contarAdministradoresActivos,
   registrarAuditoria,
-  auditoria,
 };
