@@ -3,13 +3,17 @@ const pool = require("../config/database");
 /**
  * Repository de Indicadores.
  *
- * Esta es la capa encargada de acceder directamente a PostgreSQL.
- * Los datos ya no se almacenan en memoria.
+ * Acceso a los indicadores territoriales almacenados
+ * en PostgreSQL.
  */
 
 /**
- * Consulta valores de indicadores aplicando filtros opcionales
- * de municipio, indicador y periodo.
+ * Consulta los valores de indicadores aplicando filtros
+ * opcionales de territorio, indicador y periodo.
+ *
+ * Se conserva municipioCodigo como parámetro por compatibilidad
+ * con el frontend actual. Internamente representa el código
+ * territorial.
  */
 async function consultarValores({
   municipioCodigo,
@@ -21,17 +25,23 @@ async function consultarValores({
 
   if (municipioCodigo) {
     parametros.push(municipioCodigo);
-    condiciones.push(`v.municipio_codigo = $${parametros.length}`);
+    condiciones.push(
+      `v.territorio_codigo = $${parametros.length}`
+    );
   }
 
   if (indicadorId) {
     parametros.push(Number(indicadorId));
-    condiciones.push(`v.indicador_id = $${parametros.length}`);
+    condiciones.push(
+      `v.indicador_id = $${parametros.length}`
+    );
   }
 
   if (periodo) {
     parametros.push(periodo);
-    condiciones.push(`v.periodo = $${parametros.length}`);
+    condiciones.push(
+      `v.periodo = $${parametros.length}`
+    );
   }
 
   const where =
@@ -42,12 +52,12 @@ async function consultarValores({
   const { rows } = await pool.query(
     `
       SELECT
-        m.codigo AS "municipioCodigo",
-        m.nombre AS "municipioNombre",
-        m.subregion,
-        m.departamento,
+        t.codigo AS "territorioCodigo",
+        t.nombre AS "territorioNombre",
+        t.tipo AS "territorioTipo",
 
         i.id AS "indicadorId",
+        i.codigo AS "indicadorCodigo",
         i.nombre AS "indicadorNombre",
         i.unidad,
         i.dimension,
@@ -59,8 +69,8 @@ async function consultarValores({
 
       FROM valores_indicador v
 
-      INNER JOIN municipios m
-        ON m.codigo = v.municipio_codigo
+      INNER JOIN territorios t
+        ON t.codigo = v.territorio_codigo
 
       INNER JOIN indicadores i
         ON i.id = v.indicador_id
@@ -68,7 +78,7 @@ async function consultarValores({
       ${where}
 
       ORDER BY
-        m.nombre,
+        t.nombre,
         i.nombre,
         v.periodo
     `,
@@ -76,15 +86,15 @@ async function consultarValores({
   );
 
   return rows.map((fila) => ({
-    municipio: {
-      codigo: fila.municipioCodigo,
-      nombre: fila.municipioNombre,
-      subregion: fila.subregion,
-      departamento: fila.departamento,
+    territorio: {
+      codigo: fila.territorioCodigo,
+      nombre: fila.territorioNombre,
+      tipo: fila.territorioTipo,
     },
 
     indicador: {
       id: fila.indicadorId,
+      codigo: fila.indicadorCodigo,
       nombre: fila.indicadorNombre,
       unidad: fila.unidad,
       dimension: fila.dimension,
@@ -98,16 +108,18 @@ async function consultarValores({
 }
 
 /**
- * Lista los municipios almacenados en PostgreSQL.
+ * Lista los territorios disponibles.
+ *
+ * Se mantiene el nombre listarMunicipios para no romper
+ * las capas Service y Routes existentes.
  */
 async function listarMunicipios() {
   const { rows } = await pool.query(`
     SELECT
       codigo,
       nombre,
-      subregion,
-      departamento
-    FROM municipios
+      tipo
+    FROM territorios
     ORDER BY nombre
   `);
 
@@ -115,12 +127,14 @@ async function listarMunicipios() {
 }
 
 /**
- * Lista el catálogo de indicadores.
+ * Lista el catálogo de indicadores almacenados
+ * en PostgreSQL.
  */
 async function listarIndicadores() {
   const { rows } = await pool.query(`
     SELECT
       id,
+      codigo,
       nombre,
       unidad,
       dimension,
@@ -133,8 +147,7 @@ async function listarIndicadores() {
 }
 
 /**
- * Lista los periodos que realmente existen
- * en la base de datos.
+ * Lista los periodos disponibles en la base de datos.
  */
 async function listarPeriodos() {
   const { rows } = await pool.query(`
