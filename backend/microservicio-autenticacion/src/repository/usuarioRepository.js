@@ -15,7 +15,7 @@ const usuarios = [
   {
     id: 1,
     nombre: "Ana Administradora",
-    correo: "admin@datavida.gov.co",
+    correo: "admin@datavida.co",
     contrasenaHash: hashearContrasena("Admin123!"),
     rol: "Administrador",
     estado: "activo",
@@ -24,7 +24,7 @@ const usuarios = [
   {
     id: 2,
     nombre: "Andrés Analista",
-    correo: "analista@datavida.gov.co",
+    correo: "analista@datavida.co",
     contrasenaHash: hashearContrasena("Analista123!"),
     rol: "Analista",
     estado: "activo",
@@ -33,7 +33,7 @@ const usuarios = [
   {
     id: 3,
     nombre: "Úrsula Usuaria",
-    correo: "usuario@datavida.gov.co",
+    correo: "usuario@datavida.co",
     contrasenaHash: hashearContrasena("Usuario123!"),
     rol: "Usuario",
     estado: "activo",
