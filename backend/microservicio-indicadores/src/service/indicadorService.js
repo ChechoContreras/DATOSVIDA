@@ -5,8 +5,8 @@ const repository = require("../repository/indicadorRepository");
  * Aplica las reglas de negocio antes/después de consultar el Repository.
  */
 
-function obtenerIndicadores(filtros) {
-  const resultados = repository.consultarValores(filtros);
+async function obtenerIndicadores(filtros) {
+  const resultados = await repository.consultarValores(filtros);
 
   // Flujo Alternativo #1 de RF-09: si no hay datos, se informa explícitamente
   if (resultados.length === 0) {
@@ -24,16 +24,16 @@ function obtenerIndicadores(filtros) {
   };
 }
 
-function obtenerMunicipios() {
-  return repository.listarMunicipios();
+async function obtenerMunicipios() {
+  return await repository.listarMunicipios();
 }
 
-function obtenerCatalogoIndicadores() {
-  return repository.listarIndicadores();
+async function obtenerCatalogoIndicadores() {
+  return await repository.listarIndicadores();
 }
 
-function obtenerPeriodos() {
-  return repository.listarPeriodos();
+async function obtenerPeriodos() {
+  return await repository.listarPeriodos();
 }
 
 module.exports = {
