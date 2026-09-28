@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const indicadorRoutes = require("./routes/indicadorRoutes");
+const pool = require("./config/database");
 
 const app = express();
 const PORT = process.env.PORT || 4001;
@@ -14,6 +15,22 @@ app.get("/health", (req, res) => {
 
 app.use("/api", indicadorRoutes);
 
-app.listen(PORT, () => {
-  console.log(`Microservicio de Indicadores escuchando en el puerto ${PORT}`);
-});
+async function iniciarServidor() {
+  try {
+    // Verifica que PostgreSQL esté disponible antes de iniciar el servicio.
+    await pool.query("SELECT NOW()");
+
+    console.log("Base de datos PostgreSQL conectada correctamente.");
+
+    app.listen(PORT, () => {
+      console.log(
+        `Microservicio de Indicadores escuchando en el puerto ${PORT}`
+      );
+    });
+  } catch (error) {
+    console.error("Error al conectar con PostgreSQL:", error.message);
+    process.exit(1);
+  }
+}
+
+iniciarServidor();
