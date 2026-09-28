@@ -5,7 +5,7 @@ const pool = require("./database");
  * territoriales de DataVida en PostgreSQL.
  *
  * Es seguro ejecutarlo varias veces porque utiliza
- * CREATE TABLE IF NOT EXISTS.
+ * CREATE TABLE IF NOT EXISTS y ON CONFLICT.
  */
 async function inicializarDatabase() {
   // 1. Municipios
@@ -39,17 +39,58 @@ async function inicializarDatabase() {
       valor NUMERIC(15,4) NOT NULL,
       fuente VARCHAR(150) NOT NULL,
       fecha_actualizacion DATE,
+
       CONSTRAINT fk_municipio
         FOREIGN KEY (municipio_codigo)
         REFERENCES municipios(codigo),
+
       CONSTRAINT fk_indicador
         FOREIGN KEY (indicador_id)
         REFERENCES indicadores(id),
+
       CONSTRAINT valor_unico
         UNIQUE (municipio_codigo, indicador_id, periodo)
     );
   `);
 
+  // 4. Datos iniciales de municipios
+  // ON CONFLICT evita duplicarlos cada vez que Render reinicie.
+  await pool.query(`
+    INSERT INTO municipios (
+      codigo,
+      nombre,
+      subregion,
+      departamento
+    )
+    VALUES
+      (
+        '05045',
+        'Anorí',
+        'Bajo Cauca y Nordeste Antioqueño',
+        'Antioquia'
+      ),
+      (
+        '13430',
+        'Montes de María',
+        'Montes de María',
+        'Bolívar'
+      ),
+      (
+        '50006',
+        'Vistahermosa',
+        'Macarena-Guaviare',
+        'Meta'
+      ),
+      (
+        '54405',
+        'Sardinata',
+        'Catatumbo',
+        'Norte de Santander'
+      )
+    ON CONFLICT (codigo) DO NOTHING;
+  `);
+
+  console.log("Municipios iniciales cargados correctamente.");
   console.log("Tablas de indicadores verificadas correctamente.");
 }
 
