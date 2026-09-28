@@ -7,12 +7,15 @@ const { generarToken, invalidarToken } = require("../util/tokenUtil");
  * Flujo básico + Alternativo #1 (credenciales inválidas) +
  * Alternativo #2 (cuenta inactiva/bloqueada).
  */
-function iniciarSesion({ correo, contrasena }) {
-  const usuario = repository.buscarPorCorreo(correo || "");
+async function iniciarSesion({ correo, contrasena }) {
+  const usuario = await repository.buscarPorCorreo(correo || "");
 
   // Mismo mensaje tanto si el correo no existe como si la contraseña
   // es incorrecta, para no revelar cuáles correos están registrados.
-  if (!usuario || !verificarContrasena(contrasena || "", usuario.contrasenaHash)) {
+  if (
+    !usuario ||
+    !verificarContrasena(contrasena || "", usuario.contrasenaHash)
+  ) {
     const error = new Error("Correo o contraseña incorrectos.");
     error.codigo = "CREDENCIALES_INVALIDAS";
     throw error;
@@ -37,7 +40,10 @@ function iniciarSesion({ correo, contrasena }) {
   };
 }
 
-/** RF-16 Cerrar sesión: invalida el token para que no pueda reutilizarse. */
+/**
+ * RF-16 Cerrar sesión:
+ * invalida el token para que no pueda reutilizarse.
+ */
 function cerrarSesion(token) {
   if (token) invalidarToken(token);
 }
