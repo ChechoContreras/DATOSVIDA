@@ -1,35 +1,26 @@
 const pool = require("./database");
 
 /**
- * Inicializa la base de datos del Microservicio de Indicadores.
+ * Inicializa la estructura persistente del
+ * Microservicio de Indicadores.
  *
- * Los datos iniciales corresponden a resultados PDET 2025
- * procesados a partir de los microdatos del DANE.
+ * IMPORTANTE:
+ * Esta inicialización NO elimina información existente.
  */
 async function inicializarDatabase() {
-  // 1. Eliminar la estructura anterior.
-  //
-  // En esta etapa de desarrollo recreamos estas tablas para
-  // sustituir completamente los datos de prueba anteriores.
-  await pool.query(`
-    DROP TABLE IF EXISTS valores_indicador CASCADE;
-    DROP TABLE IF EXISTS municipios CASCADE;
-    DROP TABLE IF EXISTS indicadores CASCADE;
-    DROP TABLE IF EXISTS territorios CASCADE;
-  `);
 
-  // 2. Crear tabla de territorios.
+  // 1. Crear tabla de territorios si todavía no existe.
   await pool.query(`
-    CREATE TABLE territorios (
+    CREATE TABLE IF NOT EXISTS territorios (
       codigo VARCHAR(30) PRIMARY KEY,
       nombre VARCHAR(200) NOT NULL,
       tipo VARCHAR(100) NOT NULL
     );
   `);
 
-  // 3. Crear catálogo de indicadores.
+  // 2. Crear catálogo de indicadores.
   await pool.query(`
-    CREATE TABLE indicadores (
+    CREATE TABLE IF NOT EXISTS indicadores (
       id SERIAL PRIMARY KEY,
       codigo VARCHAR(100) UNIQUE NOT NULL,
       nombre VARCHAR(250) NOT NULL,
@@ -39,9 +30,9 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 4. Crear tabla de valores de indicadores.
+  // 3. Crear tabla de valores.
   await pool.query(`
-    CREATE TABLE valores_indicador (
+    CREATE TABLE IF NOT EXISTS valores_indicador (
       id SERIAL PRIMARY KEY,
       territorio_codigo VARCHAR(30) NOT NULL,
       indicador_id INTEGER NOT NULL,
@@ -67,7 +58,7 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 5. Registrar el territorio PDET.
+  // 4. Registrar/actualizar territorio agregado PDET.
   await pool.query(`
     INSERT INTO territorios (
       codigo,
@@ -78,10 +69,15 @@ async function inicializarDatabase() {
       'PDET-CO',
       'PDET Colombia',
       'Programas de Desarrollo con Enfoque Territorial'
-    );
+    )
+
+    ON CONFLICT (codigo)
+    DO UPDATE SET
+      nombre = EXCLUDED.nombre,
+      tipo = EXCLUDED.tipo;
   `);
 
-  // 6. Crear catálogo de indicadores PDET 2025.
+  // 5. Registrar/actualizar catálogo de indicadores.
   await pool.query(`
     INSERT INTO indicadores (
       codigo,
@@ -195,10 +191,17 @@ async function inicializarDatabase() {
         '%',
         'Vivienda',
         'DANE - Índice de Pobreza Multidimensional 2025'
-      );
+      )
+
+    ON CONFLICT (codigo)
+    DO UPDATE SET
+      nombre = EXCLUDED.nombre,
+      unidad = EXCLUDED.unidad,
+      dimension = EXCLUDED.dimension,
+      fuente = EXCLUDED.fuente;
   `);
 
-  // 7. Cargar valores PDET 2025.
+  // 6. Registrar/actualizar valores agregados PDET 2025.
   await pool.query(`
     INSERT INTO valores_indicador (
       territorio_codigo,
@@ -208,6 +211,7 @@ async function inicializarDatabase() {
       fuente,
       fecha_actualizacion
     )
+
     SELECT
       'PDET-CO',
       i.id,
@@ -215,6 +219,7 @@ async function inicializarDatabase() {
       d.valor,
       'DANE - Índice de Pobreza Multidimensional 2025',
       CURRENT_DATE
+
     FROM (
       VALUES
         ('IPM', 21.3546),
@@ -235,19 +240,31 @@ async function inicializarDatabase() {
     ) AS d(codigo, valor)
 
     INNER JOIN indicadores i
-      ON i.codigo = d.codigo;
+      ON i.codigo = d.codigo
+
+    ON CONFLICT (
+      territorio_codigo,
+      indicador_id,
+      periodo
+    )
+
+    DO UPDATE SET
+      valor = EXCLUDED.valor,
+      fuente = EXCLUDED.fuente,
+      fecha_actualizacion =
+        EXCLUDED.fecha_actualizacion;
   `);
 
   console.log(
-    "Estructura PostgreSQL verificada correctamente."
+    "Estructura PostgreSQL persistente verificada correctamente."
   );
 
   console.log(
-    "Datos PDET 2025 cargados correctamente."
+    "Datos agregados PDET 2025 verificados correctamente."
   );
 
   console.log(
-    "Fuente: DANE - Índice de Pobreza Multidimensional 2025."
+    "La inicialización no elimina información existente."
   );
 }
 
