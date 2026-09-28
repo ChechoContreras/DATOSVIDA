@@ -1,26 +1,30 @@
 /**
- * Permisos por rol, según los actores definidos en el documento de
- * Especificación de Requerimientos:
+ * Permisos por rol:
  *
- * - Usuario: RF-09 Consultar indicadores, RF-10 Visualizar mapas y
- *   gráficos, RF-14 Consultar recomendaciones, RF-15 Generar y
- *   exportar reportes.
- * - Analista: todo lo del Usuario + RF-11 Comparar municipios o
- *   regiones, RF-12 Ejecutar análisis estadístico, RF-13 Generar
- *   predicciones mediante IA.
- * - Administrador: RF-02 a RF-05 Gestión de usuarios, y RF-06 a RF-08
- *   Gestión de datos (microservicio aún pendiente).
+ * - Usuario: acceso a consultas, visualización, recomendaciones y reportes.
+ * - Analista: acceso a herramientas de análisis, comparación e IA.
+ * - Administrador: acceso completo a todas las funcionalidades del sistema.
  */
+
 export const PERMISOS_POR_PANTALLA = {
   inicio: ["Administrador", "Analista", "Usuario"],
-  indicadores: ["Analista", "Usuario"],
-  visualizacion: ["Analista", "Usuario"],
-  comparar: ["Analista"],
-  estadisticas: ["Analista"],
-  predicciones: ["Analista"],
-  variables: ["Analista"],
-  recomendaciones: ["Analista", "Usuario"],
-  reportes: ["Analista", "Usuario"],
+
+  indicadores: ["Administrador", "Analista", "Usuario"],
+
+  visualizacion: ["Administrador", "Analista", "Usuario"],
+
+  comparar: ["Administrador", "Analista"],
+
+  estadisticas: ["Administrador", "Analista"],
+
+  predicciones: ["Administrador", "Analista"],
+
+  variables: ["Administrador", "Analista"],
+
+  recomendaciones: ["Administrador", "Analista", "Usuario"],
+
+  reportes: ["Administrador", "Analista", "Usuario"],
+
   usuarios: ["Administrador"],
 };
 
