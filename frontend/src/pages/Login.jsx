@@ -190,7 +190,7 @@ export default function Login() {
                     <input
                       id="usuario"
                       type="email"
-                      placeholder="correo@datavida.gov.co"
+                      placeholder="correo@datavida.co"
                       autoComplete="off"
                       value={correo}
                       onChange={(e) => setCorreo(e.target.value)}
