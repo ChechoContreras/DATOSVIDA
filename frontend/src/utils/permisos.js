@@ -14,11 +14,11 @@ export const PERMISOS_POR_PANTALLA = {
 
   visualizacion: ["Analista", "Usuario"],
 
-  comparar: ["Analista"],
+  comparar: ["Analista", "Usuario"],
 
   estadisticas: ["Analista"],
 
-  predicciones: ["Analista"],
+  predicciones: ["Analista", "Usuario"],
 
   variables: ["Analista"],
 
