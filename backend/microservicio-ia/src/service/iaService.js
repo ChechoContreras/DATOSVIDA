@@ -1,5 +1,7 @@
+
 const indicadoresClient = require("../repository/indicadoresClient");
 const repository = require("../repository/iaRepository");
+
 const {
   VERSION_MODELO,
   regresionLineal,
@@ -8,226 +10,452 @@ const {
   clasificarFuerzaCorrelacion,
   calcularConfianza,
 } = require("../model/iaModel");
-const {
-  TASA_ANUAL_REFERENCIA_DANE_PDET,
-  FUENTE_TENDENCIA,
-  ANIOS_SERIE_PROVISIONAL,
-} = require("../model/parametrosModelo");
 
-const UMBRAL_CONFIANZA_MINIMO = 60;
+/**
+ * DATAVIDA - Microservicio de Inteligencia Artificial
+ *
+ * La API pública devuelve "territorio".
+ * El microservicio utiliza internamente "municipio".
+ *
+ * Esta función normaliza ambas estructuras.
+ */
+function normalizarDato(dato) {
+  const municipio = dato?.municipio || dato?.territorio;
 
-/** Hash simple y determinístico para producir variación reproducible sin Math.random(). */
-function hashTexto(texto) {
-  let h = 0;
-  for (let i = 0; i < texto.length; i++) {
-    h = (h * 31 + texto.charCodeAt(i)) % 1000;
-  }
-  return h;
+  return {
+    ...dato,
+    municipio: municipio
+      ? {
+          ...municipio,
+          departamento: municipio.departamento || "",
+        }
+      : null,
+  };
 }
 
-const VARIABLES_POR_DIMENSION = {
-  Educación: ["Cobertura educativa histórica", "Tasa de deserción escolar", "Inversión en infraestructura educativa"],
-  Trabajo: ["Tasa de informalidad histórica", "Dinámica del mercado laboral regional", "Nivel educativo de la población"],
-  "Niñez y juventud": ["Cobertura de programas de primera infancia", "Tasa de trabajo infantil histórica"],
-  "Vivienda y servicios públicos": ["Cobertura histórica de acueducto", "Inversión pública en infraestructura básica"],
-};
-
-function generarSerieProvisional(valorActual, anioActual, semilla) {
-  const anios = [];
-  const valores = [];
-
-  for (let offset = ANIOS_SERIE_PROVISIONAL - 1; offset >= 0; offset--) {
-    const anio = anioActual - offset;
-    const tendencia = valorActual + TASA_ANUAL_REFERENCIA_DANE_PDET * (anio - anioActual);
-    const jitter = Math.sin(semilla + offset * 13) * 1.1;
-    const valor = Math.max(0, Math.min(100, tendencia + jitter));
-    anios.push(anio);
-    valores.push(Math.round(valor * 10) / 10);
-  }
-
-  valores[valores.length - 1] = valorActual;
-  return { anios, valores };
+function crearError(mensaje, codigo) {
+  const error = new Error(mensaje);
+  error.codigo = codigo;
+  return error;
 }
 
-/** RF-13 Generar predicciones mediante IA. */
-async function generarPrediccion({ municipioCodigo, indicadorId, horizonte = 1 }) {
+function validarParametros(municipioCodigo, indicadorId) {
   if (!municipioCodigo || !indicadorId) {
-    const error = new Error("Debes seleccionar un municipio y un indicador.");
-    error.codigo = "PARAMETROS_INCOMPLETOS";
-    throw error;
+    throw crearError(
+      "Debes seleccionar un municipio y un indicador.",
+      "PARAMETROS_INCOMPLETOS"
+    );
+  }
+}
+
+/**
+ * RF-13: Predicciones mediante IA.
+ *
+ * Una predicción temporal requiere observaciones
+ * históricas reales de un mismo indicador y municipio.
+ *
+ * No se generan series históricas artificiales.
+ */
+async function generarPrediccion({
+  municipioCodigo,
+  indicadorId,
+  horizonte = 1,
+}) {
+  validarParametros(municipioCodigo, indicadorId);
+
+  const horizonteNumerico = Number(horizonte);
+
+  if (
+    !Number.isInteger(horizonteNumerico) ||
+    horizonteNumerico < 1 ||
+    horizonteNumerico > 10
+  ) {
+    throw crearError(
+      "El horizonte debe ser un número entero entre 1 y 10 años.",
+      "HORIZONTE_INVALIDO"
+    );
   }
 
-  const valores = await indicadoresClient.consultarValoresIndicadores({ municipioCodigo, indicadorId });
+  const valores = (
+    await indicadoresClient.consultarValoresIndicadores({
+      municipioCodigo,
+      indicadorId,
+    })
+  ).map(normalizarDato);
 
   if (valores.length === 0) {
-    const error = new Error(
-      "No existen datos suficientes para este municipio e indicador. No se puede generar la predicción."
+    throw crearError(
+      "No existen datos para el municipio e indicador seleccionados.",
+      "DATOS_INSUFICIENTES"
     );
-    error.codigo = "DATOS_INSUFICIENTES";
-    throw error;
   }
 
-  const dato = valores[0];
-  const anioActual = Number(dato.periodo);
-  const semilla = hashTexto(`${municipioCodigo}-${indicadorId}`);
+  const seriePorAnio = new Map();
 
-  const serie = generarSerieProvisional(dato.valor, anioActual, semilla);
-  const regresion = regresionLineal(serie.anios, serie.valores);
+  for (const dato of valores) {
+    const anio = Number(dato.periodo);
+    const valor = Number(dato.valor);
 
-  const anioObjetivo = anioActual + Number(horizonte);
+    if (
+      Number.isInteger(anio) &&
+      Number.isFinite(valor)
+    ) {
+      seriePorAnio.set(anio, valor);
+    }
+  }
+
+  const serieHistorica = [...seriePorAnio.entries()]
+    .sort((a, b) => a[0] - b[0]);
+
+  /**
+   * Se requieren al menos 3 años reales diferentes
+   * para realizar una regresión temporal preliminar.
+   */
+  if (serieHistorica.length < 3) {
+    throw crearError(
+      "DATAVIDA dispone actualmente de información censal de 2018 " +
+        "para este municipio e indicador. No existen suficientes " +
+        "años históricos reales para generar una predicción temporal " +
+        "estadísticamente sustentada. Se requieren al menos " +
+        "3 periodos anuales diferentes. El dato de 2018 puede " +
+        "consultarse en el módulo de indicadores.",
+      "SERIE_HISTORICA_INSUFICIENTE"
+    );
+  }
+
+  const anios = serieHistorica.map(([anio]) => anio);
+  const datos = serieHistorica.map(([, valor]) => valor);
+
+  const regresion = regresionLineal(anios, datos);
+
+  if (
+    !regresion ||
+    !Number.isFinite(regresion.r2)
+  ) {
+    throw crearError(
+      "No fue posible calcular un modelo estadístico válido " +
+        "con los datos históricos disponibles.",
+      "MODELO_NO_VALIDO"
+    );
+  }
+
+  const anioActual = anios[anios.length - 1];
+  const valorActual = datos[datos.length - 1];
+
+  const anioObjetivo = anioActual + horizonteNumerico;
+
   let valorPredicho = predecir(regresion, anioObjetivo);
-  valorPredicho = Math.max(0, Math.min(100, valorPredicho));
 
-  const confianza = calcularConfianza({
+  if (!Number.isFinite(valorPredicho)) {
+    throw crearError(
+      "El modelo no produjo una predicción numérica válida.",
+      "PREDICCION_NO_VALIDA"
+    );
+  }
+
+  /**
+   * Los indicadores IPM expresados en porcentaje
+   * deben mantenerse dentro del intervalo 0-100.
+   */
+  const indicador = valores[0].indicador;
+
+  if (indicador.unidad === "%") {
+    valorPredicho = Math.max(
+      0,
+      Math.min(100, valorPredicho)
+    );
+  }
+
+  const confianzaCalculada = calcularConfianza({
     r2: regresion.r2,
     n: regresion.n,
-    horizonte: Number(horizonte),
-    basadoEnDatoReal: false,
+    horizonte: horizonteNumerico,
+    basadoEnDatoReal: true,
   });
 
-  const apto = confianza >= UMBRAL_CONFIANZA_MINIMO;
+  /**
+   * La función heredada calcularConfianza genera
+   * una puntuación interna del modelo.
+   * No equivale a una probabilidad estadística
+   * de acierto ni a un intervalo de confianza.
+   */
+  const puntuacionModelo = Number.isFinite(
+    Number(confianzaCalculada)
+  )
+    ? Number(confianzaCalculada)
+    : null;
 
   const resultado = {
-    municipio: dato.municipio,
-    indicador: dato.indicador,
-    horizonte: Number(horizonte),
-    valorActual: dato.valor,
-    valorPredicho: Math.round(valorPredicho * 10) / 10,
+    municipio: valores[0].municipio,
+    indicador,
+    horizonte: horizonteNumerico,
+    anioActual,
+    anioObjetivo,
+    valorActual,
+    valorPredicho:
+      Math.round(valorPredicho * 10) / 10,
     r2: Math.round(regresion.r2 * 100) / 100,
-    confianza,
-    apto,
-    basadoEnDatoReal: false,
-    fuenteTendencia: FUENTE_TENDENCIA,
-    mensajeConfiabilidad: apto
-      ? "Predicción con nivel de confianza aceptable."
-      : "Confiabilidad baja: este resultado no debe presentarse como una recomendación definitiva.",
+
+    // Compatibilidad con la interfaz existente.
+    confianza: puntuacionModelo,
+
+    // No declarar confiabilidad estadística sin validación.
+    apto: false,
+    basadoEnDatoReal: true,
+    serieHistorica: serieHistorica.map(
+      ([anio, valor]) => ({ anio, valor })
+    ),
+    mensajeConfiabilidad:
+      "Proyección exploratoria basada en observaciones " +
+      "históricas reales. El modelo no cuenta todavía " +
+      "con validación predictiva independiente. " +
+      "La puntuación mostrada no representa una " +
+      "probabilidad de acierto.",
     versionModelo: VERSION_MODELO,
-    variablesRelevantes:
-      VARIABLES_POR_DIMENSION[dato.indicador.dimension] || ["Comportamiento histórico del indicador"],
+    variablesRelevantes: [
+      "Evolución temporal real del indicador",
+    ],
   };
 
-  repository.guardarPrediccion({ municipioCodigo, indicadorId, horizonte, resultado });
+  repository.guardarPrediccion({
+    municipioCodigo,
+    indicadorId,
+    horizonte: horizonteNumerico,
+    resultado,
+  });
+
   return resultado;
 }
 
-/** RF-14 Consultar recomendaciones. (sin cambios de lógica de negocio) */
-async function obtenerRecomendaciones({ municipioCodigo, indicadorId }) {
-  const valores = await indicadoresClient.consultarValoresIndicadores({ municipioCodigo, indicadorId });
+/**
+ * RF-14: Recomendaciones basadas en los
+ * valores observados de los indicadores.
+ */
+async function obtenerRecomendaciones({
+  municipioCodigo,
+  indicadorId,
+} = {}) {
+  const valores = (
+    await indicadoresClient.consultarValoresIndicadores({
+      municipioCodigo,
+      indicadorId,
+    })
+  ).map(normalizarDato);
 
   if (valores.length === 0) {
-    const error = new Error("No existe evidencia suficiente para generar una recomendación confiable.");
-    error.codigo = "EVIDENCIA_INSUFICIENTE";
-    throw error;
+    throw crearError(
+      "No existe evidencia suficiente para generar recomendaciones.",
+      "EVIDENCIA_INSUFICIENTE"
+    );
   }
 
-  const recomendaciones = valores.map((dato) => {
-    let prioridad = "baja";
-    let descripcion = `Mantener el seguimiento del indicador "${dato.indicador.nombre}" en ${dato.municipio.nombre}.`;
+  const recomendaciones = valores
+    .filter((dato) => dato.municipio && dato.indicador)
+    .map((dato) => {
+      const valor = Number(dato.valor);
 
-    if (dato.valor >= 45) {
-      prioridad = "alta";
-      descripcion = `Priorizar intervención en "${dato.indicador.nombre}" (dimensión ${dato.indicador.dimension}) en ${dato.municipio.nombre}, dado su valor elevado.`;
-    } else if (dato.valor >= 25) {
-      prioridad = "media";
-      descripcion = `Reforzar programas relacionados con "${dato.indicador.nombre}" en ${dato.municipio.nombre}.`;
-    }
+      let prioridad = "baja";
 
-    const recomendacion = {
-      municipio: dato.municipio,
-      indicador: dato.indicador,
-      prioridad,
-      descripcion,
-      justificacion: `Basado en un valor registrado de ${dato.valor}${dato.indicador.unidad} (${dato.periodo}, fuente ${dato.fuente}).`,
-      fechaGeneracion: new Date().toISOString(),
-    };
+      let descripcion =
+        `Mantener el seguimiento del indicador ` +
+        `"${dato.indicador.nombre}" en ` +
+        `${dato.municipio.nombre}.`;
 
-    repository.guardarRecomendacion({ municipioCodigo: dato.municipio.codigo, indicadorId: dato.indicador.id, recomendacion });
-    return recomendacion;
-  });
+      if (valor >= 45) {
+        prioridad = "alta";
+        descripcion =
+          `Priorizar el análisis del indicador ` +
+          `"${dato.indicador.nombre}" en ` +
+          `${dato.municipio.nombre}, dado su valor elevado.`;
+      } else if (valor >= 25) {
+        prioridad = "media";
+        descripcion =
+          `Reforzar el seguimiento del indicador ` +
+          `"${dato.indicador.nombre}" en ` +
+          `${dato.municipio.nombre}.`;
+      }
+
+      const recomendacion = {
+        municipio: dato.municipio,
+        indicador: dato.indicador,
+        prioridad,
+        descripcion,
+        justificacion:
+          `Basado en un valor registrado de ` +
+          `${dato.valor}${dato.indicador.unidad || ""} ` +
+          `(${dato.periodo}, fuente: ${dato.fuente}).`,
+        fechaGeneracion: new Date().toISOString(),
+      };
+
+      repository.guardarRecomendacion({
+        municipioCodigo: dato.municipio.codigo,
+        indicadorId: dato.indicador.id,
+        recomendacion,
+      });
+
+      return recomendacion;
+    });
 
   return recomendaciones;
 }
 
+/**
+ * Genera combinaciones únicas de indicadores.
+ */
 function combinacionesUnicas(ids) {
   const pares = [];
+
   for (let i = 0; i < ids.length; i++) {
     for (let j = i + 1; j < ids.length; j++) {
       pares.push([ids[i], ids[j]]);
     }
   }
+
   return pares;
 }
 
-/** RF-13 apoyo: correlaciones e impacto de variables priorizadas. */
-async function calcularCorrelaciones({ indicadorIdA, indicadorIdB } = {}) {
-  const todos = await indicadoresClient.consultarTodosLosValores();
+/**
+ * RF-13: Correlaciones de Pearson entre
+ * indicadores de distintos municipios.
+ */
+async function calcularCorrelaciones({
+  indicadorIdA,
+  indicadorIdB,
+} = {}) {
+  const todos = (
+    await indicadoresClient.consultarTodosLosValores()
+  ).map(normalizarDato);
 
   if (todos.length === 0) {
-    const error = new Error("No hay datos de indicadores registrados todavía.");
-    error.codigo = "DATOS_INSUFICIENTES";
-    throw error;
+    throw crearError(
+      "No hay datos de indicadores registrados.",
+      "DATOS_INSUFICIENTES"
+    );
   }
 
   const porMunicipio = {};
-  todos.forEach((v) => {
-    const cod = v.municipio.codigo;
-    porMunicipio[cod] = porMunicipio[cod] || {};
-    porMunicipio[cod][v.indicador.id] = v.valor;
+  const catalogo = {};
+
+  todos.forEach((dato) => {
+    if (!dato.municipio || !dato.indicador) {
+      return;
+    }
+
+    const codigo = dato.municipio.codigo;
+    const idIndicador = Number(dato.indicador.id);
+    const valor = Number(dato.valor);
+
+    if (!Number.isFinite(valor)) {
+      return;
+    }
+
+    if (!porMunicipio[codigo]) {
+      porMunicipio[codigo] = {};
+    }
+
+    porMunicipio[codigo][idIndicador] = valor;
+    catalogo[idIndicador] = dato.indicador;
   });
 
-  const catalogo = {};
-  todos.forEach((v) => {
-    catalogo[v.indicador.id] = v.indicador;
-  });
   const idsCatalogo = Object.keys(catalogo).map(Number);
 
   const pares =
     indicadorIdA && indicadorIdB
-      ? [[Number(indicadorIdA), Number(indicadorIdB)]]
+      ? [
+          [
+            Number(indicadorIdA),
+            Number(indicadorIdB),
+          ],
+        ]
       : combinacionesUnicas(idsCatalogo);
 
   const correlaciones = pares.map(([a, b]) => {
     const xs = [];
     const ys = [];
-    Object.values(porMunicipio).forEach((m) => {
-      if (m[a] !== undefined && m[b] !== undefined) {
-        xs.push(m[a]);
-        ys.push(m[b]);
+
+    Object.values(porMunicipio).forEach((municipio) => {
+      if (
+        municipio[a] !== undefined &&
+        municipio[b] !== undefined
+      ) {
+        xs.push(municipio[a]);
+        ys.push(municipio[b]);
       }
     });
 
     const r = correlacionPearson(xs, ys);
+
     return {
-      indicadorA: catalogo[a],
-      indicadorB: catalogo[b],
+      indicadorA: catalogo[a] || null,
+      indicadorB: catalogo[b] || null,
       n: xs.length,
-      r: r === null ? null : Math.round(r * 100) / 100,
+      r:
+        r === null || !Number.isFinite(r)
+          ? null
+          : Math.round(r * 100) / 100,
       fuerza: clasificarFuerzaCorrelacion(r),
       advertencia:
         xs.length < 5
-          ? `Muestra pequeña (n=${xs.length} municipios con ambos indicadores). Resultado preliminar; se recalculará automáticamente con más datos en la base de datos.`
-          : null,
+          ? `Muestra pequeña (n=${xs.length}). ` +
+            "El resultado debe interpretarse con precaución."
+          : "La correlación representa asociación estadística, " +
+            "no demuestra causalidad.",
     };
   });
 
   const variablesPriorizadas = idsCatalogo
     .map((id) => {
       const rs = correlaciones
-        .filter((c) => c.indicadorA.id === id || c.indicadorB.id === id)
-        .map((c) => c.r)
-        .filter((r) => r !== null);
-      const impactoPromedio = rs.length ? Math.round((rs.reduce((a, b) => a + Math.abs(b), 0) / rs.length) * 100) / 100 : null;
-      return { indicador: catalogo[id], impactoPromedio };
-    })
-    .sort((a, b) => (b.impactoPromedio ?? -1) - (a.impactoPromedio ?? -1));
+        .filter(
+          (correlacion) =>
+            correlacion.indicadorA?.id === id ||
+            correlacion.indicadorB?.id === id
+        )
+        .map((correlacion) => correlacion.r)
+        .filter(
+          (r) => r !== null && Number.isFinite(r)
+        );
 
-  return { correlaciones, variablesPriorizadas };
+      const asociacionPromedio = rs.length
+        ? Math.round(
+            (rs.reduce(
+              (suma, r) => suma + Math.abs(r),
+              0
+            ) /
+              rs.length) *
+              100
+          ) / 100
+        : null;
+
+      return {
+        indicador: catalogo[id],
+
+        // Nombre conservado por compatibilidad.
+        impactoPromedio: asociacionPromedio,
+      };
+    })
+    .sort(
+      (a, b) =>
+        (b.impactoPromedio ?? -1) -
+        (a.impactoPromedio ?? -1)
+    );
+
+  return {
+    correlaciones,
+    variablesPriorizadas,
+  };
 }
 
+/**
+ * Historial de predicciones.
+ */
 function obtenerHistorialPredicciones() {
   return repository.listarPredicciones();
 }
 
+/**
+ * Historial de recomendaciones.
+ */
 function obtenerHistorialRecomendaciones() {
   return repository.listarRecomendaciones();
 }
