@@ -1,29 +1,30 @@
 /**
  * Permisos por rol:
  *
+ * - Administrador: solo administra la plataforma (Inicio y Gestión de
+ *   usuarios). No entra a las pantallas de consulta/análisis de datos.
  * - Usuario: acceso a consultas, visualización, recomendaciones y reportes.
  * - Analista: acceso a herramientas de análisis, comparación e IA.
- * - Administrador: acceso completo a todas las funcionalidades del sistema.
  */
 
 export const PERMISOS_POR_PANTALLA = {
   inicio: ["Administrador", "Analista", "Usuario"],
 
-  indicadores: ["Administrador", "Analista", "Usuario"],
+  indicadores: ["Analista", "Usuario"],
 
-  visualizacion: ["Administrador", "Analista", "Usuario"],
+  visualizacion: ["Analista", "Usuario"],
 
-  comparar: ["Administrador", "Analista"],
+  comparar: ["Analista"],
 
-  estadisticas: ["Administrador", "Analista"],
+  estadisticas: ["Analista"],
 
-  predicciones: ["Administrador", "Analista"],
+  predicciones: ["Analista"],
 
-  variables: ["Administrador", "Analista"],
+  variables: ["Analista"],
 
-  recomendaciones: ["Administrador", "Analista", "Usuario"],
+  recomendaciones: ["Analista", "Usuario"],
 
-  reportes: ["Administrador", "Analista", "Usuario"],
+  reportes: ["Analista", "Usuario"],
 
   usuarios: ["Administrador"],
 };
