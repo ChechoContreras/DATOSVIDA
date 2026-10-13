@@ -1,19 +1,23 @@
 
+const fs = require("fs");
 const path = require("path");
 const XLSX = require("xlsx");
 const pool = require("../config/database");
 
 /**
  * DATAVIDA
- * Importación de IPM municipal censal 2018.
+ * Importador de IPM municipal censal 2018.
  *
  * Fuente: DANE - CNPV 2018.
  *
- * Solo importa municipios existentes en
- * la tabla municipios con es_pdet = true.
+ * MODO PRUEBA:
+ * npm run importar:ipm2018
  *
- * No elimina información existente.
- * No modifica registros de otros periodos.
+ * MODO IMPORTACIÓN:
+ * npm run importar:ipm2018 -- --confirmar
+ *
+ * Solo procesa los municipios PDET existentes.
+ * No modifica datos de otros periodos.
  */
 
 const ARCHIVO = path.join(
@@ -28,35 +32,33 @@ const FUENTE =
 
 const PERIODO = "2018";
 
-// Columnas del anexo DANE:
-// Hoja 2: ID, Municipio, IPM...
-// Hoja 6: ID, Municipio y privaciones.
+const CONFIRMAR = process.argv.includes("--confirmar");
 
-const COLUMNAS_PRIVACIONES = {
+const COLUMNAS = {
+  IPM: "IPM Municipal",
   ANALFABETISMO: "Analfabetismo",
   LOGRO_EDUCATIVO: "Bajo logro educativo",
   BARRERAS_SALUD:
     "Barreras de acceso a servicios de salud",
   HACINAMIENTO: "Hacinamiento crítico",
-  EXCRETAS:
-    "Inadecuada eliminación de excretas",
+  EXCRETAS: "Inadecuada eliminación de excretas",
   INASISTENCIA: "Inasistencia escolar",
   PAREDES_INADECUADAS:
     "Material inadecuado de paredes exteriores",
-  PISOS_INADECUADOS:
-    "Material inadecuado de pisos",
+  PISOS_INADECUADOS: "Material inadecuado de pisos",
   REZAGO_ESCOLAR: "Rezago escolar",
   SIN_ACUEDUCTO:
     "Sin acceso a fuente de agua mejorada",
-  SIN_ASEGURAMIENTO:
-    "Sin aseguramiento en salud",
+  SIN_ASEGURAMIENTO: "Sin aseguramiento en salud",
   TRABAJO_INFANTIL: "Trabajo infantil",
   EMPLEO_INFORMAL: "Trabajo informal",
 };
 
-// Desempleo de larga duración no aparece
-// como variable equivalente en este anexo.
-// Por ello no se importa.
+// El anexo también incluye otras variables,
+// pero no se importan sin un indicador equivalente.
+//
+// DESEMPLEO_LARGA_DURACION no tiene una columna
+// equivalente en este archivo.
 
 function normalizarCodigo(valor) {
   if (valor === null || valor === undefined) {
@@ -73,7 +75,7 @@ function normalizarCodigo(valor) {
 }
 
 function normalizarTexto(valor) {
-  return String(valor || "")
+  return String(valor ?? "")
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/\s+/g, " ")
@@ -85,7 +87,7 @@ function obtenerValor(valor) {
   if (
     valor === null ||
     valor === undefined ||
-    valor === ""
+    String(valor).trim() === ""
   ) {
     return null;
   }
@@ -93,7 +95,11 @@ function obtenerValor(valor) {
   const numero =
     typeof valor === "number"
       ? valor
-      : Number(String(valor).replace(",", "."));
+      : Number(
+          String(valor)
+            .trim()
+            .replace(",", ".")
+        );
 
   if (
     !Number.isFinite(numero) ||
@@ -106,233 +112,384 @@ function obtenerValor(valor) {
   return numero;
 }
 
-function leerHoja(libro, nombre, encabezado) {
+function leerHoja(libro, nombre, filaEncabezado) {
   const hoja = libro.Sheets[nombre];
 
   if (!hoja) {
     throw new Error(
-      `No se encontró la hoja: ${nombre}`
+      `No existe la hoja "${nombre}".`
     );
   }
 
   const filas = XLSX.utils.sheet_to_json(hoja, {
-    range: encabezado - 1,
-    defval: null,
+    range: filaEncabezado - 1,
     raw: true,
+    defval: null,
   });
 
-  if (!filas.length) {
+  if (filas.length === 0) {
     throw new Error(
-      `La hoja ${nombre} no contiene registros.`
+      `La hoja "${nombre}" está vacía.`
     );
   }
 
   return filas;
 }
 
+function validarColumnas(filas, columnas, hoja) {
+  const disponibles = new Set(
+    Object.keys(filas[0]).map(normalizarTexto)
+  );
+
+  for (const columna of columnas) {
+    if (!disponibles.has(normalizarTexto(columna))) {
+      throw new Error(
+        `Falta la columna "${columna}" ` +
+        `en la hoja "${hoja}".`
+      );
+    }
+  }
+}
+
+function obtenerCampo(fila, nombre) {
+  const buscado = normalizarTexto(nombre);
+
+  const entrada = Object.entries(fila).find(
+    ([clave]) => normalizarTexto(clave) === buscado
+  );
+
+  return entrada ? entrada[1] : null;
+}
+
+function construirDatos(libro) {
+  const nombreIpm = "2_IPM Mpio y Dpt";
+  const nombrePrivaciones =
+    "6_Privaciones IPM Dpt-Mpio";
+
+  const filasIpm = leerHoja(
+    libro,
+    nombreIpm,
+    1
+  );
+
+  const filasPrivaciones = leerHoja(
+    libro,
+    nombrePrivaciones,
+    2
+  );
+
+  validarColumnas(
+    filasIpm,
+    ["ID", "Municipio", "IPM Municipal"],
+    nombreIpm
+  );
+
+  validarColumnas(
+    filasPrivaciones,
+    [
+      "ID",
+      "Municipio",
+      ...Object.values(COLUMNAS).filter(
+        (nombre) => nombre !== "IPM Municipal"
+      ),
+    ],
+    nombrePrivaciones
+  );
+
+  console.log(
+    `Filas IPM leídas: ${filasIpm.length}`
+  );
+
+  console.log(
+    `Filas de privaciones: ${filasPrivaciones.length}`
+  );
+
+  const datos = new Map();
+
+  // =====================================
+  // LEER IPM MUNICIPAL
+  // =====================================
+
+  for (const fila of filasIpm) {
+    const codigo = normalizarCodigo(
+      obtenerCampo(fila, "ID")
+    );
+
+    const valor = obtenerValor(
+      obtenerCampo(fila, "IPM Municipal")
+    );
+
+    if (!codigo || valor === null) {
+      continue;
+    }
+
+    if (datos.has(codigo)) {
+      throw new Error(
+        `Código municipal duplicado: ${codigo}`
+      );
+    }
+
+    datos.set(codigo, {
+      codigo,
+      nombre: obtenerCampo(fila, "Municipio"),
+      indicadores: {
+        IPM: valor,
+      },
+    });
+  }
+
+  // =====================================
+  // LEER PRIVACIONES MUNICIPALES
+  // =====================================
+
+  const codigosPrivaciones =
+    Object.keys(COLUMNAS).filter(
+      (codigo) => codigo !== "IPM"
+    );
+
+  const municipiosConPrivaciones = new Set();
+
+  for (const fila of filasPrivaciones) {
+    const codigo = normalizarCodigo(
+      obtenerCampo(fila, "ID")
+    );
+
+    if (!datos.has(codigo)) {
+      continue;
+    }
+
+    if (municipiosConPrivaciones.has(codigo)) {
+      throw new Error(
+        `Privaciones duplicadas para ${codigo}`
+      );
+    }
+
+    municipiosConPrivaciones.add(codigo);
+
+    const registro = datos.get(codigo);
+
+    for (const codigoIndicador of codigosPrivaciones) {
+      const columna = COLUMNAS[codigoIndicador];
+
+      const valor = obtenerValor(
+        obtenerCampo(fila, columna)
+      );
+
+      if (valor !== null) {
+        registro.indicadores[codigoIndicador] =
+          valor;
+      }
+    }
+  }
+
+  console.log(
+    `Municipios con IPM válido: ${datos.size}`
+  );
+
+  console.log(
+    "Municipios con privaciones:",
+    municipiosConPrivaciones.size
+  );
+
+  return datos;
+}
+
 async function importar() {
-  let cliente;
+  let cliente = null;
+  let transaccion = false;
 
   try {
     console.log(
-      "DATAVIDA: Iniciando importación DANE 2018..."
+      "===================================="
+    );
+
+    console.log(
+      "DATAVIDA - IPM MUNICIPAL DANE 2018"
+    );
+
+    console.log(
+      CONFIRMAR
+        ? "MODO IMPORTACIÓN"
+        : "MODO PRUEBA - SIN ESCRITURA"
+    );
+
+    console.log(
+      "===================================="
     );
 
     // =====================================
-    // 1. LEER EXCEL
+    // 1. VALIDAR ARCHIVO
     // =====================================
+
+    if (!fs.existsSync(ARCHIVO)) {
+      throw new Error(
+        `No se encontró el Excel: ${ARCHIVO}`
+      );
+    }
 
     const libro = XLSX.readFile(ARCHIVO);
 
-    const filasIpm = leerHoja(
-      libro,
-      "2_IPM Mpio y Dpt",
-      1
-    );
-
-    const filasPrivaciones = leerHoja(
-      libro,
-      "6_Privaciones IPM Dpt-Mpio",
-      2
-    );
-
-    console.log(
-      `Filas IPM encontradas: ${filasIpm.length}`
-    );
-
-    console.log(
-      `Filas de privaciones: ${filasPrivaciones.length}`
-    );
+    const datos = construirDatos(libro);
 
     // =====================================
-    // 2. ORGANIZAR DATOS POR MUNICIPIO
-    // =====================================
-
-    const datosMunicipales = new Map();
-
-    for (const fila of filasIpm) {
-      const codigo = normalizarCodigo(fila.ID);
-      const valor = obtenerValor(fila.IPM);
-
-      if (!codigo || valor === null) {
-        continue;
-      }
-
-      datosMunicipales.set(codigo, {
-        codigo,
-        nombre: fila.Municipio,
-        indicadores: {
-          IPM: valor,
-        },
-      });
-    }
-
-    const columnasNormalizadas = Object.fromEntries(
-      Object.entries(COLUMNAS_PRIVACIONES).map(
-        ([codigo, nombre]) => [
-          codigo,
-          normalizarTexto(nombre),
-        ]
-      )
-    );
-
-    for (const fila of filasPrivaciones) {
-      const codigo = normalizarCodigo(fila.ID);
-
-      if (!datosMunicipales.has(codigo)) {
-        continue;
-      }
-
-      const registro = datosMunicipales.get(codigo);
-
-      const valoresFila = new Map(
-        Object.entries(fila).map(([nombre, valor]) => [
-          normalizarTexto(nombre),
-          valor,
-        ])
-      );
-
-      for (const [
-        codigoIndicador,
-        nombreColumna,
-      ] of Object.entries(columnasNormalizadas)) {
-        const valor = obtenerValor(
-          valoresFila.get(nombreColumna)
-        );
-
-        if (valor !== null) {
-          registro.indicadores[codigoIndicador] =
-            valor;
-        }
-      }
-    }
-
-    // =====================================
-    // 3. CONECTAR A POSTGRESQL
+    // 2. CONECTAR A POSTGRESQL
     // =====================================
 
     cliente = await pool.connect();
 
-    await cliente.query("BEGIN");
+    const resultadoMunicipios =
+      await cliente.query(`
+        SELECT codigo, nombre
+        FROM municipios
+        WHERE es_pdet = true
+        ORDER BY codigo;
+      `);
 
-    // =====================================
-    // 4. CONSULTAR MUNICIPIOS PDET
-    // =====================================
-
-    const resultadoMunicipios = await cliente.query(`
-      SELECT codigo, nombre
-      FROM municipios
-      WHERE es_pdet = true
-      ORDER BY codigo;
-    `);
-
-    const municipiosPdet = resultadoMunicipios.rows;
-
-    console.log(
-      `Municipios PDET en PostgreSQL: ${municipiosPdet.length}`
-    );
+    const municipiosPdet =
+      resultadoMunicipios.rows;
 
     if (municipiosPdet.length !== 170) {
       throw new Error(
         "Se esperaban 170 municipios PDET. " +
-        "Se cancela la importación para revisión."
+        `Encontrados: ${municipiosPdet.length}`
       );
     }
 
-    // =====================================
-    // 5. CONSULTAR CATÁLOGO INDICADORES
-    // =====================================
-
-    const resultadoIndicadores = await cliente.query(`
-      SELECT id, codigo
-      FROM indicadores;
-    `);
-
-    const indicadores = new Map(
-      resultadoIndicadores.rows.map((i) => [
-        i.codigo,
-        i.id,
-      ])
-    );
-
-    const codigosRequeridos = [
-      "IPM",
-      ...Object.keys(COLUMNAS_PRIVACIONES),
-    ];
-
-    for (const codigo of codigosRequeridos) {
-      if (!indicadores.has(codigo)) {
-        throw new Error(
-          `Falta el indicador ${codigo} en PostgreSQL.`
-        );
-      }
-    }
-
-    // =====================================
-    // 6. VERIFICAR COBERTURA
-    // =====================================
-
     const encontrados = municipiosPdet.filter(
-      (municipio) =>
-        datosMunicipales.has(municipio.codigo)
+      (municipio) => datos.has(municipio.codigo)
     );
 
     const faltantes = municipiosPdet.filter(
-      (municipio) =>
-        !datosMunicipales.has(municipio.codigo)
+      (municipio) => !datos.has(municipio.codigo)
     );
 
     console.log(
-      `Municipios PDET con IPM: ${encontrados.length}`
+      `Municipios PDET: ${municipiosPdet.length}`
     );
 
-    if (faltantes.length) {
+    console.log(
+      `Con IPM disponible: ${encontrados.length}`
+    );
+
+    if (faltantes.length > 0) {
       console.log(
         "Municipios sin coincidencia:",
         faltantes
       );
     }
 
-    // Umbral de seguridad: evita importar
-    // una hoja equivocada o incompleta.
     if (encontrados.length < 150) {
       throw new Error(
-        "Cobertura municipal insuficiente. " +
-        "Se cancela la importación."
+        "Cobertura PDET insuficiente. " +
+        "No se permite importar."
       );
     }
 
     // =====================================
-    // 7. INSERTAR TERRITORIOS MUNICIPALES
+    // 3. VALIDAR INDICADORES
     // =====================================
 
-    let valoresInsertados = 0;
+    const resultadoIndicadores =
+      await cliente.query(`
+        SELECT id, codigo
+        FROM indicadores;
+      `);
+
+    const indicadores = new Map(
+      resultadoIndicadores.rows.map(
+        (indicador) => [
+          indicador.codigo,
+          indicador.id,
+        ]
+      )
+    );
+
+    for (const codigo of Object.keys(COLUMNAS)) {
+      if (!indicadores.has(codigo)) {
+        throw new Error(
+          `Indicador inexistente: ${codigo}`
+        );
+      }
+    }
+
+    // =====================================
+    // 4. PREPARAR REGISTROS
+    // =====================================
+
+    const registros = [];
 
     for (const municipio of encontrados) {
-      const registro = datosMunicipales.get(
+      const datosMunicipio = datos.get(
         municipio.codigo
       );
 
+      for (const [
+        codigoIndicador,
+        valor,
+      ] of Object.entries(
+        datosMunicipio.indicadores
+      )) {
+        registros.push({
+          municipioCodigo: municipio.codigo,
+          municipioNombre: municipio.nombre,
+          indicadorId: indicadores.get(
+            codigoIndicador
+          ),
+          indicadorCodigo: codigoIndicador,
+          valor,
+        });
+      }
+    }
+
+    console.log(
+      `Valores preparados: ${registros.length}`
+    );
+
+    // =====================================
+    // 5. VERIFICACIÓN DE EJEMPLO
+    // =====================================
+
+    const ejemplo = registros.filter(
+      (registro) =>
+        registro.municipioCodigo === "54206" &&
+        ["IPM", "INASISTENCIA"].includes(
+          registro.indicadorCodigo
+        )
+    );
+
+    console.log(
+      "Ejemplo Convención:",
+      ejemplo
+    );
+
+    // =====================================
+    // 6. MODO PRUEBA
+    // =====================================
+
+    if (!CONFIRMAR) {
+      console.log(
+        "PRUEBA COMPLETADA."
+      );
+
+      console.log(
+        "No se modificó PostgreSQL."
+      );
+
+      console.log(
+        "Para importar se requiere --confirmar."
+      );
+
+      return;
+    }
+
+    // =====================================
+    // 7. IMPORTACIÓN TRANSACCIONAL
+    // =====================================
+
+    await cliente.query("BEGIN");
+    transaccion = true;
+
+    for (const municipio of encontrados) {
       await cliente.query(
         `
         INSERT INTO territorios (
@@ -349,96 +506,78 @@ async function importar() {
           "Municipio PDET",
         ]
       );
-
-      // ===================================
-      // 8. INSERTAR VALORES DANE 2018
-      // ===================================
-
-      for (const [
-        codigoIndicador,
-        valor,
-      ] of Object.entries(registro.indicadores)) {
-        const indicadorId = indicadores.get(
-          codigoIndicador
-        );
-
-        if (!indicadorId) {
-          continue;
-        }
-
-        await cliente.query(
-          `
-          INSERT INTO valores_indicador (
-            territorio_codigo,
-            indicador_id,
-            periodo,
-            valor,
-            fuente,
-            fecha_actualizacion
-          )
-          VALUES (
-            $1, $2, $3, $4, $5, CURRENT_DATE
-          )
-          ON CONFLICT (
-            territorio_codigo,
-            indicador_id,
-            periodo
-          )
-          DO UPDATE SET
-            valor = EXCLUDED.valor,
-            fuente = EXCLUDED.fuente,
-            fecha_actualizacion =
-              EXCLUDED.fecha_actualizacion;
-          `,
-          [
-            municipio.codigo,
-            indicadorId,
-            PERIODO,
-            valor,
-            FUENTE,
-          ]
-        );
-
-        valoresInsertados++;
-      }
     }
 
-    // =====================================
-    // 9. CONFIRMAR TRANSACCIÓN
-    // =====================================
+    for (const registro of registros) {
+      await cliente.query(
+        `
+        INSERT INTO valores_indicador (
+          territorio_codigo,
+          indicador_id,
+          periodo,
+          valor,
+          fuente,
+          fecha_actualizacion
+        )
+        VALUES (
+          $1, $2, $3, $4, $5, CURRENT_DATE
+        )
+        ON CONFLICT (
+          territorio_codigo,
+          indicador_id,
+          periodo
+        )
+        DO UPDATE SET
+          valor = EXCLUDED.valor,
+          fuente = EXCLUDED.fuente,
+          fecha_actualizacion =
+            EXCLUDED.fecha_actualizacion;
+        `,
+        [
+          registro.municipioCodigo,
+          registro.indicadorId,
+          PERIODO,
+          registro.valor,
+          FUENTE,
+        ]
+      );
+    }
 
     await cliente.query("COMMIT");
+    transaccion = false;
 
     console.log(
-      "====================================="
+      "===================================="
     );
+
     console.log(
-      "IMPORTACIÓN DANE 2018 COMPLETADA"
+      "IMPORTACIÓN COMPLETADA"
     );
+
     console.log(
-      `Municipios procesados: ${encontrados.length}`
+      `Municipios: ${encontrados.length}`
     );
+
     console.log(
-      `Valores procesados: ${valoresInsertados}`
+      `Valores: ${registros.length}`
     );
+
     console.log(
-      "Periodo: 2018"
+      `Periodo: ${PERIODO}`
     );
+
     console.log(
-      "Fuente: DANE - CNPV 2018"
-    );
-    console.log(
-      "====================================="
+      "===================================="
     );
 
   } catch (error) {
-    if (cliente) {
+    if (cliente && transaccion) {
       await cliente.query("ROLLBACK");
     }
 
     console.error(
-      "Error importando IPM 2018:",
-      error
+      "ERROR EN IMPORTACIÓN:",
+      error.message
     );
 
     process.exitCode = 1;
@@ -453,4 +592,3 @@ async function importar() {
 }
 
 importar();
-
