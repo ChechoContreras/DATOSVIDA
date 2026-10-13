@@ -334,7 +334,17 @@ export default function Mapa() {
   // ============================================
 
   const actualizarMapa = () => {
-    setSeleccionado(null);
+    if (!filtroDepartamento) {
+      setSeleccionado(null);
+      return;
+    }
+
+    const valor = obtenerValor(filtroDepartamento);
+
+    setSeleccionado({
+      nombre: filtroDepartamento,
+      valor,
+    });
   };
 
   // ============================================
