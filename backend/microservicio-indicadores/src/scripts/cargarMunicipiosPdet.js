@@ -1,13 +1,23 @@
+
 /**
- * DataVida - Importador oficial de municipios PDET
+ * DATAVIDA
+ * Importador y diagnóstico de municipios PDET
  *
  * Fuente:
  * Agencia de Renovación del Territorio (ART)
- * Datos Abiertos Colombia - "Municipios PDET"
- * Dataset ID: idrk-ba8y
+ * Datos Abiertos Colombia
+ * Dataset: idrk-ba8y
  *
- * Este script consulta la fuente oficial y carga/actualiza
- * la estructura territorial PDET en PostgreSQL.
+ * Comandos:
+ *
+ * npm run importar:pdet -- --diagnostico
+ *   Consulta las tablas existentes sin modificar datos.
+ *
+ * npm run importar:pdet
+ *   Importa o actualiza los municipios PDET.
+ *
+ * IMPORTANTE:
+ * El diagnóstico no crea tablas ni modifica registros.
  */
 
 const { Pool } = require("pg");
@@ -23,24 +33,52 @@ const pool = new Pool({
       : false,
 });
 
+// ==========================================
+// FUNCIONES AUXILIARES
+// ==========================================
+
 function texto(valor) {
   return String(valor ?? "").trim();
 }
 
 function codigoDepartamento(valor) {
-  return texto(valor).padStart(2, "0");
+  const codigo = texto(valor);
+
+  if (!/^\d{1,2}$/.test(codigo)) {
+    throw new Error(
+      `Código de departamento inválido: ${codigo}`
+    );
+  }
+
+  return codigo.padStart(2, "0");
 }
 
 function codigoMunicipio(valor) {
-  return texto(valor).padStart(5, "0");
+  const codigo = texto(valor);
+
+  if (!/^\d{1,5}$/.test(codigo)) {
+    throw new Error(
+      `Código de municipio inválido: ${codigo}`
+    );
+  }
+
+  return codigo.padStart(5, "0");
 }
 
+// ==========================================
+// DESCARGAR DATOS OFICIALES
+// ==========================================
+
 async function obtenerDatosOficiales() {
+  console.log(
+    "Consultando fuente territorial PDET..."
+  );
+
   const respuesta = await fetch(DATASET_URL);
 
   if (!respuesta.ok) {
     throw new Error(
-      `No fue posible descargar ART: HTTP ${respuesta.status}`
+      `Error consultando ART: HTTP ${respuesta.status}`
     );
   }
 
@@ -48,12 +86,101 @@ async function obtenerDatosOficiales() {
 
   if (!Array.isArray(datos) || datos.length === 0) {
     throw new Error(
-      "La fuente oficial ART no devolvió registros."
+      "La fuente ART no devolvió registros."
     );
   }
 
+  console.log(
+    `Registros descargados: ${datos.length}`
+  );
+
   return datos;
 }
+
+// ==========================================
+// VALIDAR DATOS ANTES DE IMPORTAR
+// ==========================================
+
+function validarDatos(datos) {
+  const municipios = new Set();
+  const subregiones = new Set();
+
+  const registros = datos.map((fila) => {
+    const subregionCodigo = Number(
+      fila.cod_subreg
+    );
+
+    const subregionNombre = texto(
+      fila.nom_subreg
+    );
+
+    const departamentoCodigo =
+      codigoDepartamento(fila.cod_depto);
+
+    const departamentoNombre = texto(
+      fila.nom_depto
+    );
+
+    const municipioCodigo =
+      codigoMunicipio(fila.cod_muni);
+
+    const municipioNombre = texto(
+      fila.nom_muni
+    );
+
+    if (
+      !Number.isInteger(subregionCodigo) ||
+      subregionCodigo <= 0 ||
+      !subregionNombre ||
+      !departamentoNombre ||
+      !municipioNombre
+    ) {
+      throw new Error(
+        `Registro ART incompleto: ${JSON.stringify(fila)}`
+      );
+    }
+
+    if (municipios.has(municipioCodigo)) {
+      throw new Error(
+        `Municipio duplicado: ${municipioCodigo}`
+      );
+    }
+
+    municipios.add(municipioCodigo);
+    subregiones.add(subregionCodigo);
+
+    return {
+      subregionCodigo,
+      subregionNombre,
+      departamentoCodigo,
+      departamentoNombre,
+      municipioCodigo,
+      municipioNombre,
+    };
+  });
+
+  if (
+    municipios.size !== 170 ||
+    subregiones.size !== 16
+  ) {
+    throw new Error(
+      `Validación ART fallida: ` +
+      `${municipios.size} municipios y ` +
+      `${subregiones.size} subregiones. ` +
+      `Se esperaban 170 y 16.`
+    );
+  }
+
+  console.log(
+    "Validación de fuente ART completada."
+  );
+
+  return registros;
+}
+
+// ==========================================
+// CREAR ESTRUCTURA TERRITORIAL
+// ==========================================
 
 async function asegurarEstructura(client) {
   await client.query(`
@@ -85,8 +212,134 @@ async function asegurarEstructura(client) {
   `);
 }
 
+// ==========================================
+// DIAGNÓSTICO DE SOLO LECTURA
+// ==========================================
+
+async function diagnosticar() {
+  const client = await pool.connect();
+
+  try {
+    console.log(
+      "=================================="
+    );
+    console.log(
+      "DIAGNÓSTICO TERRITORIAL DATAVIDA"
+    );
+    console.log(
+      "=================================="
+    );
+
+    const resultado = await client.query(`
+      SELECT
+        to_regclass('public.municipios')
+          AS municipios,
+
+        to_regclass('public.departamentos')
+          AS departamentos,
+
+        to_regclass('public.subregiones_pdet')
+          AS subregiones
+    `);
+
+    const tablas = resultado.rows[0];
+
+    console.log(
+      "Tablas encontradas:",
+      tablas
+    );
+
+    if (
+      !tablas.municipios ||
+      !tablas.departamentos ||
+      !tablas.subregiones
+    ) {
+      console.log(
+        "DIAGNÓSTICO: faltan tablas territoriales."
+      );
+
+      console.log(
+        "Todavía no se ha confirmado una importación completa."
+      );
+
+      return;
+    }
+
+    const conteos = await client.query(`
+      SELECT
+        (
+          SELECT COUNT(*)
+          FROM municipios
+          WHERE es_pdet = TRUE
+        ) AS municipios,
+
+        (
+          SELECT COUNT(*)
+          FROM departamentos
+        ) AS departamentos,
+
+        (
+          SELECT COUNT(*)
+          FROM subregiones_pdet
+        ) AS subregiones
+    `);
+
+    const c = conteos.rows[0];
+
+    console.log(
+      "=================================="
+    );
+
+    console.log(
+      `Municipios PDET: ${c.municipios}`
+    );
+
+    console.log(
+      `Departamentos: ${c.departamentos}`
+    );
+
+    console.log(
+      `Subregiones: ${c.subregiones}`
+    );
+
+    console.log(
+      "=================================="
+    );
+
+    if (
+      Number(c.municipios) === 170 &&
+      Number(c.subregiones) === 16
+    ) {
+      console.log(
+        "DIAGNÓSTICO: cantidades territoriales correctas."
+      );
+    } else {
+      console.log(
+        "DIAGNÓSTICO: cantidades territoriales incompletas."
+      );
+    }
+
+    console.log(
+      "No se modificaron registros."
+    );
+  } finally {
+    client.release();
+  }
+}
+
+// ==========================================
+// IMPORTAR MUNICIPIOS PDET
+// ==========================================
+
 async function cargar() {
+  console.log(
+    "Iniciando importación territorial PDET..."
+  );
+
   const datos = await obtenerDatosOficiales();
+
+  const registros = validarDatos(datos);
+
   const client = await pool.connect();
 
   try {
@@ -94,96 +347,68 @@ async function cargar() {
 
     await asegurarEstructura(client);
 
-    for (const fila of datos) {
-      const subregionCodigo = Number(fila.cod_subreg);
-      const subregionNombre = texto(fila.nom_subreg);
-
-      const departamentoCodigo =
-        codigoDepartamento(fila.cod_depto);
-
-      const departamentoNombre =
-        texto(fila.nom_depto);
-
-      const municipioCodigo =
-        codigoMunicipio(fila.cod_muni);
-
-      const municipioNombre =
-        texto(fila.nom_muni);
-
-      if (
-        !Number.isInteger(subregionCodigo) ||
-        !subregionNombre ||
-        !departamentoCodigo ||
-        !departamentoNombre ||
-        !municipioCodigo ||
-        !municipioNombre
-      ) {
-        throw new Error(
-          `Registro ART incompleto: ${JSON.stringify(fila)}`
-        );
-      }
-
+    for (const fila of registros) {
       await client.query(
         `
-          INSERT INTO subregiones_pdet (
-            codigo,
-            nombre
-          )
-          VALUES ($1, $2)
+        INSERT INTO subregiones_pdet (
+          codigo,
+          nombre
+        )
+        VALUES ($1, $2)
 
-          ON CONFLICT (codigo)
-          DO UPDATE SET
-            nombre = EXCLUDED.nombre
+        ON CONFLICT (codigo)
+        DO UPDATE SET
+          nombre = EXCLUDED.nombre
         `,
         [
-          subregionCodigo,
-          subregionNombre,
+          fila.subregionCodigo,
+          fila.subregionNombre,
         ]
       );
 
       await client.query(
         `
-          INSERT INTO departamentos (
-            codigo,
-            nombre
-          )
-          VALUES ($1, $2)
+        INSERT INTO departamentos (
+          codigo,
+          nombre
+        )
+        VALUES ($1, $2)
 
-          ON CONFLICT (codigo)
-          DO UPDATE SET
-            nombre = EXCLUDED.nombre
+        ON CONFLICT (codigo)
+        DO UPDATE SET
+          nombre = EXCLUDED.nombre
         `,
         [
-          departamentoCodigo,
-          departamentoNombre,
+          fila.departamentoCodigo,
+          fila.departamentoNombre,
         ]
       );
 
       await client.query(
         `
-          INSERT INTO municipios (
-            codigo,
-            nombre,
-            departamento_codigo,
-            subregion_codigo,
-            es_pdet
-          )
-          VALUES ($1, $2, $3, $4, TRUE)
+        INSERT INTO municipios (
+          codigo,
+          nombre,
+          departamento_codigo,
+          subregion_codigo,
+          es_pdet
+        )
+        VALUES ($1, $2, $3, $4, TRUE)
 
-          ON CONFLICT (codigo)
-          DO UPDATE SET
-            nombre = EXCLUDED.nombre,
-            departamento_codigo =
-              EXCLUDED.departamento_codigo,
-            subregion_codigo =
-              EXCLUDED.subregion_codigo,
-            es_pdet = TRUE
+        ON CONFLICT (codigo)
+        DO UPDATE SET
+          nombre = EXCLUDED.nombre,
+          departamento_codigo =
+            EXCLUDED.departamento_codigo,
+          subregion_codigo =
+            EXCLUDED.subregion_codigo,
+          es_pdet = TRUE
         `,
         [
-          municipioCodigo,
-          municipioNombre,
-          departamentoCodigo,
-          subregionCodigo,
+          fila.municipioCodigo,
+          fila.municipioNombre,
+          fila.departamentoCodigo,
+          fila.subregionCodigo,
         ]
       );
     }
@@ -216,15 +441,18 @@ async function cargar() {
     ) {
       throw new Error(
         `Validación fallida: ${c.municipios} municipios y ` +
-        `${c.subregiones} subregiones. ` +
-        `Se esperaba 170 y 16.`
+        `${c.subregiones} subregiones.`
       );
     }
 
     await client.query("COMMIT");
 
     console.log(
-      "Carga territorial PDET completada."
+      "=================================="
+    );
+
+    console.log(
+      "IMPORTACIÓN PDET COMPLETADA"
     );
 
     console.log(
@@ -232,30 +460,49 @@ async function cargar() {
     );
 
     console.log(
-      `Subregiones PDET: ${c.subregiones}`
+      `Subregiones: ${c.subregiones}`
     );
 
     console.log(
-      `Departamentos presentes: ${c.departamentos}`
+      `Departamentos: ${c.departamentos}`
     );
 
     console.log(
-      "Fuente: Agencia de Renovación del Territorio - ART."
+      "Fuente: Agencia de Renovación del Territorio."
+    );
+
+    console.log(
+      "=================================="
     );
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
   } finally {
     client.release();
+  }
+}
+
+// ==========================================
+// EJECUCIÓN CONTROLADA
+// ==========================================
+
+async function ejecutar() {
+  try {
+    if (process.argv.includes("--diagnostico")) {
+      await diagnosticar();
+    } else {
+      await cargar();
+    }
+  } catch (error) {
+    console.error(
+      "Error en proceso territorial PDET:",
+      error
+    );
+
+    process.exitCode = 1;
+  } finally {
     await pool.end();
   }
 }
 
-cargar().catch((error) => {
-  console.error(
-    "Error cargando municipios PDET:",
-    error
-  );
-
-  process.exit(1);
-});
+ejecutar();
