@@ -1,3 +1,4 @@
+
 import { useMemo, useState } from "react";
 import { useIndicadores } from "../hooks/useIndicadores";
 import GraficoIndicadores from "../components/GraficoIndicadores";
@@ -52,10 +53,13 @@ function IconoAlerta() {
 function ConsultarIndicadores() {
   const {
     datos,
+    departamentos,
+    subregiones,
     municipios,
     catalogoIndicadores,
     periodos,
     cargando,
+    cargandoTerritorios,
     error,
     mensaje,
     haBuscado,
@@ -63,62 +67,153 @@ function ConsultarIndicadores() {
     limpiar,
   } = useIndicadores();
 
+  // ==========================================
+  // FILTROS SELECCIONADOS
+  // ==========================================
+
   const [departamento, setDepartamento] = useState("");
-  const [municipio, setMunicipio] = useState("");
   const [region, setRegion] = useState("");
+  const [municipio, setMunicipio] = useState("");
   const [indicador, setIndicador] = useState("");
   const [periodo, setPeriodo] = useState("");
 
-  /* Departamentos únicos a partir de los municipios reales del backend */
-  const departamentos = useMemo(() => {
-    return [...new Set(municipios.map((m) => m.departamento))].sort();
-  }, [municipios]);
+  // Consulta territorial sin datos estadísticos
+  // disponibles todavía.
+  const [avisoTerritorial, setAvisoTerritorial] =
+    useState("");
 
-  /* Regiones (subregión) disponibles, acotadas por el departamento elegido */
-  const regiones = useMemo(() => {
-    const base = departamento
-      ? municipios.filter((m) => m.departamento === departamento)
-      : municipios;
-    return [...new Set(base.map((m) => m.subregion))].sort();
-  }, [municipios, departamento]);
+  // ==========================================
+  // SUBREGIONES DISPONIBLES
+  // ==========================================
 
-  /* Municipios disponibles, acotados por departamento y región elegidos */
+  const regionesDisponibles = useMemo(() => {
+    if (!departamento) {
+      return subregiones;
+    }
+
+    const codigos = new Set(
+      municipios
+        .filter(
+          (m) => m.departamentoCodigo === departamento
+        )
+        .map((m) => String(m.subregionCodigo))
+    );
+
+    return subregiones.filter((s) =>
+      codigos.has(String(s.codigo))
+    );
+  }, [departamento, municipios, subregiones]);
+
+  // ==========================================
+  // MUNICIPIOS DISPONIBLES
+  // ==========================================
+
   const municipiosDisponibles = useMemo(() => {
-    return municipios
-      .filter((m) => !departamento || m.departamento === departamento)
-      .filter((m) => !region || m.subregion === region);
+    return municipios.filter((m) => {
+      const coincideDepartamento =
+        !departamento ||
+        m.departamentoCodigo === departamento;
+
+      const coincideRegion =
+        !region ||
+        String(m.subregionCodigo) === region;
+
+      return coincideDepartamento && coincideRegion;
+    });
   }, [municipios, departamento, region]);
+
+  // ==========================================
+  // CAMBIO DE DEPARTAMENTO
+  // ==========================================
 
   function manejarCambioDepartamento(valor) {
     setDepartamento(valor);
     setRegion("");
     setMunicipio("");
+    setAvisoTerritorial("");
+    limpiar();
   }
+
+  // ==========================================
+  // CAMBIO DE REGIÓN
+  // ==========================================
 
   function manejarCambioRegion(valor) {
     setRegion(valor);
     setMunicipio("");
+    setAvisoTerritorial("");
+    limpiar();
   }
 
+  // ==========================================
+  // CAMBIO DE MUNICIPIO
+  // ==========================================
+
+  function manejarCambioMunicipio(valor) {
+    setMunicipio(valor);
+    setAvisoTerritorial("");
+    limpiar();
+  }
+
+  // ==========================================
+  // CONSULTAR INDICADORES
+  // ==========================================
+
   function consultar() {
+    setAvisoTerritorial("");
+
+    // El catálogo territorial está disponible,
+    // pero aún no se han cargado valores IPM
+    // oficiales por municipio, departamento
+    // o subregión.
+    //
+    // Evitamos presentar valores agregados
+    // de PDET Colombia como si fueran locales.
+
+    if (departamento || region || municipio) {
+      limpiar();
+
+      setAvisoTerritorial(
+        "El territorio seleccionado está registrado " +
+        "en DATAVIDA, pero todavía no se han " +
+        "incorporado sus valores estadísticos " +
+        "individuales. No se mostrarán cifras " +
+        "agregadas de PDET Colombia como si " +
+        "correspondieran a este territorio."
+      );
+
+      return;
+    }
+
+    // Consulta agregada PDET Colombia.
     buscar({
-      municipioCodigo: municipio,
+      municipioCodigo: "PDET-CO",
       indicadorId: indicador,
       periodo,
     });
   }
 
+  // ==========================================
+  // LIMPIAR FILTROS
+  // ==========================================
+
   function limpiarFiltros() {
     setDepartamento("");
-    setMunicipio("");
     setRegion("");
+    setMunicipio("");
     setIndicador("");
     setPeriodo("");
+    setAvisoTerritorial("");
     limpiar();
   }
 
-  // Determina qué bloque de estado mostrar debajo del panel de filtros
-  const estado = cargando
+  // ==========================================
+  // ESTADO DE RESULTADOS
+  // ==========================================
+
+  const estado = avisoTerritorial
+    ? "sin-datos-territoriales"
+    : cargando
     ? "cargando"
     : error
     ? "error"
@@ -130,16 +225,22 @@ function ConsultarIndicadores() {
 
   return (
     <div className="pagina-indicadores">
+
       {/* =====================================
           ENCABEZADO
           ===================================== */}
 
       <header className="encabezado-indicadores">
-        <span className="etiqueta-pagina-indicadores">CONSULTA TERRITORIAL</span>
+        <span className="etiqueta-pagina-indicadores">
+          CONSULTA TERRITORIAL
+        </span>
+
         <h1>Indicadores</h1>
+
         <p>
-          Consulta los indicadores territoriales de Colombia y analiza
-          información por municipio, región y periodo.
+          Consulta los indicadores territoriales de
+          Colombia y analiza información por municipio,
+          región y periodo.
         </p>
       </header>
 
@@ -148,62 +249,101 @@ function ConsultarIndicadores() {
           ===================================== */}
 
       <section className="panel-filtros-indicadores">
+
         <div className="titulo-panel-indicadores">
           <div className="icono-titulo-filtros">
             <IconoBusqueda />
           </div>
+
           <div>
             <h2>Filtros de consulta</h2>
-            <p>Selecciona los criterios para consultar información.</p>
+            <p>
+              Selecciona los criterios para consultar
+              información.
+            </p>
           </div>
         </div>
 
         <div className="grid-filtros-indicadores">
+
           {/* DEPARTAMENTO */}
+
           <div className="campo-indicadores">
-            <label htmlFor="departamento">Departamento</label>
+            <label htmlFor="departamento">
+              Departamento
+            </label>
+
             <select
               id="departamento"
               value={departamento}
-              onChange={(e) => manejarCambioDepartamento(e.target.value)}
+              onChange={(e) =>
+                manejarCambioDepartamento(e.target.value)
+              }
+              disabled={cargandoTerritorios}
             >
               <option value="">Todos</option>
+
               {departamentos.map((d) => (
-                <option key={d} value={d}>
-                  {d}
+                <option
+                  key={d.codigo}
+                  value={d.codigo}
+                >
+                  {d.nombre}
                 </option>
               ))}
             </select>
           </div>
 
-          {/* REGIÓN */}
+          {/* REGIÓN PDET */}
+
           <div className="campo-indicadores">
-            <label htmlFor="region">Región</label>
+            <label htmlFor="region">
+              Región
+            </label>
+
             <select
               id="region"
               value={region}
-              onChange={(e) => manejarCambioRegion(e.target.value)}
+              onChange={(e) =>
+                manejarCambioRegion(e.target.value)
+              }
+              disabled={cargandoTerritorios}
             >
               <option value="">Todas</option>
-              {regiones.map((r) => (
-                <option key={r} value={r}>
-                  {r}
+
+              {regionesDisponibles.map((r) => (
+                <option
+                  key={r.codigo}
+                  value={String(r.codigo)}
+                >
+                  {r.nombre}
                 </option>
               ))}
             </select>
           </div>
 
           {/* MUNICIPIO */}
+
           <div className="campo-indicadores">
-            <label htmlFor="municipio">Municipio</label>
+            <label htmlFor="municipio">
+              Municipio
+            </label>
+
             <select
               id="municipio"
               value={municipio}
-              onChange={(e) => setMunicipio(e.target.value)}
+              onChange={(e) =>
+                manejarCambioMunicipio(e.target.value)
+              }
+              disabled={cargandoTerritorios}
             >
               <option value="">Todos</option>
+
               {municipiosDisponibles.map((m) => (
-                <option key={m.codigo} value={m.codigo}>
+                <option
+                  key={m.codigo}
+                  value={m.codigo}
+                >
                   {m.nombre}
                 </option>
               ))}
@@ -211,16 +351,28 @@ function ConsultarIndicadores() {
           </div>
 
           {/* INDICADOR */}
+
           <div className="campo-indicadores">
-            <label htmlFor="indicador">Indicador</label>
+            <label htmlFor="indicador">
+              Indicador
+            </label>
+
             <select
               id="indicador"
               value={indicador}
-              onChange={(e) => setIndicador(e.target.value)}
+              onChange={(e) => {
+                setIndicador(e.target.value);
+                setAvisoTerritorial("");
+                limpiar();
+              }}
             >
               <option value="">Todos</option>
+
               {catalogoIndicadores.map((i) => (
-                <option key={i.id} value={i.id}>
+                <option
+                  key={i.id}
+                  value={i.id}
+                >
                   {i.nombre}
                 </option>
               ))}
@@ -228,16 +380,28 @@ function ConsultarIndicadores() {
           </div>
 
           {/* PERIODO */}
+
           <div className="campo-indicadores">
-            <label htmlFor="periodo">Periodo</label>
+            <label htmlFor="periodo">
+              Periodo
+            </label>
+
             <select
               id="periodo"
               value={periodo}
-              onChange={(e) => setPeriodo(e.target.value)}
+              onChange={(e) => {
+                setPeriodo(e.target.value);
+                setAvisoTerritorial("");
+                limpiar();
+              }}
             >
               <option value="">Todos</option>
+
               {periodos.map((p) => (
-                <option key={p} value={p}>
+                <option
+                  key={p}
+                  value={p}
+                >
                   {p}
                 </option>
               ))}
@@ -245,14 +409,20 @@ function ConsultarIndicadores() {
           </div>
         </div>
 
+        {/* =====================================
+            BOTONES
+            ===================================== */}
+
         <div className="acciones-filtros-indicadores">
           <button
             type="button"
             className="boton-consultar-indicadores"
             onClick={consultar}
+            disabled={cargando}
           >
             Consultar
           </button>
+
           <button
             type="button"
             className="boton-limpiar-indicadores"
@@ -264,7 +434,7 @@ function ConsultarIndicadores() {
       </section>
 
       {/* =====================================
-          ESTADO VACÍO (aún no se ha consultado)
+          ESTADO INICIAL
           ===================================== */}
 
       {estado === "vacio" && (
@@ -272,9 +442,12 @@ function ConsultarIndicadores() {
           <div className="icono-estado-indicadores">
             <IconoBusqueda />
           </div>
+
           <h2>Selecciona los filtros para consultar</h2>
+
           <p>
-            Define los criterios de búsqueda y pulsa <strong>Consultar</strong>.
+            Define los criterios de búsqueda y pulsa{" "}
+            <strong>Consultar</strong>.
           </p>
         </section>
       )}
@@ -286,13 +459,17 @@ function ConsultarIndicadores() {
       {estado === "cargando" && (
         <section className="estado-indicadores estado-cargando-indicadores">
           <div className="spinner-indicadores"></div>
+
           <h2>Consultando información</h2>
-          <p>Estamos preparando los resultados de la consulta.</p>
+
+          <p>
+            Estamos preparando los resultados de la consulta.
+          </p>
         </section>
       )}
 
       {/* =====================================
-          ERROR DE CONEXIÓN CON EL BACKEND
+          ERROR
           ===================================== */}
 
       {estado === "error" && (
@@ -300,8 +477,28 @@ function ConsultarIndicadores() {
           <div className="icono-alerta-indicadores">
             <IconoAlerta />
           </div>
+
           <h2>No fue posible completar la consulta</h2>
+
           <p>{error}</p>
+        </section>
+      )}
+
+      {/* =====================================
+          SIN DATOS TERRITORIALES
+          ===================================== */}
+
+      {estado === "sin-datos-territoriales" && (
+        <section className="estado-indicadores estado-sin-resultados">
+          <div className="icono-alerta-indicadores">
+            <IconoAlerta />
+          </div>
+
+          <h2>
+            Datos estadísticos territoriales pendientes
+          </h2>
+
+          <p>{avisoTerritorial}</p>
         </section>
       )}
 
@@ -314,19 +511,27 @@ function ConsultarIndicadores() {
           <div className="icono-alerta-indicadores">
             <IconoAlerta />
           </div>
+
           <h2>No se encontraron resultados</h2>
-          <p>Intenta modificar los criterios de búsqueda.</p>
+
+          <p>
+            Intenta modificar los criterios de búsqueda.
+          </p>
         </section>
       )}
 
       {/* =====================================
-          RESULTADOS REALES (Microservicio de Indicadores)
+          RESULTADOS
           ===================================== */}
 
       {estado === "resultados" && (
         <section className="resultados-indicadores">
-          <p className="mensaje-resultado">{mensaje}</p>
+          <p className="mensaje-resultado">
+            {mensaje}
+          </p>
+
           <GraficoIndicadores datos={datos} />
+
           <TarjetasIndicadores datos={datos} />
         </section>
       )}
