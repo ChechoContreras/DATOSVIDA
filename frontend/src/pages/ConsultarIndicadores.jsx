@@ -77,8 +77,6 @@ function ConsultarIndicadores() {
   const [indicador, setIndicador] = useState("");
   const [periodo, setPeriodo] = useState("");
 
-  // Consulta territorial sin datos estadísticos
-  // disponibles todavía.
   const [avisoTerritorial, setAvisoTerritorial] =
     useState("");
 
@@ -94,7 +92,9 @@ function ConsultarIndicadores() {
     const codigos = new Set(
       municipios
         .filter(
-          (m) => m.departamentoCodigo === departamento
+          (m) =>
+            String(m.departamentoCodigo) ===
+            String(departamento)
         )
         .map((m) => String(m.subregionCodigo))
     );
@@ -112,11 +112,13 @@ function ConsultarIndicadores() {
     return municipios.filter((m) => {
       const coincideDepartamento =
         !departamento ||
-        m.departamentoCodigo === departamento;
+        String(m.departamentoCodigo) ===
+          String(departamento);
 
       const coincideRegion =
         !region ||
-        String(m.subregionCodigo) === region;
+        String(m.subregionCodigo) ===
+          String(region);
 
       return coincideDepartamento && coincideRegion;
     });
@@ -162,30 +164,57 @@ function ConsultarIndicadores() {
   function consultar() {
     setAvisoTerritorial("");
 
-    // El catálogo territorial está disponible,
-    // pero aún no se han cargado valores IPM
-    // oficiales por municipio, departamento
-    // o subregión.
-    //
-    // Evitamos presentar valores agregados
-    // de PDET Colombia como si fueran locales.
+    // CONSULTA MUNICIPAL DANE 2018
 
-    if (departamento || region || municipio) {
+    if (municipio) {
+      // Los valores municipales importados
+      // corresponden al CNPV 2018.
+
+      if (periodo && String(periodo) !== "2018") {
+        limpiar();
+
+        setAvisoTerritorial(
+          "Los indicadores municipales del DANE " +
+            "actualmente disponibles en DATAVIDA " +
+            "corresponden al año 2018. " +
+            "Selecciona el periodo 2018 o " +
+            "la opción Todos."
+        );
+
+        return;
+      }
+
+      buscar({
+        municipioCodigo: municipio,
+        indicadorId: indicador,
+        periodo: "2018",
+      });
+
+      return;
+    }
+
+    // CONSULTA DEPARTAMENTAL O REGIONAL
+    //
+    // No se presentan datos municipales
+    // como si fueran agregados oficiales.
+
+    if (departamento || region) {
       limpiar();
 
       setAvisoTerritorial(
-        "El territorio seleccionado está registrado " +
-        "en DATAVIDA, pero todavía no se han " +
-        "incorporado sus valores estadísticos " +
-        "individuales. No se mostrarán cifras " +
-        "agregadas de PDET Colombia como si " +
-        "correspondieran a este territorio."
+        "Selecciona un municipio para consultar " +
+          "sus indicadores oficiales del DANE 2018. " +
+          "Los resultados agregados por departamento " +
+          "y región PDET todavía no están disponibles."
       );
 
       return;
     }
 
-    // Consulta agregada PDET Colombia.
+    // CONSULTA GENERAL PDET COLOMBIA
+    //
+    // Se conserva el comportamiento anterior.
+
     buscar({
       municipioCodigo: "PDET-CO",
       indicadorId: indicador,
@@ -257,6 +286,7 @@ function ConsultarIndicadores() {
 
           <div>
             <h2>Filtros de consulta</h2>
+
             <p>
               Selecciona los criterios para consultar
               información.
@@ -443,7 +473,9 @@ function ConsultarIndicadores() {
             <IconoBusqueda />
           </div>
 
-          <h2>Selecciona los filtros para consultar</h2>
+          <h2>
+            Selecciona los filtros para consultar
+          </h2>
 
           <p>
             Define los criterios de búsqueda y pulsa{" "}
@@ -478,14 +510,16 @@ function ConsultarIndicadores() {
             <IconoAlerta />
           </div>
 
-          <h2>No fue posible completar la consulta</h2>
+          <h2>
+            No fue posible completar la consulta
+          </h2>
 
           <p>{error}</p>
         </section>
       )}
 
       {/* =====================================
-          SIN DATOS TERRITORIALES
+          AVISO TERRITORIAL
           ===================================== */}
 
       {estado === "sin-datos-territoriales" && (
@@ -495,7 +529,7 @@ function ConsultarIndicadores() {
           </div>
 
           <h2>
-            Datos estadísticos territoriales pendientes
+            Información territorial no disponible
           </h2>
 
           <p>{avisoTerritorial}</p>
@@ -515,7 +549,8 @@ function ConsultarIndicadores() {
           <h2>No se encontraron resultados</h2>
 
           <p>
-            Intenta modificar los criterios de búsqueda.
+            No hay información disponible para
+            los criterios seleccionados.
           </p>
         </section>
       )}
