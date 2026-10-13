@@ -8,7 +8,7 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "importar:pdet": "node src/guiones/cargarMunicipiosPdet.js"
+    "importar:pdet": "node src/scripts/cargarMunicipiosPdet.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
