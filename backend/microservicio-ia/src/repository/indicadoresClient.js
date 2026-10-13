@@ -1,22 +1,31 @@
+
 const axios = require("axios");
 
-const INDICADORES_URL = process.env.INDICADORES_URL || "http://localhost:4001/api";
+const INDICADORES_URL =
+  process.env.INDICADORES_URL ||
+  "https://datavida-api.onrender.com/api";
 
 async function consultarValoresIndicadores(filtros = {}) {
-  const { data } = await axios.get(`${INDICADORES_URL}/indicadores`, {
-    params: filtros,
-    timeout: 5000,
-  });
+  const { data } = await axios.get(
+    `${INDICADORES_URL}/indicadores`,
+    {
+      params: filtros,
+      timeout: 30000,
+    }
+  );
+
   return data.datos || [];
 }
 
 /**
- * Trae todos los valores registrados, sin filtro. Se usa para calcular
- * correlaciones entre indicadores cruzando municipios (RF-13 apoyo:
- * "correlaciones e impacto de variables priorizadas").
+ * Consulta todos los valores registrados para
+ * calcular correlaciones entre indicadores.
  */
 async function consultarTodosLosValores() {
   return consultarValoresIndicadores({});
 }
 
-module.exports = { consultarValoresIndicadores, consultarTodosLosValores };
+module.exports = {
+  consultarValoresIndicadores,
+  consultarTodosLosValores,
+};
