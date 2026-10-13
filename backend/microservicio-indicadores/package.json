@@ -8,12 +8,14 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
-    "importar:pdet": "node src/scripts/cargarMunicipiosPdet.js"
+    "importar:pdet": "node src/scripts/cargarMunicipiosPdet.js",
+    "importar:ipm2018": "node src/scripts/importarIpmMunicipal2018.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "pg": "^8.13.1"
+    "pg": "^8.13.1",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "nodemon": "^3.1.4"
