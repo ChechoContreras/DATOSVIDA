@@ -9,7 +9,8 @@
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "importar:pdet": "node src/scripts/cargarMunicipiosPdet.js",
-    "importar:ipm2018": "node src/scripts/importarIpmMunicipal2018.js"
+    "importar:ipm2018": "node src/scripts/importarIpmMunicipal2018.js",
+    "importar:pdet-historico": "node src/scripts/importarIpmPdetHistorico.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
