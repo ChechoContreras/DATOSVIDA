@@ -248,11 +248,7 @@ async function inicializarDatabase() {
       periodo
     )
 
-    DO UPDATE SET
-      valor = EXCLUDED.valor,
-      fuente = EXCLUDED.fuente,
-      fecha_actualizacion =
-        EXCLUDED.fecha_actualizacion;
+    DO NOTHING;
   `);
 
   console.log(
