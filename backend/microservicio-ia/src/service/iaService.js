@@ -112,13 +112,19 @@ async function generarPrediccion({
    * para realizar una regresión temporal preliminar.
    */
   if (serieHistorica.length < 3) {
+    const territorio = valores[0].municipio?.nombre || "el territorio seleccionado";
+    const periodos = serieHistorica.map(([anio]) => anio).join(", ");
+
     throw crearError(
-      "DATAVIDA dispone actualmente de información censal de 2018 " +
-        "para este municipio e indicador. No existen suficientes " +
-        "años históricos reales para generar una predicción temporal " +
-        "estadísticamente sustentada. Se requieren al menos " +
-        "3 periodos anuales diferentes. El dato de 2018 puede " +
-        "consultarse en el módulo de indicadores.",
+      `Para ${territorio} solo hay ${serieHistorica.length} periodo(s) ` +
+        `con datos reales (${periodos}). Una proyección temporal ` +
+        "estadísticamente sustentada requiere al menos 3 periodos " +
+        "anuales distintos. A nivel municipal DATAVIDA solo dispone " +
+        "del corte censal 2018; la serie anual 2018-2025 está " +
+        "disponible para el agregado PDET (PDET Colombia, cabeceras " +
+        "y centros poblados/rural disperso). Selecciona uno de esos " +
+        "territorios, o consulta el dato del municipio en el módulo " +
+        "de Indicadores.",
       "SERIE_HISTORICA_INSUFICIENTE"
     );
   }
@@ -342,6 +348,13 @@ async function calcularCorrelaciones({
     }
 
     const codigo = dato.municipio.codigo;
+
+    // Los agregados PDET (PDET-CO, PDET-CAB, PDET-CPRD) no son
+    // municipios: se excluyen de la correlación entre municipios.
+    if (String(codigo).startsWith("PDET-")) {
+      return;
+    }
+
     const idIndicador = Number(dato.indicador.id);
     const valor = Number(dato.valor);
 
