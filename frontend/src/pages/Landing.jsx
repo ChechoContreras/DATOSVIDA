@@ -1,291 +1,511 @@
+
 import { Link } from "react-router-dom";
-
 import logoIcono from "../assets/logo-icono.png";
-import fondoHero from "../assets/hero-topografico.png";
-
 import "../styles/Landing.css";
 
-export default function Landing() {
-return ( <div className="landing">
+const imagenHero =
+  "https://images.unsplash.com/photo-1568489711036-9c94a7d5aea6?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=88&w=1600";
 
+const imagenTerritorio =
+  "https://images.unsplash.com/photo-1650201777831-8c5c23a2b41e?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=88&w=1400";
 
-  {/* NAVEGACIÓN */}
-  <header className="landing__nav">
+const mapaPdetUrl =
+  "https://www.arcgis.com/apps/mapviewer/index.html?url=https%3A%2F%2Fmapas.igac.gov.co%2Fserver%2Frest%2Fservices%2Fordenamientoterritorial%2FmunicipiosPDET%2FMapServer";
 
-    {/* LOGO + NOMBRE */}
-    <div className="landing__marca">
+function Marca({ footer = false }) {
+  return (
+    <Link
+      to="/"
+      className={`landing__marca ${
+        footer ? "landing__marca--footer" : ""
+      }`}
+      aria-label="DATAVIDA, página de inicio"
+    >
       <img
         src={logoIcono}
-        alt="DATAVIDA"
+        alt=""
         className="landing__logo"
       />
 
-      <span className="landing__nombre">
-        DATAVIDA
+      <span className="landing__marca-texto">
+        <strong>DATAVIDA</strong>
+        <small>DATOS QUE TRANSFORMAN</small>
       </span>
-    </div>
-
-    {/* MENÚ */}
-    <nav className="landing__menu">
-      <a href="#inicio">Inicio</a>
-      <a href="#nosotros">Nosotros</a>
-      <a href="#servicios">Servicios</a>
-      <a href="#informacion">Información</a>
-    </nav>
-
-    {/* ÚNICO BOTÓN INGRESAR */}
-    <Link
-      to="/login"
-      className="landing__boton-login"
-    >
-      Ingresar
     </Link>
+  );
+}
 
-  </header>
+function Icono({ tipo }) {
+  const propiedades = {
+    width: 25,
+    height: 25,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.5,
+    strokeLinecap: "round",
+    strokeLinejoin: "round",
+    "aria-hidden": true,
+  };
 
-  <main>
+  if (tipo === "indicadores") {
+    return (
+      <svg {...propiedades}>
+        <path d="M4 19V5" />
+        <path d="M4 19h17" />
+        <rect x="7" y="11" width="3" height="5" rx="0.5" />
+        <rect x="13" y="7" width="3" height="9" rx="0.5" />
+        <rect x="19" y="4" width="2" height="12" rx="0.5" />
+      </svg>
+    );
+  }
 
-    {/* HERO */}
-    <section
-      id="inicio"
-      className="landing__hero"
-      style={{
-        backgroundImage: `url(${fondoHero})`,
-      }}
-    >
-      <div className="landing__hero-contenido">
+  if (tipo === "mapa") {
+    return (
+      <svg {...propiedades}>
+        <path d="m3 6 6-3 6 3 6-3v15l-6 3-6-3-6 3z" />
+        <path d="M9 3v15" />
+        <path d="M15 6v15" />
+        <circle cx="12" cy="10" r="2" />
+      </svg>
+    );
+  }
 
-        <span className="landing__badge">
-          DATOS + VIDA
-        </span>
+  if (tipo === "analisis") {
+    return (
+      <svg {...propiedades}>
+        <circle cx="10.5" cy="10.5" r="6.5" />
+        <path d="m15.5 15.5 5 5" />
+        <path d="M7.5 12.5 9.5 10l2 1.5 2.5-3" />
+      </svg>
+    );
+  }
 
-        <h1>
-          Entender la pobreza para transformar{" "}
-          <em>vida</em> en los territorios PDET
-        </h1>
+  return (
+    <svg {...propiedades}>
+      <path d="M6 2.5h8l4 4V21H6z" />
+      <path d="M14 2.5v5h4" />
+      <path d="M9 12h6" />
+      <path d="M9 16h6" />
+      <path d="M9 8h1" />
+    </svg>
+  );
+}
 
-        <p className="landing__descripcion">
-          DataVida transforma tus datos en información clara para ayudarte a comprenderlos y analizarlos.
-        </p>
+const funcionalidades = [
+  {
+    numero: "01",
+    icono: "indicadores",
+    titulo: "Indicadores territoriales",
+    descripcion:
+      "Consulta información relacionada con las dimensiones e indicadores de pobreza multidimensional.",
+    ruta: "/app/indicadores",
+  },
+  {
+    numero: "02",
+    icono: "mapa",
+    titulo: "Visualización geográfica",
+    descripcion:
+      "Explora los territorios PDET y comprende cómo se distribuye la información en Colombia.",
+    ruta: "/app/mapa",
+  },
+  {
+    numero: "03",
+    icono: "analisis",
+    titulo: "Análisis de datos",
+    descripcion:
+      "Compara indicadores y encuentra diferencias que ayudan a comprender las realidades territoriales.",
+    ruta: "/app/analisis-estadistico",
+  },
+  {
+    numero: "04",
+    icono: "reportes",
+    titulo: "Generación de reportes",
+    descripcion:
+      "Organiza los resultados para facilitar su consulta, interpretación y seguimiento.",
+    ruta: "/app/reportes",
+  },
+];
 
-        <div className="landing__acciones">
-          <a
-            href="#servicios"
-            className="landing__boton-ghost"
+const pasos = [
+  {
+    numero: "01",
+    titulo: "Organizar",
+    descripcion:
+      "Reunir los indicadores para contar con información estructurada y comprensible.",
+  },
+  {
+    numero: "02",
+    titulo: "Contextualizar",
+    descripcion:
+      "Relacionar los datos con las características de cada territorio.",
+  },
+  {
+    numero: "03",
+    titulo: "Comprender",
+    descripcion:
+      "Identificar diferencias y necesidades que contribuyan a orientar decisiones.",
+  },
+];
+
+function Landing() {
+  const volverAlInicio = (evento) => {
+    evento.preventDefault();
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  return (
+    <main className="landing" id="inicio">
+      <header className="landing__header">
+        <div className="landing__header-contenido">
+          <Marca />
+
+          <nav
+            className="landing__nav"
+            aria-label="Navegación principal"
           >
-            Conocer más ↓
+            <a href="#proposito">Propósito</a>
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#territorios">Territorios</a>
+          </nav>
+
+          <div className="landing__acciones-header">
+            <Link to="/login" className="landing__login">
+              Iniciar sesión
+            </Link>
+
+            <Link
+              to="/login"
+              className="landing__boton landing__boton--pequeno"
+            >
+              Explorar plataforma
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+
+      <section className="landing__hero">
+        <div className="landing__hero-cuadricula" />
+
+        <div className="landing__hero-contenido">
+          <div className="landing__hero-texto">
+            <p className="landing__eyebrow landing__eyebrow--claro">
+              INFORMACIÓN · TERRITORIO · COMPRENSIÓN
+            </p>
+
+            <h1>
+              Datos que revelan
+              <br />
+              <em>el territorio.</em>
+            </h1>
+
+            <p className="landing__hero-descripcion">
+              Información para comprender la pobreza multidimensional
+              en los territorios PDET de Colombia.
+            </p>
+
+            <div className="landing__hero-botones">
+              <a
+                href="#territorios"
+                className="landing__boton landing__boton--dorado"
+              >
+                Explorar territorios
+                <span aria-hidden="true">↗</span>
+              </a>
+
+              <a
+                href="#proposito"
+                className="landing__enlace-claro"
+              >
+                Conocer DATAVIDA
+                <span aria-hidden="true">→</span>
+              </a>
+            </div>
+
+            <div className="landing__hero-dato">
+              <span className="landing__hero-dato-linea" />
+              <p>
+                <strong>170 municipios</strong>
+                <span>agrupados en 16 subregiones PDET</span>
+              </p>
+            </div>
+          </div>
+
+          <div className="landing__hero-imagen-contenedor">
+            <img
+              src={imagenHero}
+              alt="Paisaje rural colombiano rodeado de montañas y vegetación"
+              className="landing__hero-imagen"
+            />
+
+            <div className="landing__hero-imagen-sombra" />
+
+            <div className="landing__hero-imagen-texto">
+              <span>COLOMBIA PROFUNDA</span>
+              <p>
+                Cada dato tiene un lugar
+                <br />y una historia.
+              </p>
+            </div>
+
+            <span className="landing__hero-coordenadas">
+              04° N · 72° O
+            </span>
+          </div>
+        </div>
+
+        <div className="landing__hero-pie">
+          <span>DATOS CON CONTEXTO</span>
+          <span>UNA MIRADA AL TERRITORIO COLOMBIANO</span>
+          <a href="#proposito" aria-label="Desplazarse hacia abajo">
+            ↓
           </a>
         </div>
+      </section>
 
-      </div>
-    </section>
+      <section className="landing__proposito" id="proposito">
+        <div className="landing__proposito-imagen-contenedor">
+          <img
+            src={imagenTerritorio}
+            alt="Paisaje natural que representa la diversidad de los territorios"
+            className="landing__proposito-imagen"
+            loading="lazy"
+          />
 
-
-    {/* SERVICIOS */}
-    <section
-      id="servicios"
-      className="landing__caracteristicas"
-    >
-
-      <p className="landing__seccion-etiqueta">
-        DESCUBRE DATAVIDA
-      </p>
-
-      <h2 className="landing__seccion-titulo">
-        Todo lo que necesitas
-        <br />
-        en un solo lugar
-      </h2>
-
-      <div className="landing__grid">
-
-        {/* INDICADORES */}
-        <article className="landing__tarjeta">
-
-          <div className="landing__tarjeta-icono">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <line x1="4" y1="19" x2="4" y2="10" />
-              <line x1="10" y1="19" x2="10" y2="5" />
-              <line x1="16" y1="19" x2="16" y2="13" />
-              <line x1="22" y1="19" x2="22" y2="8" />
-            </svg>
+          <div className="landing__imagen-etiqueta">
+            <span>01 — EL PROPÓSITO</span>
+            <p>Comprender para transformar.</p>
           </div>
-
-          <h3>Indicadores</h3>
-
-          <p>
-            Consulta información importante de manera
-            sencilla y organizada sobre los territorios
-            y sus condiciones de pobreza multidimensional.
-          </p>
-
-        </article>
-
-
-        {/* ESTADÍSTICAS */}
-        <article className="landing__tarjeta">
-
-          <div className="landing__tarjeta-icono">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <polyline points="3 17 9 11 13 14 21 6" />
-              <polyline points="16 6 21 6 21 11" />
-            </svg>
-          </div>
-
-          <h3>Estadísticas</h3>
-
-          <p>
-            Visualiza los datos y comprende mejor
-            su comportamiento para identificar
-            tendencias y diferencias entre territorios.
-          </p>
-
-        </article>
-
-
-        {/* RECOMENDACIONES */}
-        <article className="landing__tarjeta">
-
-          <div className="landing__tarjeta-icono">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.6"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M9 18h6" />
-              <path d="M10 22h4" />
-              <path d="M8.5 14.5C7.55 13.7 7 12.5 7 11a5 5 0 0 1 10 0c0 1.5-.55 2.7-1.5 3.5-.75.65-1.5 1.3-1.5 2.5h-4c0-1.2-.75-1.85-1.5-2.5Z" />
-            </svg>
-          </div>
-
-          <h3>Recomendaciones</h3>
-
-          <p>
-            Obtén información que te ayude a interpretar
-            los datos y tomar mejores decisiones basadas
-            en evidencia.
-          </p>
-
-        </article>
-
-      </div>
-    </section>
-
-
-    {/* SOBRE DATAVIDA */}
-    <section
-      id="nosotros"
-      className="landing__informacion"
-    >
-
-      <div className="landing__informacion-visual">
-
-        <div className="landing__grafico-grande">
-
-          <div className="landing__barra landing__barra--1"></div>
-
-          <div className="landing__barra landing__barra--2"></div>
-
-          <div className="landing__barra landing__barra--3"></div>
-
-          <div className="landing__barra landing__barra--4"></div>
-
         </div>
 
-      </div>
+        <div className="landing__proposito-contenido">
+          <p className="landing__eyebrow">
+            01 — NUESTRO PROPÓSITO
+          </p>
 
+          <h2>
+            Comprender la pobreza
+            <br />
+            más allá de <em>una cifra.</em>
+          </h2>
 
-      <div className="landing__informacion-texto">
+          <p className="landing__texto">
+            La pobreza multidimensional tiene distintas expresiones
+            según las condiciones sociales, económicas y territoriales.
+            DATAVIDA busca facilitar la consulta y el análisis de
+            información para comprender mejor las realidades de los
+            municipios PDET de Colombia.
+          </p>
 
-        <p className="landing__seccion-etiqueta">
-          SOBRE DATAVIDA
-        </p>
+          <div className="landing__pasos">
+            {pasos.map((paso) => (
+              <article className="landing__paso" key={paso.numero}>
+                <span className="landing__paso-numero">
+                  {paso.numero}
+                </span>
 
-        <h2>
-          Los datos también
-          <br />
-          cuentan una historia.
-        </h2>
+                <div>
+                  <h3>{paso.titulo}</h3>
+                  <p>{paso.descripcion}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
 
-        <p>
-          DATAVIDA reúne diferentes herramientas para
-          consultar, analizar y visualizar información
-          de una manera más clara y fácil de entender.
-        </p>
+      <section
+        className="landing__funcionalidades"
+        id="funcionalidades"
+      >
+        <div className="landing__seccion-encabezado">
+          <div>
+            <p className="landing__eyebrow">
+              02 — LA PLATAFORMA
+            </p>
 
-        <p>
-          La plataforma permite explorar los indicadores
-          de pobreza multidimensional de los territorios
-          PDET y utilizar los datos como apoyo para
-          comprender mejor sus necesidades.
-        </p>
+            <h2>
+              Información que
+              <br />
+              <em>cobra sentido.</em>
+            </h2>
+          </div>
 
-        <a
-          href="#informacion"
-          className="landing__boton-secundario"
+          <p className="landing__seccion-descripcion">
+            Herramientas para consultar, explorar y analizar información
+            sobre los territorios, desde diferentes perspectivas.
+          </p>
+        </div>
+
+        <div className="landing__funcionalidades-grid">
+          {funcionalidades.map((funcionalidad) => (
+            <article
+              className="landing__funcionalidad"
+              key={funcionalidad.numero}
+            >
+              <div className="landing__funcionalidad-arriba">
+                <span>{funcionalidad.numero}</span>
+                <span className="landing__funcionalidad-icono">
+                  <Icono tipo={funcionalidad.icono} />
+                </span>
+              </div>
+
+              <h3>{funcionalidad.titulo}</h3>
+              <p>{funcionalidad.descripcion}</p>
+
+              <Link
+                to={funcionalidad.ruta}
+                className="landing__funcionalidad-enlace"
+              >
+                Explorar
+                <span aria-hidden="true">↗</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="landing__territorios" id="territorios">
+        <div className="landing__territorios-contenido">
+          <p className="landing__eyebrow landing__eyebrow--claro">
+            04 — UNA MIRADA A COLOMBIA
+          </p>
+
+          <h2>
+            Un país.
+            <br />
+            Muchos territorios.
+            <br />
+            <em>Realidades distintas.</em>
+          </h2>
+
+          <p className="landing__territorios-descripcion">
+            Los municipios PDET hacen parte de territorios con historias,
+            características y desafíos propios. Explorar sus indicadores
+            permite acercarnos a esas diferencias con mayor contexto.
+          </p>
+
+          <Link
+            to="/app/mapa"
+            className="landing__boton landing__boton--dorado"
+          >
+            Explorar los datos
+            <span aria-hidden="true">↗</span>
+          </Link>
+
+          <div className="landing__territorios-cita">
+            <span>170</span>
+            <p>
+              municipios PDET
+              <br />
+              en 16 subregiones
+            </p>
+          </div>
+        </div>
+
+        <div className="landing__territorios-visual">
+          <div className="landing__mapa-encabezado">
+            <span>COLOMBIA</span>
+            <span>MAPA DE TERRITORIOS PDET</span>
+          </div>
+
+          <div className="landing__mapa-marco landing__mapa-marco--real">
+            <iframe
+              className="landing__mapa-iframe"
+              src={mapaPdetUrl}
+              title="Mapa geográfico de municipios PDET de Colombia"
+              loading="lazy"
+              allowFullScreen
+            />
+
+            <div className="landing__mapa-leyenda">
+              <span className="landing__mapa-leyenda-muestra" />
+              <p>Municipios PDET de Colombia</p>
+            </div>
+          </div>
+
+          <p className="landing__mapa-fuente">
+            Fuente cartográfica: IGAC y Agencia de Renovación del Territorio.
+          </p>
+
+          <a
+            className="landing__mapa-enlace"
+            href="https://mapas.igac.gov.co/server/rest/services/ordenamientoterritorial/municipiosPDET/MapServer"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Consultar servicio cartográfico oficial
+            <span aria-hidden="true">↗</span>
+          </a>
+        </div>
+      </section>
+
+      <section className="landing__llamado">
+        <div className="landing__llamado-contenido">
+          <p className="landing__eyebrow">
+            DATAVIDA · DATOS CON PROPÓSITO
+          </p>
+
+          <h2>
+            Conocer el territorio es el primer paso para{" "}
+            <em>comprenderlo.</em>
+          </h2>
+
+          <p>
+            Explora la información y descubre nuevas perspectivas sobre
+            la pobreza multidimensional en los territorios PDET.
+          </p>
+
+          <Link
+            to="/login"
+            className="landing__boton landing__boton--oscuro"
+          >
+            Ingresar a DATAVIDA
+            <span aria-hidden="true">↗</span>
+          </Link>
+        </div>
+
+        <div
+          className="landing__llamado-decoracion"
+          aria-hidden="true"
         >
-          Conocer más
-        </a>
+          <span />
+          <span />
+          <span />
+        </div>
+      </section>
 
-      </div>
+      <footer className="landing__footer">
+        <div className="landing__footer-principal">
+          <Marca footer />
 
-    </section>
+          <p className="landing__footer-descripcion">
+            Información para comprender la pobreza multidimensional
+            en los territorios PDET de Colombia.
+          </p>
 
+          <nav
+            className="landing__footer-enlaces"
+            aria-label="Enlaces del pie de página"
+          >
+            <a href="#proposito">Propósito</a>
+            <a href="#funcionalidades">Funcionalidades</a>
+            <a href="#territorios">Territorios</a>
+            <Link to="/login">Iniciar sesión</Link>
+          </nav>
+        </div>
 
-    {/* INFORMACIÓN */}
-    <section
-      id="informacion"
-      className="landing__informacion-extra"
-    >
+        <div className="landing__footer-final">
+          <p>Proyecto DATAVIDA · Proyecto Integrador II · UPB</p>
 
-      <p className="landing__seccion-etiqueta">
-        INFORMACIÓN
-      </p>
-
-      <h2>
-        Datos para comprender
-        <br />
-        nuestros territorios.
-      </h2>
-
-      <p>
-        DATAVIDA busca facilitar el acceso y la
-        interpretación de información relacionada
-        con la pobreza multidimensional en los
-        territorios PDET de Colombia.
-      </p>
-
-    </section>
-
-  </main>
-
-
-  {/* FOOTER */}
-  <footer className="landing__footer">
-    <p>
-      Proyecto DATAVIDA — Proyecto Integrador II, UPB
-    </p>
-  </footer>
-
-</div>
-
-
-);
+          <a href="#inicio" onClick={volverAlInicio}>
+            Volver al inicio ↑
+          </a>
+        </div>
+      </footer>
+    </main>
+  );
 }
+
+export default Landing;
