@@ -1,6 +1,13 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { obtenerUsuario } from "../utils/auth";
 import { tienePermiso } from "../utils/permisos";
+import {
+  obtenerMunicipios,
+  obtenerSubregiones,
+  obtenerCatalogoIndicadores,
+  obtenerPeriodos,
+} from "../services/indicadoresService";
 
 import "../styles/Inicio.css";
 
@@ -67,6 +74,22 @@ function IconoResumen({ tipo }) {
         <path d="M16 14h.01" />
         <path d="M8 18h.01" />
         <path d="M12 18h.01" />
+      </svg>
+    );
+  }
+
+  if (tipo === "subregiones") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 3l9 5-9 5-9-5z" />
+        <path d="M3 13l9 5 9-5" />
       </svg>
     );
   }
@@ -188,6 +211,25 @@ function IconoAcceso({ tipo }) {
     );
   }
 
+  if (tipo === "variables") {
+    return (
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="5" cy="18" r="2" />
+        <circle cx="12" cy="8" r="2" />
+        <circle cx="19" cy="14" r="2" />
+        <path d="M6.5 16.5L11 9.5" />
+        <path d="M13.8 9.2l4 3.6" />
+      </svg>
+    );
+  }
+
   if (tipo === "reportes") {
     return (
       <svg
@@ -211,97 +253,7 @@ function IconoAcceso({ tipo }) {
 }
 
 /* =========================================
-   ICONOS DE ACTIVIDAD
-   ========================================= */
-
-function IconoActividad({ tipo }) {
-  if (tipo === "consulta") {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <circle cx="11" cy="11" r="6" />
-        <path d="M16 16l5 5" />
-      </svg>
-    );
-  }
-
-  if (tipo === "analisis") {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M4 19V5" />
-        <path d="M4 19h17" />
-        <path d="M7 15l4-4 3 2 5-6" />
-      </svg>
-    );
-  }
-
-  if (tipo === "reporte") {
-    return (
-      <svg
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d="M6 3h9l4 4v14H6z" />
-        <path d="M14 3v5h5" />
-        <path d="M9 13h6" />
-        <path d="M9 17h6" />
-      </svg>
-    );
-  }
-
-  return null;
-}
-
-/* =========================================
    DATOS
-   ========================================= */
-
-const tarjetasResumen = [
-  {
-    valor: "1.103",
-    etiqueta: "Municipios disponibles",
-    icono: "municipios",
-    color: "azul",
-  },
-  {
-    valor: "32",
-    etiqueta: "Indicadores disponibles",
-    icono: "indicadores",
-    color: "cian",
-  },
-  {
-    valor: "12",
-    etiqueta: "Periodos registrados",
-    icono: "periodos",
-    color: "cielo",
-  },
-  {
-    valor: "248",
-    etiqueta: "Análisis realizados",
-    icono: "analisis",
-    color: "verde",
-  },
-];
-
-/* =========================================
-   ACCESOS RÁPIDOS
    ========================================= */
 
 const accesosRapidos = [
@@ -309,7 +261,6 @@ const accesosRapidos = [
     titulo: "Consultar indicadores",
     descripcion: "Consulta información de municipios y regiones.",
     icono: "indicadores",
-    color: "gris",
     pantalla: "indicadores",
     permiso: "indicadores",
   },
@@ -317,7 +268,6 @@ const accesosRapidos = [
     titulo: "Visualizar información",
     descripcion: "Explora indicadores mediante mapas y gráficos.",
     icono: "visualizacion",
-    color: "celeste",
     pantalla: "mapa",
     permiso: "visualizacion",
   },
@@ -325,7 +275,6 @@ const accesosRapidos = [
     titulo: "Comparar territorios",
     descripcion: "Compara indicadores entre municipios o regiones.",
     icono: "comparar",
-    color: "azul",
     pantalla: "comparar",
     permiso: "comparar",
   },
@@ -333,80 +282,44 @@ const accesosRapidos = [
     titulo: "Análisis estadístico",
     descripcion: "Analiza patrones y comportamientos en los datos.",
     icono: "estadisticas",
-    color: "verde",
     pantalla: "analisis-estadistico",
     permiso: "estadisticas",
   },
   {
     titulo: "Predicciones IA",
-    descripcion: "Genera predicciones a partir de información histórica.",
+    descripcion: "Proyecta un indicador hasta 5 años y simula escenarios.",
     icono: "predicciones",
-    color: "morado",
     pantalla: "predicciones",
     permiso: "predicciones",
   },
   {
-    titulo: "Reportes",
-    descripcion: "Genera y exporta reportes personalizados.",
-    icono: "reportes",
-    color: "naranja",
-    pantalla: "reportes",
-    permiso: "reportes",
+    titulo: "Análisis de variables",
+    descripcion: "Descubre con qué otras variables se relaciona un indicador.",
+    icono: "variables",
+    pantalla: "variables",
+    permiso: "variables",
   },
 ];
 
-const indicadoresDestacados = [
-  {
-    codigo: "IPM",
-    nombre: "Índice de Pobreza Multidimensional",
-    periodo: "2024",
-    valor: "28,4%",
-    tendencia: "+1,8%",
-    tipo: "negativa",
-  },
-  {
-    codigo: "EDU",
-    nombre: "Rezago educativo",
-    periodo: "2024",
-    valor: "18,7%",
-    tendencia: "-2,4%",
-    tipo: "positiva",
-  },
-  {
-    codigo: "SAL",
-    nombre: "Sin acceso a servicios de salud",
-    periodo: "2024",
-    valor: "11,2%",
-    tendencia: "-1,1%",
-    tipo: "positiva",
-  },
-  {
-    codigo: "EMP",
-    nombre: "Desempleo de larga duración",
-    periodo: "2024",
-    valor: "9,6%",
-    tendencia: "+0,7%",
-    tipo: "negativa",
-  },
-];
+/* =========================================
+   CIFRAS DEL RESUMEN (calculadas con la API, sin valores fijos)
+   ========================================= */
 
-const actividadReciente = [
-  {
-    tipo: "consulta",
-    texto: "Consultaste indicadores de Bucaramanga",
-    tiempo: "Hace 2 horas",
-  },
-  {
-    tipo: "analisis",
-    texto: "Realizaste un análisis estadístico",
-    tiempo: "Ayer",
-  },
-  {
-    tipo: "reporte",
-    texto: "Generaste un reporte territorial",
-    tiempo: "Hace 3 días",
-  },
-];
+const listaDe = (datos) =>
+  Array.isArray(datos) ? datos : datos?.datos || datos?.data || [];
+
+function textoRangoPeriodos(datos) {
+  const anios = listaDe(datos)
+    .map((p) => Number(p?.periodo ?? p?.anio ?? p?.year ?? p))
+    .filter(Number.isFinite);
+
+  if (!anios.length) return "—";
+
+  const min = Math.min(...anios);
+  const max = Math.max(...anios);
+
+  return min === max ? String(min) : `${min}–${max}`;
+}
 
 /* =========================================
    COMPONENTE PRINCIPAL
@@ -418,6 +331,50 @@ function Inicio() {
   const accesosPermitidos = accesosRapidos.filter((acceso) =>
     tienePermiso(usuario?.rol, acceso.permiso)
   );
+
+  const [resumen, setResumen] = useState({
+    municipios: "—",
+    subregiones: "—",
+    indicadores: "—",
+    periodos: "—",
+  });
+
+  useEffect(() => {
+    let activo = true;
+
+    Promise.allSettled([
+      obtenerMunicipios(),
+      obtenerSubregiones(),
+      obtenerCatalogoIndicadores(),
+      obtenerPeriodos(),
+    ]).then(([municipios, subregiones, indicadores, periodos]) => {
+      if (!activo) return;
+
+      const cantidad = (r) =>
+        r.status === "fulfilled" ? String(listaDe(r.value).length) : "—";
+
+      setResumen({
+        municipios: cantidad(municipios),
+        subregiones: cantidad(subregiones),
+        indicadores: cantidad(indicadores),
+        periodos:
+          periodos.status === "fulfilled"
+            ? textoRangoPeriodos(periodos.value)
+            : "—",
+      });
+    });
+
+    return () => {
+      activo = false;
+    };
+  }, []);
+
+  const tarjetasResumen = [
+    { valor: resumen.municipios, etiqueta: "Municipios PDET", icono: "municipios", tono: "ocre" },
+    { valor: resumen.subregiones, etiqueta: "Subregiones PDET", icono: "subregiones", tono: "verde" },
+    { valor: resumen.indicadores, etiqueta: "Indicadores", icono: "indicadores", tono: "azul" },
+    { valor: resumen.periodos, etiqueta: "Periodos de datos", icono: "periodos", tono: "morado", largo: true },
+  ];
 
   function irAPantalla(pantalla) {
     if (pantalla === "inicio") {
@@ -431,42 +388,33 @@ function Inicio() {
   return (
     <div className="inicio-usuario">
 
-      {/* ENCABEZADO */}
+      {/* BANNER DE BIENVENIDA */}
 
-      <header className="encabezado-inicio-usuario">
-        <div>
-          <span className="etiqueta-inicio-usuario">
-            PANEL PRINCIPAL
-          </span>
+      <header className="inicio-hero">
+        <span className="inicio-hero__etiqueta">PANEL PRINCIPAL</span>
 
-          <h1>Bienvenido a DataVida</h1>
+        <h1>Bienvenido a DataVida</h1>
 
-          <p>
-            Explora la información territorial de Colombia y utiliza
-            nuestras herramientas para consultar, comparar y analizar datos.
-          </p>
-        </div>
-
-        <div className="fecha-inicio-usuario">
-          <span>HOY</span>
-          <strong>Resumen general</strong>
-        </div>
+        <p>
+          Explora la información territorial de los municipios PDET y usa
+          nuestras herramientas para consultar, comparar, proyectar y
+          entender la pobreza multidimensional.
+        </p>
       </header>
 
-      {/* TARJETAS DE RESUMEN */}
+      {/* CIFRAS */}
 
-      <section className="tarjetas-resumen">
+      <section className="inicio-cifras">
         {tarjetasResumen.map((tarjeta) => (
-          <article
-            className="tarjeta-resumen"
-            key={tarjeta.etiqueta}
-          >
-            <div className={`icono-resumen ${tarjeta.color}`}>
+          <article className="inicio-cifra" key={tarjeta.etiqueta}>
+            <div className={`inicio-cifra__icono tono-${tarjeta.tono}`}>
               <IconoResumen tipo={tarjeta.icono} />
             </div>
 
-            <div className="contenido-resumen">
-              <strong>{tarjeta.valor}</strong>
+            <div className="inicio-cifra__texto">
+              <strong className={tarjeta.largo ? "inicio-cifra__valor--largo" : ""}>
+                {tarjeta.valor}
+              </strong>
               <span>{tarjeta.etiqueta}</span>
             </div>
           </article>
@@ -475,15 +423,13 @@ function Inicio() {
 
       {/* ACCESOS RÁPIDOS */}
 
-      <section className="seccion-inicio-usuario">
-        <div className="titulo-seccion-inicio">
-          <h2>Accesos rápidos</h2>
-        </div>
+      <section className="inicio-accesos">
+        <h2>Accesos rápidos</h2>
 
-        <div className="grid-accesos">
+        <div className="inicio-accesos__grid">
           {accesosPermitidos.map((acceso) => (
             <article
-              className={`tarjeta-acceso tarjeta-acceso-${acceso.color}`}
+              className="inicio-acceso"
               key={acceso.pantalla}
               onClick={() => irAPantalla(acceso.pantalla)}
               role="button"
@@ -495,138 +441,16 @@ function Inicio() {
                 }
               }}
             >
-              <div
-                className={`icono-acceso icono-acceso-${acceso.color}`}
-              >
+              <div className="inicio-acceso__icono">
                 <IconoAcceso tipo={acceso.icono} />
               </div>
 
-              <div className="contenido-acceso">
-                <h3>{acceso.titulo}</h3>
-                <p>{acceso.descripcion}</p>
-              </div>
+              <h3>{acceso.titulo}</h3>
+              <p>{acceso.descripcion}</p>
+
+              <span className="inicio-acceso__abrir">Abrir →</span>
             </article>
           ))}
-        </div>
-      </section>
-
-      {/* INDICADORES Y ACTIVIDAD */}
-
-      <section className="seccion-inferior-inicio">
-
-        {/* INDICADORES */}
-
-        <article className="panel-indicadores">
-          <div className="encabezado-panel">
-            <div>
-              <span>DATOS DESTACADOS</span>
-              <h2>Indicadores recientes</h2>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => irAPantalla("indicadores")}
-              style={{ visibility: tienePermiso(usuario?.rol, "indicadores") ? "visible" : "hidden" }}
-            >
-              Ver todos
-            </button>
-          </div>
-
-          <div className="lista-indicadores">
-            {indicadoresDestacados.map((indicador) => (
-              <div
-                className="fila-indicador"
-                key={indicador.codigo}
-              >
-                <div className="informacion-indicador">
-                  <span className="etiqueta-indicador">
-                    {indicador.codigo}
-                  </span>
-
-                  <div>
-                    <strong>{indicador.nombre}</strong>
-                    <small>{indicador.periodo}</small>
-                  </div>
-                </div>
-
-                <div className="valor-indicador">
-                  <strong>{indicador.valor}</strong>
-
-                  <span
-                    className={`tendencia ${indicador.tipo}`}
-                  >
-                    {indicador.tendencia}
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
-
-        {/* ACTIVIDAD */}
-
-        <article className="panel-actividad">
-          <div className="encabezado-panel">
-            <div>
-              <span>HISTORIAL</span>
-              <h2>Actividad reciente</h2>
-            </div>
-
-            <button type="button">
-              Ver todo
-            </button>
-          </div>
-
-          <div className="lista-actividad">
-            {actividadReciente.map((actividad, indice) => (
-              <div
-                className="elemento-actividad"
-                key={`${actividad.tipo}-${indice}`}
-              >
-                <div
-                  className={`icono-actividad ${actividad.tipo}`}
-                >
-                  <IconoActividad tipo={actividad.tipo} />
-                </div>
-
-                <div className="contenido-actividad">
-                  <p>{actividad.texto}</p>
-                  <span>{actividad.tiempo}</span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </article>
-
-      </section>
-
-      {/* BANNER FINAL */}
-
-      <section className="banner-inicio-usuario">
-        <div className="banner-contenido">
-          <span>DATAVIDA</span>
-
-          <h2>
-            Convierte los datos en decisiones.
-          </h2>
-
-          <p>
-            Explora los indicadores territoriales de Colombia,
-            identifica patrones y comprende mejor la realidad de
-            nuestros territorios.
-          </p>
-        </div>
-
-        <div
-          className="banner-grafico"
-          aria-hidden="true"
-        >
-          <span className="barra-grafico barra-1"></span>
-          <span className="barra-grafico barra-2"></span>
-          <span className="barra-grafico barra-3"></span>
-          <span className="barra-grafico barra-4"></span>
-          <span className="barra-grafico barra-5"></span>
-          <span className="linea-grafico"></span>
         </div>
       </section>
 
