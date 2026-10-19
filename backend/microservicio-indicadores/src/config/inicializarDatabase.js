@@ -1,15 +1,20 @@
+
 const pool = require("./database");
 
 /**
- * Inicializa la estructura persistente del
- * Microservicio de Indicadores.
+ * DATAVIDA
+ * Inicialización de PostgreSQL.
  *
- * IMPORTANTE:
- * Esta inicialización NO elimina información existente.
+ * Crea las tablas necesarias y registra
+ * los territorios y el catálogo de indicadores.
+ *
+ * NO elimina datos existentes.
+ * NO inserta valores estadísticos.
+ * NO sobrescribe observaciones oficiales.
  */
-async function inicializarDatabase() {
 
-  // 1. Crear tabla de territorios si todavía no existe.
+async function inicializarDatabase() {
+  // 1. Tabla de territorios
   await pool.query(`
     CREATE TABLE IF NOT EXISTS territorios (
       codigo VARCHAR(30) PRIMARY KEY,
@@ -18,7 +23,7 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 2. Crear catálogo de indicadores.
+  // 2. Catálogo de indicadores
   await pool.query(`
     CREATE TABLE IF NOT EXISTS indicadores (
       id SERIAL PRIMARY KEY,
@@ -30,7 +35,7 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 3. Crear tabla de valores.
+  // 3. Valores de los indicadores
   await pool.query(`
     CREATE TABLE IF NOT EXISTS valores_indicador (
       id SERIAL PRIMARY KEY,
@@ -58,209 +63,114 @@ async function inicializarDatabase() {
     );
   `);
 
-  // 4. Registrar/actualizar territorio agregado PDET.
+  // 4. Territorios agregados PDET
   await pool.query(`
     INSERT INTO territorios (
-      codigo,
-      nombre,
-      tipo
-    )
-    VALUES (
-      'PDET-CO',
-      'PDET Colombia',
-      'Programas de Desarrollo con Enfoque Territorial'
-    )
-
-    ON CONFLICT (codigo)
-    DO UPDATE SET
-      nombre = EXCLUDED.nombre,
-      tipo = EXCLUDED.tipo;
-  `);
-
-  // 5. Registrar/actualizar catálogo de indicadores.
-  await pool.query(`
-    INSERT INTO indicadores (
-      codigo,
-      nombre,
-      unidad,
-      dimension,
-      fuente
+      codigo, nombre, tipo
     )
     VALUES
       (
-        'IPM',
-        'Pobreza multidimensional',
-        '%',
-        'Pobreza multidimensional',
-        'DANE - Índice de Pobreza Multidimensional 2025'
+        'PDET-CO',
+        'Agregado PDET Colombia',
+        'Agregado PDET'
       ),
       (
-        'LOGRO_EDUCATIVO',
-        'Bajo logro educativo',
-        '%',
-        'Educación',
-        'DANE - Índice de Pobreza Multidimensional 2025'
+        'PDET-CAB',
+        'Cabeceras PDET',
+        'Dominio PDET'
       ),
       (
-        'ANALFABETISMO',
-        'Analfabetismo',
-        '%',
-        'Educación',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'INASISTENCIA',
-        'Inasistencia escolar',
-        '%',
-        'Educación',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'REZAGO_ESCOLAR',
-        'Rezago escolar',
-        '%',
-        'Educación',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'TRABAJO_INFANTIL',
-        'Trabajo infantil',
-        '%',
-        'Niñez y juventud',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'SIN_ASEGURAMIENTO',
-        'Sin aseguramiento en salud',
-        '%',
-        'Salud',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'BARRERAS_SALUD',
-        'Barreras de acceso a servicios de salud',
-        '%',
-        'Salud',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'DESEMPLEO_LARGA_DURACION',
-        'Desempleo de larga duración',
-        '%',
-        'Trabajo',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'EMPLEO_INFORMAL',
-        'Empleo informal',
-        '%',
-        'Trabajo',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'SIN_ACUEDUCTO',
-        'Sin acceso a fuente de agua mejorada',
-        '%',
-        'Vivienda y servicios públicos',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'EXCRETAS',
-        'Inadecuada eliminación de excretas',
-        '%',
-        'Vivienda y servicios públicos',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'PISOS_INADECUADOS',
-        'Pisos inadecuados',
-        '%',
-        'Vivienda',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'PAREDES_INADECUADAS',
-        'Paredes exteriores inadecuadas',
-        '%',
-        'Vivienda',
-        'DANE - Índice de Pobreza Multidimensional 2025'
-      ),
-      (
-        'HACINAMIENTO',
-        'Hacinamiento crítico',
-        '%',
-        'Vivienda',
-        'DANE - Índice de Pobreza Multidimensional 2025'
+        'PDET-RUR',
+        'Centros poblados y rural disperso PDET',
+        'Dominio PDET'
       )
-
-    ON CONFLICT (codigo)
-    DO UPDATE SET
-      nombre = EXCLUDED.nombre,
-      unidad = EXCLUDED.unidad,
-      dimension = EXCLUDED.dimension,
-      fuente = EXCLUDED.fuente;
+    ON CONFLICT (codigo) DO NOTHING;
   `);
 
-  // 6. Registrar/actualizar valores agregados PDET 2025.
-  await pool.query(`
-    INSERT INTO valores_indicador (
-      territorio_codigo,
-      indicador_id,
-      periodo,
-      valor,
-      fuente,
-      fecha_actualizacion
-    )
+  // 5. Catálogo de indicadores
+  const indicadores = [
+    ["IPM", "Pobreza multidimensional",
+      "Pobreza multidimensional"],
 
-    SELECT
-      'PDET-CO',
-      i.id,
-      '2025',
-      d.valor,
-      'DANE - Índice de Pobreza Multidimensional 2025',
-      CURRENT_DATE
+    ["LOGRO_EDUCATIVO", "Bajo logro educativo",
+      "Educación"],
 
-    FROM (
-      VALUES
-        ('IPM', 21.3546),
-        ('LOGRO_EDUCATIVO', 57.8),
-        ('ANALFABETISMO', 13.2),
-        ('INASISTENCIA', 6.3),
-        ('REZAGO_ESCOLAR', 36.3),
-        ('TRABAJO_INFANTIL', 4.3),
-        ('SIN_ASEGURAMIENTO', 3.7),
-        ('BARRERAS_SALUD', 3.5),
-        ('DESEMPLEO_LARGA_DURACION', 7.1),
-        ('EMPLEO_INFORMAL', 91.8),
-        ('SIN_ACUEDUCTO', 31.3),
-        ('EXCRETAS', 26.2),
-        ('PISOS_INADECUADOS', 12.7),
-        ('PAREDES_INADECUADAS', 5.9),
-        ('HACINAMIENTO', 11.7)
-    ) AS d(codigo, valor)
+    ["ANALFABETISMO", "Analfabetismo",
+      "Educación"],
 
-    INNER JOIN indicadores i
-      ON i.codigo = d.codigo
+    ["INASISTENCIA", "Inasistencia escolar",
+      "Educación"],
 
-    ON CONFLICT (
-      territorio_codigo,
-      indicador_id,
-      periodo
-    )
+    ["REZAGO_ESCOLAR", "Rezago escolar",
+      "Educación"],
 
-    DO NOTHING;
-  `);
+    ["TRABAJO_INFANTIL", "Trabajo infantil",
+      "Niñez y juventud"],
+
+    ["SIN_ASEGURAMIENTO",
+      "Sin aseguramiento en salud", "Salud"],
+
+    ["BARRERAS_SALUD",
+      "Barreras de acceso a servicios de salud",
+      "Salud"],
+
+    ["DESEMPLEO_LARGA_DURACION",
+      "Desempleo de larga duración", "Trabajo"],
+
+    ["EMPLEO_INFORMAL", "Empleo informal",
+      "Trabajo"],
+
+    ["SIN_ACUEDUCTO",
+      "Sin acceso a fuente de agua mejorada",
+      "Vivienda y servicios públicos"],
+
+    ["EXCRETAS",
+      "Inadecuada eliminación de excretas",
+      "Vivienda y servicios públicos"],
+
+    ["PISOS_INADECUADOS",
+      "Pisos inadecuados", "Vivienda"],
+
+    ["PAREDES_INADECUADAS",
+      "Paredes exteriores inadecuadas",
+      "Vivienda"],
+
+    ["HACINAMIENTO",
+      "Hacinamiento crítico", "Vivienda"]
+  ];
+
+  for (const [codigo, nombre, dimension] of indicadores) {
+    await pool.query(
+      `
+      INSERT INTO indicadores (
+        codigo, nombre, unidad, dimension, fuente
+      )
+      VALUES ($1, $2, '%', $3, $4)
+      ON CONFLICT (codigo) DO NOTHING;
+      `,
+      [
+        codigo,
+        nombre,
+        dimension,
+        "DANE - Índice de Pobreza Multidimensional"
+      ]
+    );
+  }
 
   console.log(
-    "Estructura PostgreSQL persistente verificada correctamente."
+    "DATAVIDA: estructura PostgreSQL verificada."
   );
 
   console.log(
-    "Datos agregados PDET 2025 verificados correctamente."
+    "DATAVIDA: territorios PDET registrados."
   );
 
   console.log(
-    "La inicialización no elimina información existente."
+    "DATAVIDA: catálogo de indicadores verificado."
+  );
+
+  console.log(
+    "DATAVIDA: no se modificaron valores estadísticos."
   );
 }
 
