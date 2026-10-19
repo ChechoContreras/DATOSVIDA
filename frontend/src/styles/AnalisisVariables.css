@@ -1,0 +1,256 @@
+/* Módulo "Análisis de variables" */
+
+.variables-guia {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 18px 0 22px;
+}
+
+.variables-paso {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.variables-paso > span {
+  flex: 0 0 auto;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--verde-medio);
+  color: #fff;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.variables-paso p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--texto);
+}
+
+.variables-selector {
+  display: flex;
+  gap: 24px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 18px;
+}
+
+.variables-selector .campo-indicadores {
+  flex: 1 1 320px;
+  max-width: 460px;
+}
+
+.variables-muestra {
+  margin: 0;
+  font-size: 13px;
+  color: #6f6b60;
+  flex: 1 1 260px;
+}
+
+.variables-panel {
+  background: var(--blanco);
+  border: 1px solid var(--gris-borde);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 18px;
+}
+
+.variables-panel__cabecera {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.variables-panel h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--verde-oscuro);
+}
+
+.variables-detalle h2 span {
+  color: var(--ocre);
+  font-weight: 500;
+  margin: 0 4px;
+}
+
+.variables-leyenda {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: #6f6b60;
+}
+
+.variables-leyenda i {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 6px;
+  vertical-align: -1px;
+}
+
+.variables-ranking {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.variables-fila {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(180px, 1.2fr) 2fr 110px;
+  align-items: center;
+  gap: 16px;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 9px 12px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--texto);
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.variables-fila:hover {
+  background: var(--verde-suave);
+}
+
+.variables-fila--activa {
+  background: var(--verde-suave);
+  border-color: var(--verde-medio);
+}
+
+.variables-fila__nombre {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.variables-fila__nombre small,
+.variables-fila__valor small {
+  display: block;
+  font-weight: 400;
+  font-size: 11.5px;
+  color: #7c786c;
+  margin-top: 2px;
+}
+
+.variables-fila__pista {
+  height: 14px;
+  background: #f0ece1;
+  border-radius: 7px;
+  overflow: hidden;
+}
+
+.variables-fila__barra {
+  display: block;
+  height: 100%;
+  border-radius: 7px;
+}
+
+.variables-fila__valor {
+  font-weight: 700;
+  font-size: 15px;
+  text-align: right;
+  color: var(--verde-oscuro);
+}
+
+.variables-nota,
+.variables-aviso {
+  margin: 14px 0 0;
+  font-size: 12px;
+  color: #7c786c;
+}
+
+.variables-vacio {
+  margin: 0;
+  color: #7c786c;
+}
+
+.variables-frase {
+  margin: 8px 0 16px;
+  font-size: 15px;
+  color: var(--texto);
+}
+
+.variables-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.variables-cifras > div {
+  background: var(--arena);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+
+.variables-cifras span {
+  display: block;
+  font-size: 12px;
+  color: #7c786c;
+}
+
+.variables-cifras strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 20px;
+  color: var(--verde-oscuro);
+  text-transform: capitalize;
+}
+
+.variables-grafico {
+  position: relative;
+  height: 380px;
+  max-width: 820px;
+}
+
+@media (max-width: 800px) {
+  .variables-guia,
+  .variables-cifras {
+    grid-template-columns: 1fr;
+  }
+
+  .variables-fila {
+    grid-template-columns: 1fr 90px;
+  }
+
+  .variables-fila__pista {
+    grid-column: 1 / -1;
+    order: 3;
+  }
+}
+
+.variables-inicio {
+  text-align: center;
+  padding: 44px 22px;
+}
+
+.variables-inicio p {
+  margin: 8px auto 0;
+  max-width: 520px;
+  color: #6f6b60;
+  font-size: 14px;
+}
