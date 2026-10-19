@@ -1,7 +1,16 @@
 import { useEffect, useState } from "react";
 import { obtenerMunicipios, obtenerCatalogoIndicadores } from "../services/indicadoresService";
 import { generarPrediccion } from "../services/iaServiceCliente";
+import SimulacionEscenarios from "../components/SimulacionEscenarios";
 import "../styles/Indicadores.css";
+
+// Territorios agregados PDET: son los que tienen serie anual 2018-2025,
+// necesaria para proyectar (los municipios solo tienen el corte 2018).
+const TERRITORIOS_AGREGADOS = [
+  { codigo: "PDET-CO", nombre: "PDET Colombia (total)" },
+  { codigo: "PDET-CAB", nombre: "PDET Colombia - Cabeceras" },
+  { codigo: "PDET-CPRD", nombre: "PDET Colombia - Centros poblados y rural disperso" },
+];
 
 export default function PrediccionesIA() {
   const [municipios, setMunicipios] = useState([]);
@@ -47,9 +56,16 @@ export default function PrediccionesIA() {
             <label>Municipio</label>
             <select value={municipioCodigo} onChange={(e) => setMunicipioCodigo(e.target.value)}>
               <option value="">Selecciona…</option>
-              {municipios.map((m) => (
-                <option key={m.codigo} value={m.codigo}>{m.nombre}</option>
-              ))}
+              <optgroup label="Agregados PDET (con serie 2018-2025)">
+                {TERRITORIOS_AGREGADOS.map((t) => (
+                  <option key={t.codigo} value={t.codigo}>{t.nombre}</option>
+                ))}
+              </optgroup>
+              <optgroup label="Municipios PDET (solo corte 2018)">
+                {municipios.map((m) => (
+                  <option key={m.codigo} value={m.codigo}>{m.nombre}</option>
+                ))}
+              </optgroup>
             </select>
           </div>
           <div className="campo-indicadores">
@@ -66,7 +82,7 @@ export default function PrediccionesIA() {
             <input
               type="number"
               min="1"
-              max="10"
+              max="5"
               value={horizonte}
               onChange={(e) => setHorizonte(e.target.value)}
             />
@@ -123,6 +139,16 @@ export default function PrediccionesIA() {
             Modelo: {resultado.versionModelo} · Variables consideradas: {resultado.variablesRelevantes.join(", ")}
           </p>
         </section>
+      )}
+
+      {estado === "resultados" && resultado && (
+        <SimulacionEscenarios
+          key={`${resultado.municipio?.codigo}-${resultado.indicador?.id}-${resultado.horizonte}-${resultado.anioActual}`}
+          municipioCodigo={resultado.municipio?.codigo}
+          indicadorId={resultado.indicador?.id}
+          horizonte={resultado.horizonte}
+          unidad={resultado.indicador.unidad}
+        />
       )}
     </div>
   );

@@ -48,33 +48,34 @@ function validarParametros(municipioCodigo, indicadorId) {
   }
 }
 
-/**
- * RF-13: Predicciones mediante IA.
- *
- * Una predicción temporal requiere observaciones
- * históricas reales de un mismo indicador y municipio.
- *
- * No se generan series históricas artificiales.
- */
-async function generarPrediccion({
-  municipioCodigo,
-  indicadorId,
-  horizonte = 1,
-}) {
-  validarParametros(municipioCodigo, indicadorId);
+const HORIZONTE_MAXIMO = 5;
 
+function validarHorizonte(horizonte) {
   const horizonteNumerico = Number(horizonte);
 
   if (
     !Number.isInteger(horizonteNumerico) ||
     horizonteNumerico < 1 ||
-    horizonteNumerico > 10
+    horizonteNumerico > HORIZONTE_MAXIMO
   ) {
     throw crearError(
-      "El horizonte debe ser un número entero entre 1 y 10 años.",
+      `El horizonte debe ser un número entero entre 1 y ${HORIZONTE_MAXIMO} años.`,
       "HORIZONTE_INVALIDO"
     );
   }
+
+  return horizonteNumerico;
+}
+
+/**
+ * Obtiene la serie histórica real de un indicador en un territorio
+ * y ajusta la regresión lineal. Lo comparten las predicciones (RF-13)
+ * y la simulación de escenarios.
+ *
+ * No se generan series históricas artificiales.
+ */
+async function prepararSerieTemporal(municipioCodigo, indicadorId) {
+  validarParametros(municipioCodigo, indicadorId);
 
   const valores = (
     await indicadoresClient.consultarValoresIndicadores({
@@ -144,6 +145,37 @@ async function generarPrediccion({
       "MODELO_NO_VALIDO"
     );
   }
+
+  const indicador = valores[0].indicador;
+
+  return {
+    valores,
+    indicador,
+    municipio: valores[0].municipio,
+    serieHistorica,
+    anios,
+    datos,
+    regresion,
+  };
+}
+
+/**
+ * RF-13: Predicciones mediante IA.
+ *
+ * Una predicción temporal requiere observaciones
+ * históricas reales de un mismo indicador y municipio.
+ */
+async function generarPrediccion({
+  municipioCodigo,
+  indicadorId,
+  horizonte = 1,
+}) {
+  validarParametros(municipioCodigo, indicadorId);
+
+  const horizonteNumerico = validarHorizonte(horizonte);
+
+  const { valores, serieHistorica, anios, datos, regresion } =
+    await prepararSerieTemporal(municipioCodigo, indicadorId);
 
   const anioActual = anios[anios.length - 1];
   const valorActual = datos[datos.length - 1];
@@ -341,6 +373,7 @@ async function calcularCorrelaciones({
 
   const porMunicipio = {};
   const catalogo = {};
+  const nombresMunicipio = {};
 
   todos.forEach((dato) => {
     if (!dato.municipio || !dato.indicador) {
@@ -368,6 +401,7 @@ async function calcularCorrelaciones({
 
     porMunicipio[codigo][idIndicador] = valor;
     catalogo[idIndicador] = dato.indicador;
+    nombresMunicipio[codigo] = dato.municipio.nombre;
   });
 
   const idsCatalogo = Object.keys(catalogo).map(Number);
@@ -382,23 +416,35 @@ async function calcularCorrelaciones({
         ]
       : combinacionesUnicas(idsCatalogo);
 
+  const soloUnPar = Boolean(indicadorIdA && indicadorIdB);
+
   const correlaciones = pares.map(([a, b]) => {
     const xs = [];
     const ys = [];
+    const puntos = [];
 
-    Object.values(porMunicipio).forEach((municipio) => {
+    Object.entries(porMunicipio).forEach(([codigo, municipio]) => {
       if (
         municipio[a] !== undefined &&
         municipio[b] !== undefined
       ) {
         xs.push(municipio[a]);
         ys.push(municipio[b]);
+        puntos.push({
+          codigo,
+          nombre: nombresMunicipio[codigo] || codigo,
+          x: municipio[a],
+          y: municipio[b],
+        });
       }
     });
 
     const r = correlacionPearson(xs, ys);
 
     return {
+      // Los puntos por municipio solo se devuelven al consultar un par,
+      // para el gráfico de dispersión del detalle.
+      ...(soloUnPar ? { puntos } : {}),
       indicadorA: catalogo[a] || null,
       indicadorB: catalogo[b] || null,
       n: xs.length,
@@ -454,6 +500,7 @@ async function calcularCorrelaciones({
     );
 
   return {
+    municipiosAnalizados: Object.keys(porMunicipio).length,
     correlaciones,
     variablesPriorizadas,
   };
@@ -473,8 +520,84 @@ function obtenerHistorialRecomendaciones() {
   return repository.listarRecomendaciones();
 }
 
-module.exports = {
+/**
+ * Simulación de escenarios.
+ *
+ * Compara la TENDENCIA ACTUAL (regresión lineal sobre la serie real)
+ * con un ESCENARIO HIPOTÉTICO que suma un cambio anual adicional,
+ * elegido por la persona usuaria, a esa tendencia.
+ *
+ *   escenario(t) = tendencia(t) + ajusteAnual * t     (t = años desde el último dato)
+ *
+ * No predice el efecto real de una política: muestra qué pasaría con el
+ * indicador si, además de su tendencia, cambiara cada año en esa cantidad.
+ */
+async function simularEscenario({
+  municipioCodigo,
+  indicadorId,
+  horizonte = 3,
+  ajusteAnual = 0,
+}) {
+  validarParametros(municipioCodigo, indicadorId);
+
+  const horizonteNumerico = validarHorizonte(horizonte);
+  const ajuste = Number(ajusteAnual);
+
+  if (!Number.isFinite(ajuste) || Math.abs(ajuste) > 20) {
+    throw crearError(
+      "El cambio anual adicional debe ser un número entre -20 y 20.",
+      "AJUSTE_INVALIDO"
+    );
+  }
+
+  const { indicador, municipio, serieHistorica, anios, datos, regresion } =
+    await prepararSerieTemporal(municipioCodigo, indicadorId);
+
+  const anioActual = anios[anios.length - 1];
+  const valorActual = datos[datos.length - 1];
+  const esPorcentaje = indicador.unidad === "%";
+
+  const limitar = (v) => (esPorcentaje ? Math.max(0, Math.min(100, v)) : v);
+  const redondear = (v) => Math.round(v * 10) / 10;
+
+  const tendencia = [{ anio: anioActual, valor: redondear(valorActual) }];
+  const escenario = [{ anio: anioActual, valor: redondear(valorActual) }];
+
+  for (let t = 1; t <= horizonteNumerico; t++) {
+    const anio = anioActual + t;
+    const base = limitar(predecir(regresion, anio));
+
+    tendencia.push({ anio, valor: redondear(base) });
+    escenario.push({ anio, valor: redondear(limitar(base + ajuste * t)) });
+  }
+
+  const finalTendencia = tendencia[tendencia.length - 1].valor;
+  const finalEscenario = escenario[escenario.length - 1].valor;
+
+  return {
+    municipio,
+    indicador,
+    horizonte: horizonteNumerico,
+    anioActual,
+    anioObjetivo: anioActual + horizonteNumerico,
+    ajusteAnual: ajuste,
+    serieHistorica: serieHistorica.map(([anio, valor]) => ({ anio, valor })),
+    tendencia,
+    escenario,
+    valorFinalTendencia: finalTendencia,
+    valorFinalEscenario: finalEscenario,
+    diferencia: redondear(finalEscenario - finalTendencia),
+    r2: Math.round(regresion.r2 * 100) / 100,
+    versionModelo: VERSION_MODELO,
+    nota:
+      "Escenario hipotético: suma a la tendencia estimada un cambio anual " +
+      "adicional definido por la persona usuaria. No representa el efecto " +
+      "real de una intervención ni una predicción validada.",
+  };
+} module.exports = {
   generarPrediccion,
+  simularEscenario,
+
   obtenerRecomendaciones,
   calcularCorrelaciones,
   obtenerHistorialPredicciones,

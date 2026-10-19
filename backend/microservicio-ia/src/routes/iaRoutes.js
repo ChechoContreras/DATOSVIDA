@@ -12,6 +12,16 @@ router.post("/predicciones", async (req, res) => {
   }
 });
 
+/** POST /api/ia/simulacion — Simulación de escenarios (tendencia vs. cambio anual adicional). */
+router.post("/simulacion", async (req, res) => {
+  try {
+    const resultado = await service.simularEscenario(req.body || {});
+    res.status(200).json(resultado);
+  } catch (err) {
+    res.status(400).json({ mensaje: err.message, codigo: err.codigo });
+  }
+});
+
 /** GET /api/ia/recomendaciones?municipioCodigo=&indicadorId= — RF-14. */
 router.get("/recomendaciones", async (req, res) => {
   try {
