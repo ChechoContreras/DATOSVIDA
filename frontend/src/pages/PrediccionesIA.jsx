@@ -56,12 +56,12 @@ export default function PrediccionesIA() {
             <label>Municipio</label>
             <select value={municipioCodigo} onChange={(e) => setMunicipioCodigo(e.target.value)}>
               <option value="">Selecciona…</option>
-              <optgroup label="Agregados PDET (con serie 2018-2025)">
+              <optgroup label="PDET Colombia">
                 {TERRITORIOS_AGREGADOS.map((t) => (
                   <option key={t.codigo} value={t.codigo}>{t.nombre}</option>
                 ))}
               </optgroup>
-              <optgroup label="Municipios PDET (solo corte 2018)">
+              <optgroup label="Municipios">
                 {municipios.map((m) => (
                   <option key={m.codigo} value={m.codigo}>{m.nombre}</option>
                 ))}
