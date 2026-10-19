@@ -9,23 +9,14 @@ const imagenHero =
 const imagenTerritorio =
   "https://images.unsplash.com/photo-1650201777831-8c5c23a2b41e?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=88&w=1400";
 
-const mapaPdetUrl =
-  "https://www.arcgis.com/apps/mapviewer/index.html?url=https%3A%2F%2Fmapas.igac.gov.co%2Fserver%2Frest%2Fservices%2Fordenamientoterritorial%2FmunicipiosPDET%2FMapServer";
-
 function Marca({ footer = false }) {
   return (
     <Link
       to="/"
-      className={`landing__marca ${
-        footer ? "landing__marca--footer" : ""
-      }`}
+      className={`landing__marca ${footer ? "landing__marca--footer" : ""}`}
       aria-label="DATAVIDA, página de inicio"
     >
-      <img
-        src={logoIcono}
-        alt=""
-        className="landing__logo"
-      />
+      <img src={logoIcono} alt="" className="landing__logo" />
 
       <span className="landing__marca-texto">
         <strong>DATAVIDA</strong>
@@ -99,7 +90,6 @@ const funcionalidades = [
     titulo: "Indicadores territoriales",
     descripcion:
       "Consulta información relacionada con las dimensiones e indicadores de pobreza multidimensional.",
-    ruta: "/app/indicadores",
   },
   {
     numero: "02",
@@ -107,7 +97,6 @@ const funcionalidades = [
     titulo: "Visualización geográfica",
     descripcion:
       "Explora los territorios PDET y comprende cómo se distribuye la información en Colombia.",
-    ruta: "/app/mapa",
   },
   {
     numero: "03",
@@ -115,7 +104,6 @@ const funcionalidades = [
     titulo: "Análisis de datos",
     descripcion:
       "Compara indicadores y encuentra diferencias que ayudan a comprender las realidades territoriales.",
-    ruta: "/app/analisis-estadistico",
   },
   {
     numero: "04",
@@ -123,7 +111,6 @@ const funcionalidades = [
     titulo: "Generación de reportes",
     descripcion:
       "Organiza los resultados para facilitar su consulta, interpretación y seguimiento.",
-    ruta: "/app/reportes",
   },
 ];
 
@@ -149,24 +136,15 @@ const pasos = [
 ];
 
 function Landing() {
-  const volverAlInicio = (evento) => {
-    evento.preventDefault();
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
   return (
-    <main className="landing" id="inicio">
+    <main className="landing">
       <header className="landing__header">
         <div className="landing__header-contenido">
           <Marca />
 
-          <nav
-            className="landing__nav"
-            aria-label="Navegación principal"
-          >
+          <nav className="landing__nav" aria-label="Navegación principal">
             <a href="#proposito">Propósito</a>
             <a href="#funcionalidades">Funcionalidades</a>
-            <a href="#territorios">Territorios</a>
           </nav>
 
           <div className="landing__acciones-header">
@@ -179,7 +157,6 @@ function Landing() {
               className="landing__boton landing__boton--pequeno"
             >
               Explorar plataforma
-              <span aria-hidden="true">↗</span>
             </Link>
           </div>
         </div>
@@ -191,7 +168,7 @@ function Landing() {
         <div className="landing__hero-contenido">
           <div className="landing__hero-texto">
             <p className="landing__eyebrow landing__eyebrow--claro">
-              INFORMACIÓN · TERRITORIO · COMPRENSIÓN
+              INFORMACIÓN DEL TERRITORIO COLOMBIANO
             </p>
 
             <h1>
@@ -201,34 +178,21 @@ function Landing() {
             </h1>
 
             <p className="landing__hero-descripcion">
-              Información para comprender la pobreza multidimensional
-              en los territorios PDET de Colombia.
+              Información para comprender la pobreza multidimensional en
+              los territorios PDET de Colombia.
             </p>
 
             <div className="landing__hero-botones">
               <a
-                href="#territorios"
+                href="#funcionalidades"
                 className="landing__boton landing__boton--dorado"
               >
                 Explorar territorios
-                <span aria-hidden="true">↗</span>
               </a>
 
-              <a
-                href="#proposito"
-                className="landing__enlace-claro"
-              >
+              <a href="#proposito" className="landing__enlace-claro">
                 Conocer DATAVIDA
-                <span aria-hidden="true">→</span>
               </a>
-            </div>
-
-            <div className="landing__hero-dato">
-              <span className="landing__hero-dato-linea" />
-              <p>
-                <strong>170 municipios</strong>
-                <span>agrupados en 16 subregiones PDET</span>
-              </p>
             </div>
           </div>
 
@@ -258,9 +222,6 @@ function Landing() {
         <div className="landing__hero-pie">
           <span>DATOS CON CONTEXTO</span>
           <span>UNA MIRADA AL TERRITORIO COLOMBIANO</span>
-          <a href="#proposito" aria-label="Desplazarse hacia abajo">
-            ↓
-          </a>
         </div>
       </section>
 
@@ -274,14 +235,14 @@ function Landing() {
           />
 
           <div className="landing__imagen-etiqueta">
-            <span>01 — EL PROPÓSITO</span>
+            <span>01 EL PROPÓSITO</span>
             <p>Comprender para transformar.</p>
           </div>
         </div>
 
         <div className="landing__proposito-contenido">
           <p className="landing__eyebrow">
-            01 — NUESTRO PROPÓSITO
+            01 NUESTRO PROPÓSITO
           </p>
 
           <h2>
@@ -322,7 +283,7 @@ function Landing() {
         <div className="landing__seccion-encabezado">
           <div>
             <p className="landing__eyebrow">
-              02 — LA PLATAFORMA
+              02 LA PLATAFORMA
             </p>
 
             <h2>
@@ -345,106 +306,30 @@ function Landing() {
               key={funcionalidad.numero}
             >
               <div className="landing__funcionalidad-arriba">
-                <span>{funcionalidad.numero}</span>
                 <span className="landing__funcionalidad-icono">
-                  <Icono tipo={funcionalidad.icono} />
+                  {funcionalidad.numero}
                 </span>
               </div>
 
               <h3>{funcionalidad.titulo}</h3>
+
               <p>{funcionalidad.descripcion}</p>
 
               <Link
-                to={funcionalidad.ruta}
+                to="/login"
                 className="landing__funcionalidad-enlace"
               >
                 Explorar
-                <span aria-hidden="true">↗</span>
               </Link>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="landing__territorios" id="territorios">
-        <div className="landing__territorios-contenido">
-          <p className="landing__eyebrow landing__eyebrow--claro">
-            04 — UNA MIRADA A COLOMBIA
-          </p>
-
-          <h2>
-            Un país.
-            <br />
-            Muchos territorios.
-            <br />
-            <em>Realidades distintas.</em>
-          </h2>
-
-          <p className="landing__territorios-descripcion">
-            Los municipios PDET hacen parte de territorios con historias,
-            características y desafíos propios. Explorar sus indicadores
-            permite acercarnos a esas diferencias con mayor contexto.
-          </p>
-
-          <Link
-            to="/app/mapa"
-            className="landing__boton landing__boton--dorado"
-          >
-            Explorar los datos
-            <span aria-hidden="true">↗</span>
-          </Link>
-
-          <div className="landing__territorios-cita">
-            <span>170</span>
-            <p>
-              municipios PDET
-              <br />
-              en 16 subregiones
-            </p>
-          </div>
-        </div>
-
-        <div className="landing__territorios-visual">
-          <div className="landing__mapa-encabezado">
-            <span>COLOMBIA</span>
-            <span>MAPA DE TERRITORIOS PDET</span>
-          </div>
-
-          <div className="landing__mapa-marco landing__mapa-marco--real">
-            <iframe
-              className="landing__mapa-iframe"
-              src={mapaPdetUrl}
-              title="Mapa geográfico de municipios PDET de Colombia"
-              loading="lazy"
-              allowFullScreen
-            />
-
-            <div className="landing__mapa-leyenda">
-              <span className="landing__mapa-leyenda-muestra" />
-              <p>Municipios PDET de Colombia</p>
-            </div>
-          </div>
-
-          <p className="landing__mapa-fuente">
-            Fuente cartográfica: IGAC y Agencia de Renovación del Territorio.
-          </p>
-
-          <a
-            className="landing__mapa-enlace"
-            href="https://mapas.igac.gov.co/server/rest/services/ordenamientoterritorial/municipiosPDET/MapServer"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Consultar servicio cartográfico oficial
-            <span aria-hidden="true">↗</span>
-          </a>
-        </div>
-      </section>
-
       <section className="landing__llamado">
         <div className="landing__llamado-contenido">
           <p className="landing__eyebrow">
-            DATAVIDA · DATOS CON PROPÓSITO
+            DATAVIDA
           </p>
 
           <h2>
@@ -462,14 +347,10 @@ function Landing() {
             className="landing__boton landing__boton--oscuro"
           >
             Ingresar a DATAVIDA
-            <span aria-hidden="true">↗</span>
           </Link>
         </div>
 
-        <div
-          className="landing__llamado-decoracion"
-          aria-hidden="true"
-        >
+        <div className="landing__llamado-decoracion" aria-hidden="true">
           <span />
           <span />
           <span />
@@ -491,7 +372,6 @@ function Landing() {
           >
             <a href="#proposito">Propósito</a>
             <a href="#funcionalidades">Funcionalidades</a>
-            <a href="#territorios">Territorios</a>
             <Link to="/login">Iniciar sesión</Link>
           </nav>
         </div>
@@ -499,8 +379,14 @@ function Landing() {
         <div className="landing__footer-final">
           <p>Proyecto DATAVIDA · Proyecto Integrador II · UPB</p>
 
-          <a href="#inicio" onClick={volverAlInicio}>
-            Volver al inicio ↑
+          <a
+            href="#inicio"
+            onClick={(evento) => {
+              evento.preventDefault();
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            Volver al inicio
           </a>
         </div>
       </footer>
@@ -509,3 +395,4 @@ function Landing() {
 }
 
 export default Landing;
+
