@@ -1,562 +1,817 @@
-/* =========================================
-   PAGINA INDICADORES
-   ========================================= */
+```css
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap");
+
+/* ========================================
+   DATAVIDA · CONSULTA DE INDICADORES
+======================================== */
 
 .pagina-indicadores {
+  --verde-oscuro: #173c34;
+  --verde-medio: #245047;
+  --verde-claro: #e8eee8;
+  --dorado: #b5793a;
+  --crema: #f3f6f3;
+  --blanco: #ffffff;
+  --texto: #243b32;
+  --texto-secundario: #68776e;
+  --borde: #e2e8e1;
+  --sombra: 0 14px 38px rgba(23, 60, 52, 0.08);
+
+  display: flex;
+  flex-direction: column;
   width: 100%;
-  max-width: 1500px;
-  margin: 0 auto;
-  padding-bottom: 30px;
+  min-height: 100vh;
+  overflow-x: clip;
+  background: var(--crema);
+  color: var(--texto);
+  font-family: "DM Sans", sans-serif;
+}
+
+.pagina-indicadores *,
+.pagina-indicadores *::before,
+.pagina-indicadores *::after {
   box-sizing: border-box;
 }
 
-/* =========================================
-   ENCABEZADO
-   ========================================= */
+.pagina-indicadores a {
+  text-decoration: none;
+}
 
-.encabezado-indicadores {
+.pagina-indicadores button,
+.pagina-indicadores input,
+.pagina-indicadores select {
+  font: inherit;
+}
+
+.pagina-indicadores button:focus-visible,
+.pagina-indicadores a:focus-visible,
+.pagina-indicadores input:focus-visible,
+.pagina-indicadores select:focus-visible {
+  outline: 2px solid var(--dorado);
+  outline-offset: 3px;
+}
+
+/* ========================================
+   PORTADA
+======================================== */
+
+.pagina-indicadores .hero-indicadores {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: clamp(510px, 72vh, 720px);
+  overflow: hidden;
+  isolation: isolate;
+  background: #263d32;
+}
+
+.pagina-indicadores .hero-indicadores-imagen {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 48%;
+  animation: aparecer-imagen-indicadores 1.2s ease both;
+}
+
+.pagina-indicadores .hero-indicadores-degradado {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      180deg,
+      rgb(15 37 29 / 54%),
+      rgb(19 44 33 / 13%) 30%,
+      rgb(12 35 26 / 76%) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgb(16 43 32 / 30%),
+      transparent 75%
+    );
+}
+
+@keyframes aparecer-imagen-indicadores {
+  from {
+    opacity: 0.6;
+    transform: scale(1.035);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ========================================
+   BARRA SUPERIOR
+======================================== */
+
+.pagina-indicadores .barra-superior-indicadores {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 27px 5.5%;
+  background: linear-gradient(
+    180deg,
+    rgb(15 39 31 / 35%),
+    transparent
+  );
+}
+
+.pagina-indicadores .marca-indicadores {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 11px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2.3px;
+}
+
+.pagina-indicadores .logo-indicadores {
+  display: block;
+  flex-shrink: 0;
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.pagina-indicadores .nombre-marca-indicadores {
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2.3px;
+}
+
+/* ========================================
+   BUSCADOR
+======================================== */
+
+.pagina-indicadores .buscador-indicadores {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: clamp(190px, 23vw, 285px);
+  height: 48px;
+  margin-left: auto;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 30px;
+  background: rgb(255 255 255 / 14%);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.pagina-indicadores .buscador-indicadores:focus-within {
+  border-color: #fff;
+  background: rgb(255 255 255 / 23%);
+}
+
+.pagina-indicadores .icono-busqueda-indicadores {
+  display: block;
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.pagina-indicadores .buscador-indicadores > .icono-busqueda-indicadores {
+  color: #fff;
+}
+
+.pagina-indicadores .buscador-indicadores input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+}
+
+.pagina-indicadores .buscador-indicadores input::placeholder {
+  color: rgb(255 255 255 / 94%);
+}
+
+.pagina-indicadores .buscador-indicadores input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.pagina-indicadores .limpiar-busqueda-indicadores {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 25px;
+  height: 25px;
+  padding: 3px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+}
+
+.pagina-indicadores .limpiar-busqueda-indicadores:hover {
+  background: rgb(255 255 255 / 15%);
+}
+
+.pagina-indicadores .limpiar-busqueda-indicadores svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+/* ========================================
+   PERFIL Y MENÚ
+======================================== */
+
+.pagina-indicadores .acciones-superiores-indicadores {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+}
+
+.pagina-indicadores .perfil-indicadores {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.pagina-indicadores .avatar-indicadores {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border: 1px solid rgb(255 255 255 / 70%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 17%);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.pagina-indicadores .perfil-indicadores:hover .avatar-indicadores {
+  background: #fff;
+  color: var(--verde-oscuro);
+}
+
+.pagina-indicadores .boton-menu-indicadores {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: background 0.2s ease;
+}
+
+.pagina-indicadores .boton-menu-indicadores:hover,
+.pagina-indicadores .boton-menu-indicadores[aria-expanded="true"] {
+  background: rgb(255 255 255 / 28%);
+}
+
+.pagina-indicadores .icono-menu-indicadores,
+.pagina-indicadores .icono-cerrar-indicadores {
+  display: block;
+  width: 23px;
+  height: 23px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Compatibilidad con los nombres de clase del JSX local */
+
+.pagina-indicadores .barra-superior-inicio {
+  position: relative;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  padding: 27px 5.5%;
+}
+
+.pagina-indicadores .marca-inicio {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 11px;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.pagina-indicadores .marca-inicio img {
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.pagina-indicadores .acciones-superiores-inicio {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 13px;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: clamp(190px, 23vw, 285px);
+  height: 48px;
+  margin-left: auto;
+  padding: 0 16px;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 30px;
+  background: rgb(255 255 255 / 14%);
+  color: #fff;
+  backdrop-filter: blur(12px);
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input::placeholder {
+  color: rgb(255 255 255 / 94%);
+}
+
+.pagina-indicadores .busqueda-territorio-inicio svg {
+  flex-shrink: 0;
+  width: 19px;
+  height: 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+}
+
+.pagina-indicadores .menu-desplegable-inicio {
+  position: fixed;
+  z-index: 40;
+  top: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  width: min(410px, 92vw);
+  height: 100vh;
+  height: 100dvh;
+  overflow-y: auto;
+  padding: 28px 24px 22px;
+  border-left: 1px solid rgb(23 60 52 / 8%);
+  background: #f9faf7;
+  box-shadow: -15px 0 50px rgb(10 31 23 / 17%);
+  animation: entrar-menu-indicadores 0.25s ease both;
+}
+
+.pagina-indicadores .fondo-menu-inicio {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: rgb(11 26 21 / 40%);
+  cursor: pointer;
+}
+
+.pagina-indicadores .encabezado-menu-inicio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 21px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.pagina-indicadores .opcion-menu-inicio {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 13px;
+  min-height: 48px;
+  padding: 12px 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  color: var(--texto);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.pagina-indicadores .opcion-menu-inicio:hover,
+.pagina-indicadores .opcion-menu-inicio.activo {
+  border-color: #d9e4d6;
+  background: #e7eee5;
+}
+
+.pagina-indicadores .menu-desplegable-inicio .avatar-indicadores {
+  background: #e6eee5;
+  color: var(--verde-oscuro);
+}
+
+/* ========================================
+   CONTENIDO PRINCIPAL
+======================================== */
+
+.pagina-indicadores .contenido-indicadores {
+  flex: 1 0 auto;
+  width: 100%;
+  max-width: 1220px;
+  margin: 0 auto;
+  padding: 78px 35px 0;
+}
+
+.pagina-indicadores .encabezado-indicadores {
   margin-bottom: 28px;
 }
 
-/* CONSULTA TERRITORIAL - AMARILLO */
-.etiqueta-pagina-indicadores {
+.pagina-indicadores .contenido-indicadores > .encabezado-indicadores {
+  display: none;
+}
+
+.pagina-indicadores .encabezado-exploracion-indicadores {
+  display: block;
+  width: 100%;
+  margin: 0 0 24px;
+  text-align: left;
+}
+
+.pagina-indicadores .sobretitulo-indicadores,
+.pagina-indicadores .etiqueta-pagina-indicadores {
   display: inline-block;
-  margin-bottom: 8px;
-  color: #d68c3e;
-  font-family: var(--fuente-texto);
+  margin-bottom: 9px;
+  color: var(--dorado);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.8px;
   text-transform: uppercase;
 }
 
-/* INDICADORES - VERDE */
-.encabezado-indicadores h1 {
+.pagina-indicadores .encabezado-exploracion-indicadores h2,
+.pagina-indicadores .encabezado-indicadores h1 {
   margin: 0;
-  color: var(--verde-petroleo);
-  font-family: var(--fuente-titulo);
-  font-size: 32px;
-  font-weight: 600;
-  line-height: 1.15;
-  letter-spacing: -0.8px;
+  color: var(--verde-oscuro);
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 31px;
+  font-weight: 500;
+  line-height: 1.25;
 }
 
-.encabezado-indicadores p {
-  max-width: 700px;
-  margin: 9px 0 0;
-  color: #6f7f7c;
-  font-family: var(--fuente-texto);
+.pagina-indicadores .encabezado-exploracion-indicadores p,
+.pagina-indicadores .encabezado-indicadores p {
+  max-width: 680px;
+  margin: 10px 0 0;
+  color: var(--texto-secundario);
   font-size: 13px;
-  line-height: 1.6;
+  line-height: 1.8;
 }
 
-/* =========================================
-   PANEL DE FILTROS
-   ========================================= */
+/* ========================================
+   FILTROS
+======================================== */
 
-.panel-filtros-indicadores {
+.pagina-indicadores .panel-filtros-indicadores {
   position: relative;
   width: 100%;
-  box-sizing: border-box;
-  margin-bottom: 24px;
-  padding: 26px;
-  border: 1px solid rgba(222, 191, 104, 0.45);
-  border-radius: 20px;
-
-  background:
-    linear-gradient(
-      135deg,
-      #ffffff 0%,
-      #fffef8 35%,
-      #fff9df 68%,
-      #f8f3d9 100%
-    );
-
-  box-shadow:
-    0 12px 32px rgba(36, 67, 61, 0.07),
-    0 3px 10px rgba(214, 140, 62, 0.07);
-
-  overflow: hidden;
+  margin: 0;
+  padding: 27px 28px;
+  border: 1px solid var(--borde);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--sombra);
 }
 
-/* =========================================
-   DETALLE DECORATIVO AMARILLO
-   ========================================= */
-
-.panel-filtros-indicadores::before {
-  content: "";
-  position: absolute;
-  top: -80px;
-  right: -70px;
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(229, 193, 70, 0.16) 0%,
-      rgba(229, 193, 70, 0.05) 48%,
-      transparent 72%
-    );
-
-  pointer-events: none;
-}
-
-/* =========================================
-   TITULO DEL PANEL
-   ========================================= */
-
-.titulo-panel-indicadores {
-  position: relative;
-  z-index: 1;
-
+.pagina-indicadores .titulo-panel-indicadores {
   display: flex;
   align-items: center;
   gap: 13px;
-
   margin-bottom: 24px;
   padding-bottom: 18px;
-
-  border-bottom: 1px solid rgba(213, 199, 139, 0.35);
+  border-bottom: 1px solid var(--borde);
 }
 
-.icono-titulo-filtros {
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-
+.pagina-indicadores .icono-titulo-filtros {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-
+  width: 40px;
+  height: 40px;
   border-radius: 11px;
-
-  background:
-    linear-gradient(
-      145deg,
-      #fff4bd 0%,
-      #f5d967 100%
-    );
-
-  color: #8c6b00;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 5px 12px rgba(214, 140, 62, 0.12);
+  background: #e8eee8;
+  color: var(--verde-medio);
 }
 
-.icono-titulo-filtros svg {
+.pagina-indicadores .icono-titulo-filtros svg {
   width: 20px;
   height: 20px;
 }
 
-.titulo-panel-indicadores h2 {
+.pagina-indicadores .titulo-panel-indicadores h2 {
   margin: 0;
-  color: var(--verde-petroleo);
-  font-family: var(--fuente-titulo);
-  font-size: 16px;
+  color: var(--verde-oscuro);
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 18px;
   font-weight: 600;
 }
 
-.titulo-panel-indicadores p {
+.pagina-indicadores .titulo-panel-indicadores p {
   margin: 4px 0 0;
-  color: #7a8986;
-  font-family: var(--fuente-texto);
+  color: var(--texto-secundario);
   font-size: 11px;
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
-/* =========================================
-   GRID DE FILTROS
-   ========================================= */
+/* Acepta los dos nombres utilizados en las versiones del JSX */
 
-.grid-filtros-indicadores {
-  position: relative;
-  z-index: 1;
-
+.pagina-indicadores .formulario-filtros-indicadores {
   width: 100%;
-
-  display: grid;
-
-  grid-template-columns:
-    repeat(5, minmax(0, 1fr));
-
-  gap: 18px;
 }
 
-/* =========================================
-   CAMPOS
-   ========================================= */
+.pagina-indicadores .rejilla-filtros-indicadores,
+.pagina-indicadores .grid-filtros-indicadores {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 16px;
+  width: 100%;
+}
 
-.campo-indicadores {
+.pagina-indicadores .campo-indicadores {
+  display: flex;
+  flex-direction: column;
   min-width: 0;
   width: 100%;
+  gap: 8px;
 }
 
-.campo-indicadores label {
+.pagina-indicadores .campo-indicadores label {
   display: block;
-
-  margin-bottom: 8px;
-
-  color: #526560;
-  font-family: var(--fuente-texto);
-  font-size: 11px;
+  color: #35483d;
+  font-size: 12px;
   font-weight: 600;
 }
 
-.campo-indicadores select {
+.pagina-indicadores .campo-indicadores select {
+  display: block;
   width: 100%;
-  height: 46px;
-
-  box-sizing: border-box;
-
-  padding: 0 13px;
-
-  border: 1px solid #d8dfc9;
-  border-radius: 11px;
-
-  outline: none;
-
-  background: rgba(255, 255, 255, 0.78);
-
-  color: var(--verde-petroleo);
-
-  font-family: var(--fuente-base);
+  min-width: 0;
+  height: 48px;
+  padding: 0 12px;
+  border: 1px solid #d5dfd5;
+  border-radius: 8px;
+  outline: 0;
+  background: #fff;
+  color: var(--texto);
+  font-family: "DM Sans", sans-serif;
   font-size: 12px;
-
   cursor: pointer;
-
-  transition:
-    border-color 0.2s ease,
-    background 0.2s ease,
-    box-shadow 0.2s ease,
-    transform 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.campo-indicadores select:hover {
-  border-color: #d2b94c;
-  background: #ffffff;
-  transform: translateY(-1px);
+.pagina-indicadores .campo-indicadores select:hover {
+  border-color: #9eb8a4;
 }
 
-.campo-indicadores select:focus {
-  border-color: #d68c3e;
-  background: #ffffff;
-
-  box-shadow:
-    0 0 0 3px rgba(214, 140, 62, 0.12),
-    0 4px 12px rgba(36, 67, 61, 0.05);
+.pagina-indicadores .campo-indicadores select:focus {
+  border-color: var(--verde-medio);
+  box-shadow: 0 0 0 3px rgb(36 80 71 / 9%);
 }
 
-.campo-indicadores select:disabled {
-  opacity: 0.5;
-  background: #eef3f1;
+.pagina-indicadores .campo-indicadores select:disabled {
+  background: #edf0eb;
+  color: #9ba69e;
   cursor: not-allowed;
 }
 
-/* =========================================
+.pagina-indicadores .campo-indicadores select option {
+  background: #fff;
+  color: var(--texto);
+}
+
+/* ========================================
    BOTONES
-   ========================================= */
+======================================== */
 
-.acciones-filtros-indicadores {
-  position: relative;
-  z-index: 1;
-
+.pagina-indicadores .acciones-filtros-indicadores {
   display: flex;
   align-items: center;
-  gap: 11px;
-
-  margin-top: 22px;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
   padding-top: 20px;
-
-  border-top: 1px solid rgba(213, 199, 139, 0.35);
+  border-top: 1px solid var(--borde);
 }
 
-.boton-consultar-indicadores,
-.boton-limpiar-indicadores {
-  min-height: 42px;
-
-  padding: 0 20px;
-
-  border-radius: 10px;
-
-  font-family: var(--fuente-base);
+.pagina-indicadores .boton-consultar-indicadores,
+.pagina-indicadores .boton-limpiar-indicadores {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 46px;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  font-family: "DM Sans", sans-serif;
   font-size: 12px;
-
-  cursor: pointer;
-
-  transition:
-    background 0.2s ease,
-    border-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease,
-    box-shadow 0.2s ease;
-}
-
-/* =========================================
-   CONSULTAR
-   ========================================= */
-
-.boton-consultar-indicadores {
-  border: 1px solid #d68c3e;
-
-  background:
-    linear-gradient(
-      135deg,
-      #dca83e 0%,
-      #c98b2d 100%
-    );
-
-  color: var(--color-blanco);
-
   font-weight: 600;
-
-  box-shadow:
-    0 5px 13px rgba(214, 140, 62, 0.18);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
 
-.boton-consultar-indicadores:hover {
-  background:
-    linear-gradient(
-      135deg,
-      #e5b34a 0%,
-      #d49a32 100%
-    );
+.pagina-indicadores .boton-consultar-indicadores {
+  border-color: var(--verde-oscuro);
+  background: var(--verde-oscuro);
+  color: #fff;
+}
 
-  border-color: #d49a32;
-
+.pagina-indicadores .boton-consultar-indicadores:hover:not(:disabled) {
   transform: translateY(-1px);
-
-  box-shadow:
-    0 7px 17px rgba(214, 140, 62, 0.24);
+  background: #2f6657;
 }
 
-.boton-consultar-indicadores:active {
-  transform: translateY(0);
+.pagina-indicadores .boton-consultar-indicadores:disabled {
+  opacity: 0.7;
+  cursor: wait;
 }
 
-/* =========================================
-   LIMPIAR
-   ========================================= */
-
-.boton-limpiar-indicadores {
-  border: 1px solid #d7e0dc;
-
-  background: rgba(255, 255, 255, 0.82);
-
-  color: #526560;
-
-  font-weight: 500;
+.pagina-indicadores .boton-limpiar-indicadores {
+  border-color: #d5dfd5;
+  background: #fff;
+  color: var(--verde-oscuro);
 }
 
-.boton-limpiar-indicadores:hover {
-  background: #ffffff;
-
-  border-color: #c5cec9;
-
-  transform: translateY(-1px);
+.pagina-indicadores .boton-limpiar-indicadores:hover {
+  border-color: #b7c9b9;
+  background: #edf2ec;
 }
 
-/* =========================================
-   ESTADOS
-   ========================================= */
+/* ========================================
+   ESTADOS Y RESULTADOS
+======================================== */
 
-.estado-indicadores {
-  position: relative;
-
+.pagina-indicadores .resultados-indicadores {
   width: 100%;
-  min-height: 300px;
+  margin-top: 27px;
+}
 
-  box-sizing: border-box;
-
+.pagina-indicadores .estado-indicadores {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  padding: 50px 30px;
-
-  border: 1px solid rgba(222, 191, 104, 0.38);
-
-  border-radius: 20px;
-
-  background:
-    radial-gradient(
-      circle at 15% 15%,
-      rgba(247, 220, 113, 0.22) 0%,
-      rgba(247, 220, 113, 0.06) 28%,
-      transparent 50%
-    ),
-    linear-gradient(
-      145deg,
-      #ffffff 0%,
-      #fffef8 38%,
-      #fff9df 70%,
-      #f4f0d9 100%
-    );
-
-  box-shadow:
-    0 14px 38px rgba(36, 67, 61, 0.07),
-    0 4px 12px rgba(214, 140, 62, 0.06);
-
+  width: 100%;
+  min-height: 245px;
+  padding: 34px 25px;
+  border: 1px solid rgb(36 80 71 / 10%);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: var(--sombra);
   text-align: center;
-
   overflow: hidden;
 }
 
-/* =========================================
-   BRILLO DECORATIVO
-   ========================================= */
-
-.estado-indicadores::after {
-  content: "";
-
-  position: absolute;
-
-  width: 240px;
-  height: 240px;
-
-  right: -100px;
-  bottom: -120px;
-
-  border-radius: 50%;
-
-  background:
-    radial-gradient(
-      circle,
-      rgba(214, 173, 48, 0.12) 0%,
-      transparent 70%
-    );
-
-  pointer-events: none;
-}
-
-/* =========================================
-   ICONOS DE ESTADO
-   ========================================= */
-
-.icono-estado-indicadores,
-.icono-alerta-indicadores {
-  position: relative;
-  z-index: 1;
-
-  width: 66px;
-  height: 66px;
-
+.pagina-indicadores .icono-estado-indicadores,
+.pagina-indicadores .icono-alerta-indicadores {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-
-  margin-bottom: 18px;
-
-  border-radius: 17px;
-
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 6px 16px rgba(36, 67, 61, 0.07);
+  width: 53px;
+  height: 53px;
+  margin-bottom: 17px;
+  border: 1px solid #dce7dc;
+  border-radius: 50%;
+  background: #edf3ec;
+  color: var(--verde-medio);
 }
 
-/* =========================================
-   ESTADO NORMAL
-   ========================================= */
+/* Cuando el icono de alerta está en un contenedor propio,
+   evita convertir el SVG en una caja de 53px. */
 
-.icono-estado-indicadores {
-  background:
-    linear-gradient(
-      145deg,
-      #fff6c9 0%,
-      #f2d65f 100%
-    );
-
-  color: #8b6c00;
+.pagina-indicadores svg.icono-alerta-indicadores {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
-/* =========================================
-   ALERTA
-   ========================================= */
-
-.icono-alerta-indicadores {
-  background:
-    linear-gradient(
-      145deg,
-      #fff0c5 0%,
-      #f4d26a 100%
-    );
-
-  color: #876500;
+.pagina-indicadores .icono-estado-indicadores svg,
+.pagina-indicadores .icono-alerta-indicadores svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
-.icono-estado-indicadores svg,
-.icono-alerta-indicadores svg {
-  width: 30px;
-  height: 30px;
-}
-
-/* =========================================
-   TEXTO DE LOS ESTADOS
-   ========================================= */
-
-.estado-indicadores h2 {
-  position: relative;
-  z-index: 1;
-
-  max-width: 600px;
-
+.pagina-indicadores .estado-indicadores h2,
+.pagina-indicadores .estado-indicadores h3 {
   margin: 0;
-
-  color: var(--verde-petroleo);
-
-  font-family: var(--fuente-titulo);
-  font-size: 17px;
-  font-weight: 600;
-
-  line-height: 1.35;
+  color: var(--verde-oscuro);
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1.3;
 }
 
-.estado-indicadores p {
-  position: relative;
-  z-index: 1;
-
-  max-width: 480px;
-
-  margin: 8px 0 0;
-
-  color: #72817e;
-
-  font-family: var(--fuente-texto);
+.pagina-indicadores .estado-indicadores p {
+  max-width: 510px;
+  margin: 11px 0 0;
+  color: var(--texto-secundario);
   font-size: 12px;
-
-  line-height: 1.7;
+  line-height: 1.8;
 }
 
-.estado-indicadores p strong {
-  color: var(--verde-petroleo);
-  font-weight: 600;
+.pagina-indicadores .estado-indicadores p strong {
+  color: var(--verde-oscuro);
 }
 
-/* =========================================
-   CARGANDO
-   ========================================= */
-
-.estado-cargando-indicadores {
-  min-height: 270px;
+.pagina-indicadores .estado-sin-resultados,
+.pagina-indicadores .estado-sin-resultados-indicadores {
+  min-height: 245px;
 }
 
-.spinner-indicadores {
+.pagina-indicadores .estado-sin-resultados .icono-estado-indicadores,
+.pagina-indicadores .estado-sin-resultados-indicadores .icono-estado-indicadores {
+  border-color: #e7d8c4;
+  background: #f7efe5;
+  color: var(--dorado);
+}
+
+.pagina-indicadores .estado-cargando-indicadores {
+  min-height: 220px;
+}
+
+.pagina-indicadores .spinner-indicadores,
+.pagina-indicadores .cargador-indicadores {
+  display: block;
   width: 38px;
   height: 38px;
-
-  margin-bottom: 18px;
-
-  border: 3px solid #eadfae;
-  border-top-color: #d68c3e;
-
+  margin-bottom: 20px;
+  border: 3px solid #dce7dc;
+  border-top-color: var(--verde-medio);
   border-radius: 50%;
-
-  animation:
-    girar-indicadores
-    0.8s linear infinite;
+  animation: girar-indicadores 0.8s linear infinite;
 }
 
 @keyframes girar-indicadores {
@@ -565,141 +820,512 @@
   }
 }
 
-/* =========================================
-   SIN RESULTADOS
-   ========================================= */
+/* Contenedores de gráficos y tarjetas */
 
-.estado-sin-resultados {
-  min-height: 300px;
+.pagina-indicadores .graficos-indicadores,
+.pagina-indicadores .contenedor-grafico-indicadores,
+.pagina-indicadores .tarjetas-indicadores {
+  width: 100%;
+  min-width: 0;
+  margin-top: 22px;
 }
 
-/* =========================================
-   RESPONSIVE
-   ========================================= */
+/* ========================================
+   PIE INSTITUCIONAL
+======================================== */
 
-@media (max-width: 1200px) {
-  .grid-filtros-indicadores {
-    grid-template-columns:
-      repeat(3, minmax(0, 1fr));
-  }
+.pagina-indicadores .pie-indicadores {
+  position: relative;
+  left: 50%;
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: center;
+  width: 100vw;
+  max-width: 100vw;
+  margin-top: 85px;
+  margin-left: -50vw;
+  padding: 55px 6% 29px;
+  background:
+    radial-gradient(
+      ellipse at 50% 0%,
+      rgb(76 119 91 / 38%),
+      transparent 65%
+    ),
+    var(--verde-oscuro);
+  color: #fff;
+  text-align: center;
 }
 
-/* =========================================
+.pagina-indicadores .pie-indicadores-contenido {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding-bottom: 28px;
+}
+
+.pagina-indicadores .marca-pie-indicadores {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.pagina-indicadores .marca-pie-indicadores img {
+  display: block;
+  width: 43px;
+  height: 43px;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.pagina-indicadores .marca-pie-indicadores span {
+  color: #fff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.pagina-indicadores .pie-indicadores-contenido p {
+  max-width: 520px;
+  margin: 10px auto 12px;
+  color: rgb(255 255 255 / 82%);
+  font-size: 12px;
+  line-height: 1.9;
+}
+
+.pagina-indicadores .pie-indicadores-final {
+  width: 100%;
+  padding-top: 21px;
+  border-top: 1px solid rgb(255 255 255 / 17%);
+  color: rgb(255 255 255 / 72%);
+  font-size: 10px;
+  line-height: 1.7;
+}
+
+/* ========================================
    TABLET
-   ========================================= */
+======================================== */
 
-@media (max-width: 750px) {
-  .encabezado-indicadores h1 {
-    font-size: 28px;
+@media (max-width: 1000px) {
+  .pagina-indicadores .hero-indicadores {
+    min-height: 640px;
   }
 
-  .panel-filtros-indicadores {
-    padding: 21px;
-    border-radius: 18px;
+  .pagina-indicadores .barra-superior-indicadores,
+  .pagina-indicadores .barra-superior-inicio {
+    padding-right: 4%;
+    padding-left: 4%;
   }
 
-  .grid-filtros-indicadores {
-    grid-template-columns:
-      repeat(2, minmax(0, 1fr));
-
-    gap: 15px;
+  .pagina-indicadores .marca-indicadores,
+  .pagina-indicadores .marca-inicio {
+    gap: 8px;
+    font-size: 19px;
+    letter-spacing: 1.7px;
   }
 
-  .estado-indicadores {
-    min-height: 270px;
-    padding: 42px 24px;
-    border-radius: 18px;
+  .pagina-indicadores .logo-indicadores,
+  .pagina-indicadores .marca-inicio img {
+    width: 38px;
+    height: 38px;
+  }
+
+  .pagina-indicadores .nombre-marca-indicadores {
+    font-size: 19px;
+    letter-spacing: 1.7px;
+  }
+
+  .pagina-indicadores .acciones-superiores-indicadores,
+  .pagina-indicadores .acciones-superiores-inicio {
+    gap: 9px;
+  }
+
+  .pagina-indicadores .buscador-indicadores,
+  .pagina-indicadores .busqueda-territorio-inicio {
+    width: 205px;
+  }
+
+  .pagina-indicadores .contenido-indicadores {
+    width: 90%;
+    padding-top: 48px;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .pagina-indicadores .rejilla-filtros-indicadores,
+  .pagina-indicadores .grid-filtros-indicadores {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    row-gap: 20px;
   }
 }
 
-/* =========================================
-   MÓVIL
-   ========================================= */
+/* ========================================
+   MÓVILES
+======================================== */
 
-@media (max-width: 520px) {
-  .pagina-indicadores {
-    padding-bottom: 20px;
+@media (max-width: 640px) {
+  .pagina-indicadores .hero-indicadores {
+    min-height: 88svh;
   }
 
-  .encabezado-indicadores {
-    margin-bottom: 21px;
+  .pagina-indicadores .hero-indicadores-imagen {
+    object-position: center;
   }
 
-  .encabezado-indicadores h1 {
+  .pagina-indicadores .barra-superior-indicadores,
+  .pagina-indicadores .barra-superior-inicio {
+    gap: 10px;
+    padding: 19px 4%;
+  }
+
+  .pagina-indicadores .marca-indicadores,
+  .pagina-indicadores .marca-inicio {
+    gap: 6px;
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  .pagina-indicadores .logo-indicadores,
+  .pagina-indicadores .marca-inicio img {
+    width: 31px;
+    height: 31px;
+  }
+
+  .pagina-indicadores .nombre-marca-indicadores {
+    font-size: 15px;
+    letter-spacing: 1px;
+  }
+
+  .pagina-indicadores .acciones-superiores-indicadores,
+  .pagina-indicadores .acciones-superiores-inicio {
+    gap: 7px;
+  }
+
+  .pagina-indicadores .buscador-indicadores,
+  .pagina-indicadores .busqueda-territorio-inicio {
+    gap: 5px;
+    width: clamp(105px, 34vw, 160px);
+    height: 41px;
+    margin: 0;
+    padding: 0 9px;
+  }
+
+  .pagina-indicadores .buscador-indicadores input,
+  .pagina-indicadores .busqueda-territorio-inicio input {
+    font-size: 10px;
+  }
+
+  .pagina-indicadores .boton-menu-indicadores,
+  .pagina-indicadores .avatar-indicadores {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pagina-indicadores .boton-menu-indicadores .icono-menu-indicadores,
+  .pagina-indicadores .boton-menu-indicadores .icono-cerrar-indicadores {
+    width: 20px;
+    height: 20px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido {
+    padding: 30px 20px 75px;
+  }
+
+  .pagina-indicadores .etiqueta-hero-indicadores {
+    max-width: 300px;
+    margin-bottom: 17px;
+    font-size: 9px;
+    letter-spacing: 3px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido h1 {
+    margin-bottom: 15px;
+    font-size: clamp(35px, 9vw, 49px);
+    line-height: 1.12;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido p {
+    font-size: 12px;
+    line-height: 1.8;
+  }
+
+  .pagina-indicadores .contenido-indicadores {
+    width: 92%;
+    padding: 29px 0 55px;
+  }
+
+  .pagina-indicadores .encabezado-exploracion-indicadores {
+    margin-bottom: 19px;
+  }
+
+  .pagina-indicadores .encabezado-exploracion-indicadores h2,
+  .pagina-indicadores .encabezado-indicadores h1 {
     font-size: 26px;
   }
 
-  .encabezado-indicadores p {
+  .pagina-indicadores .encabezado-exploracion-indicadores p,
+  .pagina-indicadores .encabezado-indicadores p {
     font-size: 12px;
   }
 
-  .panel-filtros-indicadores {
-    padding: 18px;
-    border-radius: 16px;
+  .pagina-indicadores .panel-filtros-indicadores {
+    padding: 21px 17px;
+    border-radius: 10px;
   }
 
-  .titulo-panel-indicadores {
-    align-items: flex-start;
-
-    margin-bottom: 20px;
-    padding-bottom: 16px;
+  .pagina-indicadores .rejilla-filtros-indicadores,
+  .pagina-indicadores .grid-filtros-indicadores {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 19px 14px;
   }
 
-  .titulo-panel-indicadores h2 {
-    font-size: 14px;
+  .pagina-indicadores .panel-menu-indicadores,
+  .pagina-indicadores .menu-desplegable-inicio {
+    padding: 22px 18px;
   }
 
-  .grid-filtros-indicadores {
-    grid-template-columns: 1fr;
-    gap: 14px;
+  .pagina-indicadores .pie-indicadores {
+    margin-top: 60px;
+    padding: 43px 6% 23px;
   }
 
-  .acciones-filtros-indicadores {
-    flex-direction: column;
-    align-items: stretch;
+  .pagina-indicadores .pie-indicadores-contenido {
+    padding-bottom: 23px;
   }
 
-  .boton-consultar-indicadores,
-  .boton-limpiar-indicadores {
-    width: 100%;
+  .pagina-indicadores .marca-pie-indicadores img {
+    width: 39px;
+    height: 39px;
   }
 
-  .estado-indicadores {
-    min-height: 250px;
-
-    padding: 35px 18px;
-
-    border-radius: 16px;
+  .pagina-indicadores .marca-pie-indicadores,
+  .pagina-indicadores .marca-pie-indicadores span {
+    font-size: 19px;
   }
 
-  .estado-indicadores h2 {
-    font-size: 15px;
-  }
-
-  .estado-indicadores p {
+  .pagina-indicadores .pie-indicadores-contenido p {
+    max-width: 330px;
+    margin: 20px auto 23px;
     font-size: 11px;
   }
 }
-/* ---------- Lista de checkboxes de municipios (Comparar) ---------- */
-.lista-checks-municipios {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 10px;
+
+/* ========================================
+   MÓVILES PEQUEÑOS
+======================================== */
+
+@media (max-width: 520px) {
+  .pagina-indicadores .barra-superior-indicadores,
+  .pagina-indicadores .barra-superior-inicio {
+    gap: 5px;
+    padding: 19px 4%;
+  }
+
+  .pagina-indicadores .marca-indicadores,
+  .pagina-indicadores .marca-inicio {
+    gap: 4px;
+    font-size: 13px;
+    letter-spacing: 0.6px;
+  }
+
+  .pagina-indicadores .logo-indicadores,
+  .pagina-indicadores .marca-inicio img {
+    width: 27px;
+    height: 27px;
+  }
+
+  .pagina-indicadores .nombre-marca-indicadores {
+    font-size: 13px;
+    letter-spacing: 0.6px;
+  }
+
+  .pagina-indicadores .acciones-superiores-indicadores,
+  .pagina-indicadores .acciones-superiores-inicio {
+    gap: 5px;
+  }
+
+  .pagina-indicadores .buscador-indicadores,
+  .pagina-indicadores .busqueda-territorio-inicio {
+    width: 108px;
+    height: 37px;
+    padding: 0 7px;
+  }
+
+  .pagina-indicadores .buscador-indicadores input,
+  .pagina-indicadores .busqueda-territorio-inicio input {
+    font-size: 9px;
+  }
+
+  .pagina-indicadores .buscador-indicadores .icono-busqueda-indicadores {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pagina-indicadores .avatar-indicadores,
+  .pagina-indicadores .boton-menu-indicadores {
+    width: 35px;
+    height: 35px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido {
+    padding: 30px 16px 65px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido h1 {
+    font-size: clamp(35px, 9vw, 49px);
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido p {
+    font-size: 11px;
+  }
+
+  .pagina-indicadores .etiqueta-hero-indicadores {
+    margin-bottom: 17px;
+    font-size: 9px;
+    letter-spacing: 2.5px;
+  }
+
+  .pagina-indicadores .contenido-indicadores {
+    padding: 29px 0 42px;
+  }
+
+  .pagina-indicadores .encabezado-exploracion-indicadores h2,
+  .pagina-indicadores .encabezado-indicadores h1 {
+    font-size: 25px;
+  }
+
+  .pagina-indicadores .panel-filtros-indicadores {
+    padding: 22px 17px;
+  }
+
+  .pagina-indicadores .rejilla-filtros-indicadores,
+  .pagina-indicadores .grid-filtros-indicadores {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 17px;
+  }
+
+  .pagina-indicadores .campo-indicadores {
+    gap: 7px;
+  }
+
+  .pagina-indicadores .campo-indicadores label {
+    font-size: 12px;
+  }
+
+  .pagina-indicadores .campo-indicadores select {
+    height: 45px;
+  }
+
+  .pagina-indicadores .acciones-filtros-indicadores {
+    align-items: stretch;
+    flex-direction: column;
+    margin-top: 23px;
+    padding-top: 20px;
+  }
+
+  .pagina-indicadores .boton-consultar-indicadores,
+  .pagina-indicadores .boton-limpiar-indicadores {
+    width: 100%;
+    min-height: 45px;
+  }
+
+  .pagina-indicadores .estado-indicadores {
+    min-height: 225px;
+    padding: 28px 18px;
+  }
+
+  .pagina-indicadores .estado-indicadores h2,
+  .pagina-indicadores .estado-indicadores h3 {
+    font-size: 22px;
+  }
+
+  .pagina-indicadores .estado-indicadores p {
+    font-size: 11px;
+  }
+
+  .pagina-indicadores .panel-menu-indicadores,
+  .pagina-indicadores .menu-desplegable-inicio {
+    padding: 22px 18px;
+  }
 }
 
-.check-municipio {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  color: var(--verde-petroleo);
-  background: white;
-  border: 1px solid var(--gris-borde);
-  border-radius: 8px;
-  padding: 10px 12px;
-  cursor: pointer;
+/* ========================================
+   PANTALLAS MUY PEQUEÑAS
+======================================== */
+
+@media (max-width: 380px) {
+  .pagina-indicadores .barra-superior-indicadores,
+  .pagina-indicadores .barra-superior-inicio {
+    gap: 4px;
+    padding-right: 3%;
+    padding-left: 3%;
+  }
+
+  .pagina-indicadores .marca-indicadores,
+  .pagina-indicadores .marca-inicio {
+    gap: 3px;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .pagina-indicadores .logo-indicadores,
+  .pagina-indicadores .marca-inicio img {
+    width: 25px;
+    height: 25px;
+  }
+
+  .pagina-indicadores .nombre-marca-indicadores {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+
+  .pagina-indicadores .acciones-superiores-indicadores,
+  .pagina-indicadores .acciones-superiores-inicio {
+    gap: 4px;
+  }
+
+  .pagina-indicadores .buscador-indicadores,
+  .pagina-indicadores .busqueda-territorio-inicio {
+    width: 98px;
+    height: 35px;
+    padding: 0 6px;
+  }
+
+  .pagina-indicadores .buscador-indicadores input,
+  .pagina-indicadores .busqueda-territorio-inicio input {
+    font-size: 8px;
+  }
+
+  .pagina-indicadores .avatar-indicadores,
+  .pagina-indicadores .boton-menu-indicadores {
+    width: 32px;
+    height: 32px;
+  }
 }
 
-.check-municipio input {
-  width: auto;
+/* ========================================
+   ACCESIBILIDAD
+======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .pagina-indicadores *,
+  .pagina-indicadores *::before,
+  .pagina-indicadores *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
+```
