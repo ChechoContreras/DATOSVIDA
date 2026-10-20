@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import logoDataVida from "../assets/logo-icono.png";
 import { obtenerSesion } from "../utils/autenticacion";
 import { tienePermiso } from "../utils/permisos";
@@ -152,137 +152,6 @@ function IconoResumen({ tipo }) {
 }
 
 /* =========================================
-   ICONOS DE ACCESOS RÁPIDOS
-========================================= */
-
-function IconoAcceso({ tipo }) {
-  const atributos = {
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: "1.8",
-    strokeLinecap: "round",
-    strokeLinejoin: "round",
-    "aria-hidden": true,
-  };
-
-  switch (tipo) {
-    case "indicadores":
-      return (
-        <svg {...atributos}>
-          <path d="M4 19V5M4 19h16" />
-          <path d="M8 16v-4M12 16V8M16 16V5" />
-        </svg>
-      );
-
-    case "visualizacion":
-      return (
-        <svg {...atributos}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="M3 12h18" />
-          <path d="M12 3c2.4 2.5 3.6 5.5 3.6 9s-1.2 6.5-3.6 9" />
-          <path d="M12 3c-2.4 2.5-3.6 5.5-3.6 9s1.2 6.5 3.6 9" />
-        </svg>
-      );
-
-    case "comparar":
-      return (
-        <svg {...atributos}>
-          <path d="M7 5v14M4 8l3-3 3 3" />
-          <path d="M17 19V5m-3 11 3 3 3-3" />
-          <path d="M10 9h4M10 15h4" />
-        </svg>
-      );
-
-    case "estadisticas":
-      return (
-        <svg {...atributos}>
-          <path d="M4 19V5M4 19h17" />
-          <path d="m7 15 4-4 3 2 5-6M15 7h4v4" />
-        </svg>
-      );
-
-    case "predicciones":
-      return (
-        <svg {...atributos}>
-          <path d="m12 3 1.7 5.3L19 10l-5.3 1.7L12 17l-1.7-5.3L5 10l5.3-1.7L12 3Z" />
-          <path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" />
-        </svg>
-      );
-
-    case "variables":
-      return (
-        <svg {...atributos}>
-          <circle cx="5" cy="18" r="2" />
-          <circle cx="12" cy="8" r="2" />
-          <circle cx="19" cy="14" r="2" />
-          <path d="m6.5 16.5 4.5-7m2.8-.3 4 3.6" />
-        </svg>
-      );
-
-    case "reportes":
-      return (
-        <svg {...atributos}>
-          <path d="M6 3h9l4 4v14H6z" />
-          <path d="M14 3v5h5M9 13h6M9 17h6M9 9h2" />
-        </svg>
-      );
-
-    default:
-      return null;
-  }
-}
-
-/* =========================================
-   ACCESOS RÁPIDOS
-========================================= */
-
-const accesosRapidos = [
-  {
-    titulo: "Consultar indicadores",
-    descripcion: "Consulta información de municipios y regiones.",
-    icono: "indicadores",
-    pantalla: "indicadores",
-    permiso: "indicadores",
-  },
-  {
-    titulo: "Visualizar información",
-    descripcion: "Explora indicadores mediante mapas y gráficos.",
-    icono: "visualizacion",
-    pantalla: "mapa",
-    permiso: "visualizacion",
-  },
-  {
-    titulo: "Comparar territorios",
-    descripcion: "Compara indicadores entre municipios o regiones.",
-    icono: "comparar",
-    pantalla: "comparar",
-    permiso: "comparar",
-  },
-  {
-    titulo: "Análisis estadístico",
-    descripcion: "Analiza patrones y comportamientos en los datos.",
-    icono: "estadisticas",
-    pantalla: "estadisticas",
-    permiso: "estadisticas",
-  },
-  {
-    titulo: "Predicciones IA",
-    descripcion: "Proyecta un indicador hasta 5 años y simula escenarios.",
-    icono: "predicciones",
-    pantalla: "predicciones",
-    permiso: "predicciones",
-  },
-  {
-    titulo: "Análisis de variables",
-    descripcion: "Descubre con qué otras variables se relaciona un indicador.",
-    icono: "variables",
-    pantalla: "variables",
-    permiso: "variables",
-  },
-];
-
-/* =========================================
    UTILIDADES DE DATOS
 ========================================= */
 
@@ -347,18 +216,12 @@ function obtenerIniciales(nombre) {
 ========================================= */
 
 function Inicio() {
-  const navigate = useNavigate();
   const [menuAbierto, setMenuAbierto] = useState(false);
   const [busquedaTerritorio, setBusquedaTerritorio] = useState("");
 
   const sesion = obtenerSesion();
   const nombreUsuario = sesion?.nombre || obtenerNombreUsuario();
   const inicialesUsuario = obtenerIniciales(nombreUsuario);
-  const rolActual = String(sesion?.rol || "Usuario").trim().toLowerCase();
-
-  const accesosPermitidos = accesosRapidos.filter((acceso) =>
-    tienePermiso(sesion?.rol, acceso.permiso)
-  );
 
   const opcionesVisibles = opcionesMenu.filter((opcion) => {
     if (opcion.ruta === "/app") return true;
@@ -416,23 +279,34 @@ function Inicio() {
   }, []);
 
   const tarjetasResumen = [
-    { valor: resumen.municipios, etiqueta: "Municipios PDET", icono: "municipios", tono: "ocre" },
-    { valor: resumen.subregiones, etiqueta: "Subregiones PDET", icono: "subregiones", tono: "verde" },
-    { valor: resumen.indicadores, etiqueta: "Indicadores", icono: "indicadores", tono: "azul" },
-    { valor: resumen.periodos, etiqueta: "Periodos de datos", icono: "periodos", tono: "morado", largo: true },
+    {
+      valor: resumen.municipios,
+      etiqueta: "Municipios PDET",
+      icono: "municipios",
+      tono: "ocre",
+    },
+    {
+      valor: resumen.subregiones,
+      etiqueta: "Subregiones PDET",
+      icono: "subregiones",
+      tono: "verde",
+    },
+    {
+      valor: resumen.indicadores,
+      etiqueta: "Indicadores",
+      icono: "indicadores",
+      tono: "azul",
+    },
+    {
+      valor: resumen.periodos,
+      etiqueta: "Periodos de datos",
+      icono: "periodos",
+      tono: "morado",
+    },
   ];
-
-  function irAPantalla(pantalla) {
-    navigate(pantalla === "inicio" ? "/app" : `/app/${pantalla}`);
-  }
 
   function cerrarMenu() {
     setMenuAbierto(false);
-  }
-
-  function manejarBusqueda(evento) {
-    const valor = evento.target.value;
-    setBusquedaTerritorio(valor);
   }
 
   return (
@@ -469,7 +343,9 @@ function Inicio() {
               <input
                 type="search"
                 value={busquedaTerritorio}
-                onChange={manejarBusqueda}
+                onChange={(evento) =>
+                  setBusquedaTerritorio(evento.target.value)
+                }
                 placeholder="Buscar territorio"
                 aria-label="Buscar territorio"
               />
@@ -540,12 +416,13 @@ function Inicio() {
 
                 <div className="menu-usuario-datos">
                   <strong>{nombreUsuario}</strong>
-                  <span>
-                    {sesion?.rol || "Usuario"} · Sesión activa
-                  </span>
+                  <span>{sesion?.rol || "Usuario"} · Sesión activa</span>
                 </div>
 
-                <span className="menu-estado-sesion" aria-label="Sesión activa" />
+                <span
+                  className="menu-estado-sesion"
+                  aria-label="Sesión activa"
+                />
               </div>
 
               <div className="menu-seccion-titulo">
@@ -612,10 +489,10 @@ function Inicio() {
           <div className="estadisticas-datavida-fila">
             {tarjetasResumen.map((tarjeta) => (
               <article
-                className="estadistica-datavida"
+                className={`estadistica-datavida tono-${tarjeta.tono}`}
                 key={tarjeta.etiqueta}
               >
-                <div className={`estadistica-datavida-icono tono-${tarjeta.tono}`}>
+                <div className="estadistica-datavida-icono">
                   <IconoResumen tipo={tarjeta.icono} />
                 </div>
 
@@ -696,7 +573,7 @@ function Inicio() {
 
             <span className="pie-inicio-identidad">
               <strong>DATAVIDA</strong>
-              <span>DATOS QUE TRANSFORMAN</span>
+              <span>DATOS CON PROPÓSITO</span>
             </span>
           </Link>
 
