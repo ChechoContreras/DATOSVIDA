@@ -19,18 +19,74 @@ const imagenMapa =
   "https://sensorial.coffee/cdn/shop/articles/10.png?v=1791889602&width=1600";
 
 const opcionesMenu = [
-  { nombre: "Inicio", descripcion: "Resumen territorial", ruta: "/app", icono: "⌂" },
-  { nombre: "Indicadores", descripcion: "Consulta de información", ruta: "/app/indicadores", icono: "▤" },
-  { nombre: "Visualización", descripcion: "Exploración territorial", ruta: "/app/mapa", icono: "◫" },
-  { nombre: "Comparar", descripcion: "Comparación de territorios", ruta: "/app/comparar", icono: "⇄" },
-  { nombre: "Análisis estadístico", descripcion: "Relaciones y hallazgos", ruta: "/app/estadisticas", icono: "⌁" },
-  { nombre: "Predicciones IA", descripcion: "Proyecciones e inteligencia artificial", ruta: "/app/predicciones", icono: "✳" },
-  { nombre: "Análisis de variables", descripcion: "Relaciones entre indicadores y variables", ruta: "/app/variables", icono: "⌁" },
-  { nombre: "Recomendaciones", descripcion: "Orientación para el territorio", ruta: "/app/recomendaciones", icono: "◇" },
-  { nombre: "Reportes", descripcion: "Síntesis de resultados", ruta: "/app/reportes", icono: "▧" },
-  { nombre: "Perfil", descripcion: "Mi cuenta", ruta: "/app/perfil", icono: "○" },
+  {
+    nombre: "Inicio",
+    descripcion: "Resumen territorial",
+    ruta: "/app",
+    icono: "⌂",
+  },
+  {
+    nombre: "Indicadores",
+    descripcion: "Consulta de información",
+    ruta: "/app/indicadores",
+    icono: "▤",
+  },
+  {
+    nombre: "Visualización",
+    descripcion: "Exploración territorial",
+    ruta: "/app/mapa",
+    icono: "◫",
+  },
+  {
+    nombre: "Comparar",
+    descripcion: "Comparación de territorios",
+    ruta: "/app/comparar",
+    icono: "⇄",
+  },
+  {
+    nombre: "Análisis estadístico",
+    descripcion: "Relaciones y hallazgos",
+    ruta: "/app/estadisticas",
+    icono: "⌁",
+  },
+  {
+    nombre: "Predicciones IA",
+    descripcion: "Proyecciones e inteligencia artificial",
+    ruta: "/app/predicciones",
+    icono: "✳",
+  },
+  {
+    nombre: "Análisis de variables",
+    descripcion: "Relaciones entre indicadores y variables",
+    ruta: "/app/variables",
+    icono: "⌁",
+  },
+  {
+    nombre: "Recomendaciones",
+    descripcion: "Orientación para el territorio",
+    ruta: "/app/recomendaciones",
+    icono: "◇",
+  },
+  {
+    nombre: "Reportes",
+    descripcion: "Síntesis de resultados",
+    ruta: "/app/reportes",
+    icono: "▧",
+  },
+  {
+    nombre: "Perfil",
+    descripcion: "Mi cuenta",
+    ruta: "/app/perfil",
+    icono: "○",
+  },
 ];
 
+/*
+ * DATOS DEMOSTRATIVOS.
+ * Pendiente: reemplazar por los datos del backend.
+ *
+ * Las claves deben coincidir con el resultado de normalizar().
+ */
 const datosIPM = {
   ANTIOQUIA: 18.3,
   BOLIVAR: 38.5,
@@ -49,8 +105,8 @@ const datosIPM = {
   PUTUMAYO: 48.2,
   TOLIMA: 27.5,
   "VALLE DEL CAUCA": 11.7,
-  "BOGOTA D.C": 4.2,
-  "SANTAFE DE BOGOTA D.C": 4.2,
+  "BOGOTA DC": 4.2,
+  "SANTAFE DE BOGOTA DC": 4.2,
 };
 
 function normalizar(texto = "") {
@@ -82,12 +138,16 @@ function obtenerIPM(nombre) {
 }
 
 function colorIPM(valor) {
-  if (valor === null || valor === undefined) return "#dce5dc";
+  if (valor === null || valor === undefined) {
+    return "#dce5dc";
+  }
+
   if (valor < 15) return "#dce9d8";
   if (valor < 25) return "#b8d0b0";
   if (valor < 35) return "#8db18d";
   if (valor < 45) return "#d7c58b";
   if (valor < 55) return "#c99b62";
+
   return "#a85f45";
 }
 
@@ -95,17 +155,14 @@ function obtenerEstilo(feature, departamentoSeleccionado) {
   const nombre = normalizar(obtenerNombre(feature));
   const seleccionado = normalizar(departamentoSeleccionado);
   const valor = obtenerIPM(obtenerNombre(feature));
+  const estaSeleccionado =
+    Boolean(seleccionado) && nombre === seleccionado;
 
   return {
     fillColor: colorIPM(valor),
-    fillOpacity:
-      seleccionado && nombre === seleccionado ? 0.9 : 0.72,
-    color:
-      seleccionado && nombre === seleccionado
-        ? "#173c34"
-        : "#ffffff",
-    weight:
-      seleccionado && nombre === seleccionado ? 3 : 1,
+    fillOpacity: estaSeleccionado ? 0.9 : 0.72,
+    color: estaSeleccionado ? "#173c34" : "#ffffff",
+    weight: estaSeleccionado ? 3 : 1,
     opacity: 1,
   };
 }
@@ -114,13 +171,22 @@ function AjustarMapa({ datos }) {
   const mapa = useMap();
 
   useEffect(() => {
-    if (!datos) return;
+    if (!datos || !Array.isArray(datos.features)) {
+      return;
+    }
+
+    if (datos.features.length === 0) {
+      return;
+    }
 
     const capa = L.geoJSON(datos);
     const limites = capa.getBounds();
 
     if (limites.isValid()) {
-      mapa.fitBounds(limites, { padding: [20, 20] });
+      mapa.fitBounds(limites, {
+        padding: [20, 20],
+        maxZoom: 7,
+      });
     }
   }, [datos, mapa]);
 
@@ -133,6 +199,7 @@ function IconoBusqueda() {
       className="icono-busqueda-indicadores"
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
       aria-hidden="true"
     >
       <circle cx="10.8" cy="10.8" r="6.8" />
@@ -147,6 +214,7 @@ function IconoMenu() {
       className="icono-menu-indicadores"
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
       aria-hidden="true"
     >
       <path d="M4 6h16M4 12h16M4 18h16" />
@@ -160,6 +228,7 @@ function IconoCerrar() {
       className="icono-cerrar-indicadores"
       viewBox="0 0 24 24"
       fill="none"
+      stroke="currentColor"
       aria-hidden="true"
     >
       <path d="m6 6 12 12M18 6 6 18" />
@@ -171,11 +240,15 @@ function obtenerNombreUsuario() {
   try {
     const guardado = localStorage.getItem("datavida_usuario");
 
-    if (!guardado) return "Usuario";
+    if (!guardado) {
+      return "Usuario";
+    }
 
     const usuario = JSON.parse(guardado);
 
-    if (typeof usuario === "string") return usuario;
+    if (typeof usuario === "string") {
+      return usuario;
+    }
 
     return (
       usuario?.nombreCompleto ||
@@ -192,7 +265,9 @@ function obtenerNombreUsuario() {
 }
 
 function obtenerIniciales(nombre) {
-  if (!nombre || nombre === "Usuario") return "U";
+  if (!nombre || nombre === "Usuario") {
+    return "U";
+  }
 
   const palabras = nombre.trim().split(/\s+/);
 
@@ -217,7 +292,11 @@ export default function Mapa() {
   const inicialesUsuario = obtenerIniciales(nombreUsuario);
 
   const departamentos = useMemo(() => {
-    const nombres = (colombiaGeoJSON.features || [])
+    const features = Array.isArray(colombiaGeoJSON?.features)
+      ? colombiaGeoJSON.features
+      : [];
+
+    const nombres = features
       .map((feature) => obtenerNombre(feature))
       .filter((nombre) => nombre !== "Territorio sin nombre");
 
@@ -227,18 +306,28 @@ export default function Mapa() {
   }, []);
 
   const datosFiltrados = useMemo(() => {
-    const termino = normalizar(busqueda);
+    const features = Array.isArray(colombiaGeoJSON?.features)
+      ? colombiaGeoJSON.features
+      : [];
 
-    if (!termino && !departamento) return colombiaGeoJSON;
+    const termino = normalizar(busqueda);
+    const departamentoNormalizado = normalizar(departamento);
+
+    if (!termino && !departamentoNormalizado) {
+      return colombiaGeoJSON;
+    }
 
     return {
       ...colombiaGeoJSON,
-      features: (colombiaGeoJSON.features || []).filter((feature) => {
+      features: features.filter((feature) => {
         const nombre = normalizar(obtenerNombre(feature));
-        const coincideBusqueda = !termino || nombre.includes(termino);
+
+        const coincideBusqueda =
+          !termino || nombre.includes(termino);
+
         const coincideDepartamento =
-          !departamento ||
-          nombre === normalizar(departamento);
+          !departamentoNormalizado ||
+          nombre === departamentoNormalizado;
 
         return coincideBusqueda && coincideDepartamento;
       }),
@@ -262,6 +351,7 @@ export default function Mapa() {
     });
 
     setDepartamento(nombre);
+    setBusqueda("");
   }
 
   return (
@@ -286,7 +376,10 @@ export default function Mapa() {
               alt=""
               className="logo-indicadores"
             />
-            <span className="nombre-marca-indicadores">DATAVIDA</span>
+
+            <span className="nombre-marca-indicadores">
+              DATAVIDA
+            </span>
           </Link>
 
           <div className="buscador-indicadores">
@@ -297,7 +390,10 @@ export default function Mapa() {
               placeholder="Buscar territorio"
               aria-label="Buscar territorio"
               value={busqueda}
-              onChange={(evento) => setBusqueda(evento.target.value)}
+              onChange={(evento) => {
+                setBusqueda(evento.target.value);
+                setTerritorio(null);
+              }}
             />
 
             {busqueda && (
@@ -305,7 +401,10 @@ export default function Mapa() {
                 type="button"
                 className="limpiar-busqueda-indicadores"
                 aria-label="Limpiar búsqueda"
-                onClick={() => setBusqueda("")}
+                onClick={() => {
+                  setBusqueda("");
+                  setTerritorio(null);
+                }}
               >
                 <IconoCerrar />
               </button>
@@ -327,9 +426,11 @@ export default function Mapa() {
             <button
               type="button"
               className="boton-menu-indicadores"
-              aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+              aria-label={
+                menuAbierto ? "Cerrar menú" : "Abrir menú"
+              }
               aria-expanded={menuAbierto}
-              onClick={() => setMenuAbierto(!menuAbierto)}
+              onClick={() => setMenuAbierto((abierto) => !abierto)}
             >
               {menuAbierto ? <IconoCerrar /> : <IconoMenu />}
             </button>
@@ -365,6 +466,7 @@ export default function Mapa() {
           >
             <div className="menu-desplegable-encabezado">
               <span>MENÚ PRINCIPAL</span>
+
               <button
                 type="button"
                 onClick={() => setMenuAbierto(false)}
@@ -396,7 +498,9 @@ export default function Mapa() {
                       : "enlace-menu-inicio"
                   }
                   aria-current={
-                    opcion.ruta === "/app/mapa" ? "page" : undefined
+                    opcion.ruta === "/app/mapa"
+                      ? "page"
+                      : undefined
                   }
                   onClick={() => setMenuAbierto(false)}
                 >
@@ -441,7 +545,9 @@ export default function Mapa() {
         <section className="panel-filtros-indicadores filtros-mapa">
           <div className="rejilla-filtros-indicadores">
             <div className="campo-indicadores">
-              <label htmlFor="departamento-mapa">Departamento</label>
+              <label htmlFor="departamento-mapa">
+                Departamento
+              </label>
 
               <select
                 id="departamento-mapa"
@@ -449,6 +555,7 @@ export default function Mapa() {
                 onChange={(evento) => {
                   setDepartamento(evento.target.value);
                   setTerritorio(null);
+                  setBusqueda("");
                 }}
               >
                 <option value="">Todos los departamentos</option>
@@ -467,7 +574,9 @@ export default function Mapa() {
               <select
                 id="indicador-mapa"
                 value={indicador}
-                onChange={(evento) => setIndicador(evento.target.value)}
+                onChange={(evento) =>
+                  setIndicador(evento.target.value)
+                }
               >
                 <option value="ipm">
                   Índice de Pobreza Multidimensional
@@ -481,7 +590,9 @@ export default function Mapa() {
               <select
                 id="periodo-mapa"
                 value={periodo}
-                onChange={(evento) => setPeriodo(evento.target.value)}
+                onChange={(evento) =>
+                  setPeriodo(evento.target.value)
+                }
               >
                 <option value="2024">2024</option>
                 <option value="2023">2023</option>
@@ -509,10 +620,14 @@ export default function Mapa() {
           </div>
         </section>
 
-        <section className="panel-mapa" aria-label="Mapa interactivo">
+        <section
+          className="panel-mapa"
+          aria-label="Mapa interactivo"
+        >
           <div className="encabezado-panel-mapa">
             <div>
               <h2>Mapa interactivo de Colombia</h2>
+
               <p>
                 Selecciona un departamento para consultar sus datos
                 demostrativos.
@@ -568,6 +683,8 @@ export default function Mapa() {
                         color: "#173c34",
                         fillOpacity: 0.9,
                       });
+
+                      evento.target.bringToFront();
                     },
 
                     mouseout: (evento) => {
@@ -585,12 +702,35 @@ export default function Mapa() {
             <strong>Nivel del IPM</strong>
 
             <div className="elementos-leyenda-mapa">
-              <span><i style={{ background: "#dce9d8" }} />Menor de 15%</span>
-              <span><i style={{ background: "#b8d0b0" }} />15–24%</span>
-              <span><i style={{ background: "#8db18d" }} />25–34%</span>
-              <span><i style={{ background: "#d7c58b" }} />35–44%</span>
-              <span><i style={{ background: "#c99b62" }} />45–54%</span>
-              <span><i style={{ background: "#a85f45" }} />55% o más</span>
+              <span>
+                <i style={{ background: "#dce9d8" }} />
+                Menor de 15%
+              </span>
+
+              <span>
+                <i style={{ background: "#b8d0b0" }} />
+                15–24%
+              </span>
+
+              <span>
+                <i style={{ background: "#8db18d" }} />
+                25–34%
+              </span>
+
+              <span>
+                <i style={{ background: "#d7c58b" }} />
+                35–44%
+              </span>
+
+              <span>
+                <i style={{ background: "#c99b62" }} />
+                45–54%
+              </span>
+
+              <span>
+                <i style={{ background: "#a85f45" }} />
+                55% o más
+              </span>
             </div>
           </div>
         </section>
@@ -606,6 +746,7 @@ export default function Mapa() {
               </span>
 
               <h2>{territorio.nombre}</h2>
+
               <p>Índice de Pobreza Multidimensional (IPM)</p>
             </div>
 
@@ -645,3 +786,4 @@ export default function Mapa() {
     </main>
   );
 }
+
