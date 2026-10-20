@@ -2,7 +2,7 @@
   --verde-oscuro: #1c3a34;
   --verde-medio: #2f5d52;
   --verde-suave: #e4ede9;
-  --arena: #f6f3ec;
+  --arena: #eef2ed;
   --ocre: #b5793a;
   --ocre-suave: #f0e0cb;
   --texto: #22291f;
@@ -12,8 +12,7 @@
   --fuente-cuerpo: "Inter", "Helvetica Neue", Arial, sans-serif;
   --fuente-titulo: "Sora", "Helvetica Neue", Arial, sans-serif;
 
-  /* Alias usados por los estilos de Sidebar/Inicio/Indicadores/Mapa
-     (mismo sistema de color, nombres distintos) */
+  /* Alias usados por los estilos de Sidebar/Inicio/Indicadores/Mapa */
   --verde-petroleo: var(--verde-oscuro);
   --verde-petroleo-hover: #142e29;
   --dorado: #d68c3e;
@@ -32,26 +31,35 @@
 
 /* =========================================================
    CONFIGURACIÓN GENERAL
-   ========================================================= */
+========================================================= */
 
 * {
   box-sizing: border-box;
 }
 
 html {
+  min-height: 100%;
   scroll-behavior: smooth;
+  background: var(--arena);
 }
 
 body {
+  min-height: 100vh;
   margin: 0;
   background: var(--arena);
   color: var(--texto);
   font-family: var(--fuente-cuerpo);
 }
 
+#root {
+  min-height: 100vh;
+  background: var(--arena);
+}
+
 button,
 input,
-select {
+select,
+textarea {
   font-family: inherit;
 }
 
@@ -61,7 +69,7 @@ a {
 
 /* =========================================================
    ESTRUCTURA GENERAL
-   ========================================================= */
+========================================================= */
 
 .app-shell {
   display: flex;
@@ -75,9 +83,29 @@ a {
   padding: 2.5rem 3rem;
 }
 
+/* Diseño sin barra lateral: contenido a todo el ancho */
+
+.app-shell.app-shell-sin-barra {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.app-shell-sin-barra .app-contenido-completo {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
 /* =========================================================
    SIDEBAR
-   ========================================================= */
+========================================================= */
 
 .sidebar {
   background: var(--verde-oscuro);
@@ -167,7 +195,7 @@ a {
 
 /* =========================================================
    PÁGINA INICIO
-   ========================================================= */
+========================================================= */
 
 .pagina-inicio__etiqueta,
 .pagina-consulta__etiqueta {
@@ -238,7 +266,7 @@ a {
 
 /* =========================================================
    PÁGINA CONSULTAR IPM
-   ========================================================= */
+========================================================= */
 
 .pagina-consulta__encabezado {
   margin-bottom: 1.75rem;
@@ -319,7 +347,7 @@ a {
 
 /* =========================================================
    GRÁFICO
-   ========================================================= */
+========================================================= */
 
 .grafico-contenedor {
   background: white;
@@ -332,7 +360,7 @@ a {
 
 /* =========================================================
    TARJETAS DE RESULTADOS
-   ========================================================= */
+========================================================= */
 
 .tarjetas-grid {
   display: grid;
@@ -392,7 +420,7 @@ a {
 
 /* =========================================================
    PÁGINA MAPA
-   ========================================================= */
+========================================================= */
 
 .pagina-mapa p {
   max-width: 60ch;
@@ -402,7 +430,7 @@ a {
 
 /* =========================================================
    RESPONSIVE GENERAL
-   ========================================================= */
+========================================================= */
 
 @media (max-width: 1050px) {
   .app-contenido {
@@ -419,5 +447,9 @@ a {
 @media (max-width: 500px) {
   .app-contenido {
     padding: 1.5rem;
+  }
+
+  .app-shell-sin-barra .app-contenido-completo {
+    padding: 0;
   }
 }
