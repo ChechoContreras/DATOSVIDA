@@ -1,12 +1,37 @@
-import { useState } from "react";
+
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  MapContainer,
+  TileLayer,
+  GeoJSON,
+  ZoomControl,
+  useMap,
+} from "react-leaflet";
+import L from "leaflet";
+import logoDataVida from "../assets/logo-icono.png";
 import colombiaGeoJSON from "../data/colombia.geo.json";
+import "../styles/Indicadores.css";
 import "../styles/Mapa.css";
+import "leaflet/dist/leaflet.css";
 
-// ============================================
-// DATOS PDET
-// ============================================
+const imagenMapa =
+  "https://sensorial.coffee/cdn/shop/articles/10.png?v=1791889602&width=1600";
 
-const datosPDET = {
+const opcionesMenu = [
+  { nombre: "Inicio", descripcion: "Resumen territorial", ruta: "/app", icono: "⌂" },
+  { nombre: "Indicadores", descripcion: "Consulta de información", ruta: "/app/indicadores", icono: "▤" },
+  { nombre: "Visualización", descripcion: "Exploración territorial", ruta: "/app/mapa", icono: "◫" },
+  { nombre: "Comparar", descripcion: "Comparación de territorios", ruta: "/app/comparar", icono: "⇄" },
+  { nombre: "Análisis estadístico", descripcion: "Relaciones y hallazgos", ruta: "/app/estadisticas", icono: "⌁" },
+  { nombre: "Predicciones IA", descripcion: "Proyecciones e inteligencia artificial", ruta: "/app/predicciones", icono: "✳" },
+  { nombre: "Análisis de variables", descripcion: "Relaciones entre indicadores y variables", ruta: "/app/variables", icono: "⌁" },
+  { nombre: "Recomendaciones", descripcion: "Orientación para el territorio", ruta: "/app/recomendaciones", icono: "◇" },
+  { nombre: "Reportes", descripcion: "Síntesis de resultados", ruta: "/app/reportes", icono: "▧" },
+  { nombre: "Perfil", descripcion: "Mi cuenta", ruta: "/app/perfil", icono: "○" },
+];
+
+const datosIPM = {
   ANTIOQUIA: 18.3,
   BOLIVAR: 38.5,
   BOYACA: 21.4,
@@ -24,966 +49,599 @@ const datosPDET = {
   PUTUMAYO: 48.2,
   TOLIMA: 27.5,
   "VALLE DEL CAUCA": 11.7,
-
-  // Datos adicionales para la comparación
   "BOGOTA D.C": 4.2,
   "SANTAFE DE BOGOTA D.C": 4.2,
 };
 
-// ============================================
-// DATOS PARA COMPARACIÓN
-// ============================================
-
-const departamentosComparacion = [
-  {
-    nombre: "ANTIOQUIA",
-    valor: 18.3,
-  },
-  {
-    nombre: "BOGOTA D.C.",
-    valor: 4.2,
-  },
-  {
-    nombre: "BOLIVAR",
-    valor: 38.5,
-  },
-  {
-    nombre: "CHOCO",
-    valor: 62.4,
-  },
-  {
-    nombre: "CUNDINAMARCA",
-    valor: 14.1,
-  },
-  {
-    nombre: "LA GUAJIRA",
-    valor: 65.2,
-  },
-];
-
-// ============================================
-// DATOS EVOLUCIÓN
-// ============================================
-
-const evolucionIPM = [
-  {
-    periodo: "2019",
-    valor: 27.8,
-  },
-  {
-    periodo: "2020",
-    valor: 26.4,
-  },
-  {
-    periodo: "2021",
-    valor: 25.7,
-  },
-  {
-    periodo: "2022",
-    valor: 24.9,
-  },
-  {
-    periodo: "2023",
-    valor: 23.8,
-  },
-];
-
-// ============================================
-// NORMALIZAR NOMBRES
-// ============================================
-
-const normalizarNombre = (nombre) => {
-  if (!nombre) return "";
-
-  return nombre
+function normalizar(texto = "") {
+  return String(texto)
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .toUpperCase()
     .trim()
-    .replace(/,/g, "")
+    .replace(/[.,]/g, "")
     .replace(/\s+/g, " ");
-};
+}
 
-// ============================================
-// OBTENER VALOR
-// ============================================
-
-const obtenerValor = (nombre) => {
-  const nombreNormalizado = normalizarNombre(nombre);
-
-  return datosPDET[nombreNormalizado] ?? null;
-};
-
-// ============================================
-// COLORES
-// ============================================
-
-const obtenerColor = (valor) => {
-  if (valor === null || valor === undefined) {
-    return "#CBD5E1";
-  }
-
-  if (valor >= 60) {
-    return "#991B1B";
-  }
-
-  if (valor >= 45) {
-    return "#DC2626";
-  }
-
-  if (valor >= 30) {
-    return "#F97316";
-  }
-
-  if (valor >= 20) {
-    return "#FACC15";
-  }
-
-  return "#22C55E";
-};
-
-// ============================================
-// COORDENADAS DEL GEOJSON
-// ============================================
-
-const obtenerCoordenadas = (geoJSON) => {
-  const coordenadas = [];
-
-  const recorrer = (elemento) => {
-    if (!Array.isArray(elemento)) return;
-
-    if (
-      elemento.length >= 2 &&
-      typeof elemento[0] === "number" &&
-      typeof elemento[1] === "number"
-    ) {
-      coordenadas.push(elemento);
-      return;
-    }
-
-    elemento.forEach(recorrer);
-  };
-
-  geoJSON.features.forEach((feature) => {
-    if (feature.geometry?.coordinates) {
-      recorrer(feature.geometry.coordinates);
-    }
-  });
-
-  return coordenadas;
-};
-
-const todasLasCoordenadas = obtenerCoordenadas(colombiaGeoJSON);
-
-const longitudes = todasLasCoordenadas.map(
-  (coordenada) => coordenada[0]
-);
-
-const latitudes = todasLasCoordenadas.map(
-  (coordenada) => coordenada[1]
-);
-
-const minLon = Math.min(...longitudes);
-const maxLon = Math.max(...longitudes);
-const minLat = Math.min(...latitudes);
-const maxLat = Math.max(...latitudes);
-
-// ============================================
-// MAPA SVG
-// ============================================
-
-const ANCHO_MAPA = 500;
-const ALTO_MAPA = 550;
-const MARGEN = 20;
-
-const convertirCoordenada = ([lon, lat]) => {
-  const rangoLon = maxLon - minLon;
-  const rangoLat = maxLat - minLat;
-
-  const x =
-    ((lon - minLon) / rangoLon) *
-      (ANCHO_MAPA - MARGEN * 2) +
-    MARGEN;
-
-  const y =
-    ALTO_MAPA -
-    ((lat - minLat) / rangoLat) *
-      (ALTO_MAPA - MARGEN * 2) -
-    MARGEN;
-
-  return [x, y];
-};
-
-// ============================================
-// GEOJSON → PATH SVG
-// ============================================
-
-const convertirAnilloAPath = (anillo) => {
-  if (!anillo || anillo.length === 0) {
-    return "";
-  }
+function obtenerNombre(feature) {
+  const propiedades = feature?.properties || {};
 
   return (
-    anillo
-      .map((coordenada, index) => {
-        const [x, y] =
-          convertirCoordenada(coordenada);
-
-        if (index === 0) {
-          return `M ${x} ${y}`;
-        }
-
-        return `L ${x} ${y}`;
-      })
-      .join(" ") + " Z"
+    propiedades.NOMBRE_DPT ||
+    propiedades.NOMBRE ||
+    propiedades.name ||
+    propiedades.NAME_1 ||
+    propiedades.DPTO ||
+    propiedades.departamento ||
+    "Territorio sin nombre"
   );
-};
+}
 
-const convertirGeometriaAPath = (geometry) => {
-  if (!geometry) return "";
+function obtenerIPM(nombre) {
+  return datosIPM[normalizar(nombre)] ?? null;
+}
 
-  if (geometry.type === "Polygon") {
-    return geometry.coordinates
-      .map((anillo) =>
-        convertirAnilloAPath(anillo)
-      )
-      .join(" ");
-  }
+function colorIPM(valor) {
+  if (valor === null || valor === undefined) return "#dce5dc";
+  if (valor < 15) return "#dce9d8";
+  if (valor < 25) return "#b8d0b0";
+  if (valor < 35) return "#8db18d";
+  if (valor < 45) return "#d7c58b";
+  if (valor < 55) return "#c99b62";
+  return "#a85f45";
+}
 
-  if (geometry.type === "MultiPolygon") {
-    return geometry.coordinates
-      .map((poligono) =>
-        poligono
-          .map((anillo) =>
-            convertirAnilloAPath(anillo)
-          )
-          .join(" ")
-      )
-      .join(" ");
-  }
+function obtenerEstilo(feature, departamentoSeleccionado) {
+  const nombre = normalizar(obtenerNombre(feature));
+  const seleccionado = normalizar(departamentoSeleccionado);
+  const valor = obtenerIPM(obtenerNombre(feature));
 
-  return "";
-};
-
-// ============================================
-// COMPONENTE
-// ============================================
-
-export default function Mapa() {
-  const [seleccionado, setSeleccionado] =
-    useState(null);
-
-  const [filtroDepartamento, setFiltroDepartamento] =
-    useState("");
-
-  const [filtroIndicador, setFiltroIndicador] =
-    useState("ipm");
-
-  const [filtroPeriodo, setFiltroPeriodo] =
-    useState("2023");
-
-  // ============================================
-  // DEPARTAMENTOS
-  // ============================================
-
-  const departamentos = colombiaGeoJSON.features
-    .map(
-      (feature) =>
-        feature.properties?.NOMBRE_DPT ||
-        feature.properties?.NOMBRE_DPTO ||
-        feature.properties?.name
-    )
-    .filter(Boolean)
-    .sort();
-
-  // ============================================
-  // SELECCIONAR DEPARTAMENTO
-  // ============================================
-
-  const seleccionarDepartamento = (feature) => {
-    const nombre =
-      feature.properties?.NOMBRE_DPT ||
-      feature.properties?.NOMBRE_DPTO ||
-      feature.properties?.name;
-
-    const valor = obtenerValor(nombre);
-
-    setSeleccionado({
-      nombre,
-      valor,
-    });
+  return {
+    fillColor: colorIPM(valor),
+    fillOpacity:
+      seleccionado && nombre === seleccionado ? 0.9 : 0.72,
+    color:
+      seleccionado && nombre === seleccionado
+        ? "#173c34"
+        : "#ffffff",
+    weight:
+      seleccionado && nombre === seleccionado ? 3 : 1,
+    opacity: 1,
   };
+}
 
-  // ============================================
-  // FILTRO DEPARTAMENTO
-  // ============================================
+function AjustarMapa({ datos }) {
+  const mapa = useMap();
 
-  const mostrarDepartamento = (nombre) => {
-    if (!filtroDepartamento) {
-      return true;
+  useEffect(() => {
+    if (!datos) return;
+
+    const capa = L.geoJSON(datos);
+    const limites = capa.getBounds();
+
+    if (limites.isValid()) {
+      mapa.fitBounds(limites, { padding: [20, 20] });
     }
+  }, [datos, mapa]);
+
+  return null;
+}
+
+function IconoBusqueda() {
+  return (
+    <svg
+      className="icono-busqueda-indicadores"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <circle cx="10.8" cy="10.8" r="6.8" />
+      <path d="m16 16 4.2 4.2" />
+    </svg>
+  );
+}
+
+function IconoMenu() {
+  return (
+    <svg
+      className="icono-menu-indicadores"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  );
+}
+
+function IconoCerrar() {
+  return (
+    <svg
+      className="icono-cerrar-indicadores"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path d="m6 6 12 12M18 6 6 18" />
+    </svg>
+  );
+}
+
+function obtenerNombreUsuario() {
+  try {
+    const guardado = localStorage.getItem("datavida_usuario");
+
+    if (!guardado) return "Usuario";
+
+    const usuario = JSON.parse(guardado);
+
+    if (typeof usuario === "string") return usuario;
 
     return (
-      normalizarNombre(nombre) ===
-      normalizarNombre(filtroDepartamento)
+      usuario?.nombreCompleto ||
+      usuario?.nombre ||
+      usuario?.nombres ||
+      usuario?.name ||
+      usuario?.correo ||
+      usuario?.email ||
+      "Usuario"
     );
-  };
+  } catch {
+    return "Usuario";
+  }
+}
 
-  // ============================================
-  // ACTUALIZAR
-  // ============================================
+function obtenerIniciales(nombre) {
+  if (!nombre || nombre === "Usuario") return "U";
 
-  const actualizarMapa = () => {
-    if (!filtroDepartamento) {
-      setSeleccionado(null);
-      return;
-    }
+  const palabras = nombre.trim().split(/\s+/);
 
-    const valor = obtenerValor(filtroDepartamento);
+  if (palabras.length === 1) {
+    return palabras[0].slice(0, 2).toUpperCase();
+  }
 
-    setSeleccionado({
-      nombre: filtroDepartamento,
-      valor,
+  return `${palabras[0][0]}${
+    palabras[palabras.length - 1][0]
+  }`.toUpperCase();
+}
+
+export default function Mapa() {
+  const [menuAbierto, setMenuAbierto] = useState(false);
+  const [busqueda, setBusqueda] = useState("");
+  const [departamento, setDepartamento] = useState("");
+  const [indicador, setIndicador] = useState("ipm");
+  const [periodo, setPeriodo] = useState("2024");
+  const [territorio, setTerritorio] = useState(null);
+
+  const nombreUsuario = obtenerNombreUsuario();
+  const inicialesUsuario = obtenerIniciales(nombreUsuario);
+
+  const departamentos = useMemo(() => {
+    const nombres = (colombiaGeoJSON.features || [])
+      .map((feature) => obtenerNombre(feature))
+      .filter((nombre) => nombre !== "Territorio sin nombre");
+
+    return [...new Set(nombres)].sort((a, b) =>
+      a.localeCompare(b, "es")
+    );
+  }, []);
+
+  const datosFiltrados = useMemo(() => {
+    const termino = normalizar(busqueda);
+
+    if (!termino && !departamento) return colombiaGeoJSON;
+
+    return {
+      ...colombiaGeoJSON,
+      features: (colombiaGeoJSON.features || []).filter((feature) => {
+        const nombre = normalizar(obtenerNombre(feature));
+        const coincideBusqueda = !termino || nombre.includes(termino);
+        const coincideDepartamento =
+          !departamento ||
+          nombre === normalizar(departamento);
+
+        return coincideBusqueda && coincideDepartamento;
+      }),
+    };
+  }, [busqueda, departamento]);
+
+  function limpiarFiltros() {
+    setBusqueda("");
+    setDepartamento("");
+    setIndicador("ipm");
+    setPeriodo("2024");
+    setTerritorio(null);
+  }
+
+  function seleccionarTerritorio(feature) {
+    const nombre = obtenerNombre(feature);
+
+    setTerritorio({
+      nombre,
+      ipm: obtenerIPM(nombre),
     });
-  };
 
-  // ============================================
-  // RENDER
-  // ============================================
+    setDepartamento(nombre);
+  }
 
   return (
-    <section className="pagina-mapa">
+    <main className="pagina-indicadores pagina-mapa">
+      <section className="hero-indicadores hero-mapa">
+        <img
+          className="hero-indicadores-imagen"
+          src={imagenMapa}
+          alt="Paisaje natural"
+        />
 
-      {/* ========================================
-          ENCABEZADO
-      ======================================== */}
+        <div className="hero-indicadores-degradado" />
 
-      <div className="encabezado-mapa">
-
-        <div>
-          <p className="pagina-mapa__etiqueta">
-            VISUALIZACIÓN
-          </p>
-
-          <h1>
-            Mapa de territorios PDET
-          </h1>
-
-          <p className="descripcion-mapa">
-            Explora los territorios priorizados y
-            consulta información relacionada con el
-            Índice de Pobreza Multidimensional.
-          </p>
-        </div>
-
-      </div>
-
-      {/* ========================================
-          FILTROS
-      ======================================== */}
-
-      <div className="filtros-mapa">
-
-        <div className="filtros-mapa__contenido">
-
-          {/* DEPARTAMENTO */}
-
-          <div className="campo-mapa">
-
-            <label>
-              Departamento
-            </label>
-
-            <select
-              value={filtroDepartamento}
-              onChange={(e) =>
-                setFiltroDepartamento(
-                  e.target.value
-                )
-              }
-            >
-
-              <option value="">
-                Todos
-              </option>
-
-              {departamentos.map(
-                (departamento) => (
-                  <option
-                    key={departamento}
-                    value={departamento}
-                  >
-                    {departamento}
-                  </option>
-                )
-              )}
-
-            </select>
-
-          </div>
-
-          {/* INDICADOR */}
-
-          <div className="campo-mapa">
-
-            <label>
-              Indicador
-            </label>
-
-            <select
-              value={filtroIndicador}
-              onChange={(e) =>
-                setFiltroIndicador(
-                  e.target.value
-                )
-              }
-            >
-
-              <option value="todos">
-                Todos los indicadores
-              </option>
-
-              <option value="ipm">
-                Índice de Pobreza Multidimensional
-              </option>
-
-            </select>
-
-          </div>
-
-          {/* PERIODO */}
-
-          <div className="campo-mapa">
-
-            <label>
-              Periodo
-            </label>
-
-            <select
-              value={filtroPeriodo}
-              onChange={(e) =>
-                setFiltroPeriodo(
-                  e.target.value
-                )
-              }
-            >
-
-              <option value="2019">
-                2019
-              </option>
-
-              <option value="2020">
-                2020
-              </option>
-
-              <option value="2021">
-                2021
-              </option>
-
-              <option value="2022">
-                2022
-              </option>
-
-              <option value="2023">
-                2023
-              </option>
-
-            </select>
-
-          </div>
-
-          {/* BOTÓN */}
-
-          <button
-            className="boton-consultar-mapa"
-            onClick={actualizarMapa}
+        <header className="barra-superior-indicadores">
+          <Link
+            to="/app"
+            className="marca-indicadores"
+            aria-label="Ir al inicio de DATAVIDA"
           >
-            Consultar
-          </button>
+            <img
+              src={logoDataVida}
+              alt=""
+              className="logo-indicadores"
+            />
+            <span className="nombre-marca-indicadores">DATAVIDA</span>
+          </Link>
 
-        </div>
+          <div className="buscador-indicadores">
+            <IconoBusqueda />
 
-      </div>
+            <input
+              type="search"
+              placeholder="Buscar territorio"
+              aria-label="Buscar territorio"
+              value={busqueda}
+              onChange={(evento) => setBusqueda(evento.target.value)}
+            />
 
-      {/* ========================================
-          CONTENIDO PRINCIPAL
-      ======================================== */}
-
-      <div className="contenido-mapa">
-
-        {/* ======================================
-            TARJETA DEL MAPA
-        ====================================== */}
-
-        <div className="tarjeta-mapa-pdet">
-
-          <div className="encabezado-tarjeta-mapa">
-
-            <div>
-
-              <h2>
-                Mapa de Colombia
-              </h2>
-
-              <p>
-                Territorios PDET según el IPM
-              </p>
-
-            </div>
-
-            {/* LEYENDA */}
-
-            <div className="leyenda-mapa-pdet">
-
-              <span>
-                <i
-                  style={{
-                    background: "#22C55E",
-                  }}
-                />
-                0 - 20
-              </span>
-
-              <span>
-                <i
-                  style={{
-                    background: "#FACC15",
-                  }}
-                />
-                20 - 30
-              </span>
-
-              <span>
-                <i
-                  style={{
-                    background: "#F97316",
-                  }}
-                />
-                30 - 45
-              </span>
-
-              <span>
-                <i
-                  style={{
-                    background: "#DC2626",
-                  }}
-                />
-                45 - 60
-              </span>
-
-              <span>
-                <i
-                  style={{
-                    background: "#991B1B",
-                  }}
-                />
-                60+
-              </span>
-
-            </div>
-
-          </div>
-
-          {/* ====================================
-              MAPA
-          ==================================== */}
-
-          <div className="contenedor-mapa-pdet">
-
-            <svg
-              className="mapa-colombia-pdet"
-              viewBox={`0 0 ${ANCHO_MAPA} ${ALTO_MAPA}`}
-              preserveAspectRatio="xMidYMid meet"
-            >
-
-              {colombiaGeoJSON.features.map(
-                (feature, index) => {
-
-                  const nombre =
-                    feature.properties?.NOMBRE_DPT ||
-                    feature.properties?.NOMBRE_DPTO ||
-                    feature.properties?.name;
-
-                  const valor =
-                    obtenerValor(nombre);
-
-                  const path =
-                    convertirGeometriaAPath(
-                      feature.geometry
-                    );
-
-                  const seleccionadoActual =
-                    seleccionado?.nombre ===
-                    nombre;
-
-                  const visible =
-                    mostrarDepartamento(nombre);
-
-                  return (
-                    <path
-                      key={`${nombre}-${index}`}
-                      d={path}
-                      fill={
-                        visible
-                          ? obtenerColor(valor)
-                          : "#E5E7EB"
-                      }
-                      stroke="#FFFFFF"
-                      strokeWidth={
-                        seleccionadoActual
-                          ? 2
-                          : 0.7
-                      }
-                      fillOpacity={
-                        seleccionadoActual
-                          ? 1
-                          : 0.9
-                      }
-                      fillRule="evenodd"
-                      className="departamento-pdet"
-                      onClick={() =>
-                        seleccionarDepartamento(
-                          feature
-                        )
-                      }
-                    >
-
-                      <title>
-                        {nombre}
-
-                        {valor !== null
-                          ? ` - ${valor}%`
-                          : " - Sin datos"}
-                      </title>
-
-                    </path>
-                  );
-                }
-              )}
-
-            </svg>
-
-            {/* ==================================
-                INFORMACIÓN SELECCIONADA
-            ================================== */}
-
-            {seleccionado && (
-              <div className="informacion-mapa-pdet">
-
-                <button
-                  className="cerrar-informacion-mapa"
-                  onClick={() =>
-                    setSeleccionado(null)
-                  }
-                >
-                  ×
-                </button>
-
-                <p>
-                  Departamento
-                </p>
-
-                <h3>
-                  {seleccionado.nombre}
-                </h3>
-
-                <strong>
-                  {seleccionado.valor !== null
-                    ? `${seleccionado.valor}%`
-                    : "Sin datos"}
-                </strong>
-
-                <span>
-                  Índice de Pobreza
-                  Multidimensional
-                </span>
-
-              </div>
+            {busqueda && (
+              <button
+                type="button"
+                className="limpiar-busqueda-indicadores"
+                aria-label="Limpiar búsqueda"
+                onClick={() => setBusqueda("")}
+              >
+                <IconoCerrar />
+              </button>
             )}
-
           </div>
 
+          <div className="acciones-superiores-indicadores">
+            <Link
+              to="/app/perfil"
+              className="perfil-indicadores"
+              title={nombreUsuario}
+              aria-label={`Ver perfil de ${nombreUsuario}`}
+            >
+              <span className="avatar-indicadores">
+                {inicialesUsuario}
+              </span>
+            </Link>
+
+            <button
+              type="button"
+              className="boton-menu-indicadores"
+              aria-label={menuAbierto ? "Cerrar menú" : "Abrir menú"}
+              aria-expanded={menuAbierto}
+              onClick={() => setMenuAbierto(!menuAbierto)}
+            >
+              {menuAbierto ? <IconoCerrar /> : <IconoMenu />}
+            </button>
+          </div>
+        </header>
+
+        <div className="hero-indicadores-contenido">
+          <span className="etiqueta-hero-indicadores">
+            VISUALIZACIÓN TERRITORIAL
+          </span>
+
+          <h1>Mapa de territorios PDET</h1>
+
+          <p>
+            Información para comprender la pobreza multidimensional
+            en los territorios PDET de Colombia.
+          </p>
         </div>
+      </section>
 
-        {/* ======================================
-            PANEL DERECHO
-        ====================================== */}
+      {menuAbierto && (
+        <>
+          <button
+            type="button"
+            className="fondo-menu-indicadores"
+            aria-label="Cerrar menú de navegación"
+            onClick={() => setMenuAbierto(false)}
+          />
 
-        <aside className="panel-mapa-pdet">
+          <nav
+            className="menu-desplegable-inicio menu-mapa"
+            aria-label="Menú principal"
+          >
+            <div className="menu-desplegable-encabezado">
+              <span>MENÚ PRINCIPAL</span>
+              <button
+                type="button"
+                onClick={() => setMenuAbierto(false)}
+                aria-label="Cerrar menú"
+              >
+                ×
+              </button>
+            </div>
 
-          {/* TARJETA PDET */}
+            <div className="menu-usuario-inicio">
+              <div className="menu-avatar-inicio">
+                {inicialesUsuario}
+              </div>
 
-          <div className="tarjeta-info-pdet">
+              <div>
+                <strong>{nombreUsuario}</strong>
+                <span>Sesión activa</span>
+              </div>
+            </div>
 
-            <span className="tarjeta-info-pdet__etiqueta">
-              PDET
+            <div className="menu-enlaces-inicio">
+              {opcionesMenu.map((opcion) => (
+                <Link
+                  key={opcion.nombre}
+                  to={opcion.ruta}
+                  className={
+                    opcion.ruta === "/app/mapa"
+                      ? "enlace-menu-inicio activo"
+                      : "enlace-menu-inicio"
+                  }
+                  aria-current={
+                    opcion.ruta === "/app/mapa" ? "page" : undefined
+                  }
+                  onClick={() => setMenuAbierto(false)}
+                >
+                  <span className="enlace-menu-icono">
+                    {opcion.icono}
+                  </span>
+
+                  <span className="enlace-menu-contenido">
+                    <strong>{opcion.nombre}</strong>
+                    <small>{opcion.descripcion}</small>
+                  </span>
+
+                  <span className="enlace-menu-flecha">›</span>
+                </Link>
+              ))}
+            </div>
+
+            <div className="menu-pie-inicio">
+              <span>DATAVIDA</span>
+              <small>DATAVIDA · DATOS CON PROPÓSITO</small>
+            </div>
+          </nav>
+        </>
+      )}
+
+      <section className="contenido-indicadores contenido-mapa">
+        <div className="encabezado-mapa">
+          <div>
+            <span className="sobretitulo-indicadores">
+              EXPLORACIÓN GEOGRÁFICA
             </span>
 
-            <h2>
-              Territorios priorizados
-            </h2>
+            <h2>Explora el territorio</h2>
 
             <p>
-              Consulta los departamentos
-              representados en el mapa y revisa
-              su comportamiento frente al Índice
-              de Pobreza Multidimensional.
+              Selecciona un departamento o busca su nombre para
+              consultar la información disponible.
             </p>
+          </div>
+        </div>
 
+        <section className="panel-filtros-indicadores filtros-mapa">
+          <div className="rejilla-filtros-indicadores">
+            <div className="campo-indicadores">
+              <label htmlFor="departamento-mapa">Departamento</label>
+
+              <select
+                id="departamento-mapa"
+                value={departamento}
+                onChange={(evento) => {
+                  setDepartamento(evento.target.value);
+                  setTerritorio(null);
+                }}
+              >
+                <option value="">Todos los departamentos</option>
+
+                {departamentos.map((nombre) => (
+                  <option key={nombre} value={nombre}>
+                    {nombre}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="campo-indicadores">
+              <label htmlFor="indicador-mapa">Indicador</label>
+
+              <select
+                id="indicador-mapa"
+                value={indicador}
+                onChange={(evento) => setIndicador(evento.target.value)}
+              >
+                <option value="ipm">
+                  Índice de Pobreza Multidimensional
+                </option>
+              </select>
+            </div>
+
+            <div className="campo-indicadores">
+              <label htmlFor="periodo-mapa">Periodo</label>
+
+              <select
+                id="periodo-mapa"
+                value={periodo}
+                onChange={(evento) => setPeriodo(evento.target.value)}
+              >
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+                <option value="2022">2022</option>
+              </select>
+            </div>
           </div>
 
-          {/* TERRITORIO SELECCIONADO */}
+          <div className="acciones-filtros-indicadores">
+            <button
+              type="button"
+              className="boton-consultar-indicadores"
+              onClick={() => setTerritorio(null)}
+            >
+              Consultar mapa
+            </button>
 
-          {seleccionado && (
-            <div className="tarjeta-seleccion-pdet">
+            <button
+              type="button"
+              className="boton-limpiar-indicadores"
+              onClick={limpiarFiltros}
+            >
+              Limpiar filtros
+            </button>
+          </div>
+        </section>
 
-              <span>
-                Territorio seleccionado
+        <section className="panel-mapa" aria-label="Mapa interactivo">
+          <div className="encabezado-panel-mapa">
+            <div>
+              <h2>Mapa interactivo de Colombia</h2>
+              <p>
+                Selecciona un departamento para consultar sus datos
+                demostrativos.
+              </p>
+            </div>
+
+            <span className="etiqueta-periodo-mapa">
+              Periodo {periodo}
+            </span>
+          </div>
+
+          <div className="contenedor-leaflet">
+            <MapContainer
+              center={[4.5709, -74.2973]}
+              zoom={5}
+              minZoom={4}
+              scrollWheelZoom
+              zoomControl={false}
+              className="mapa-leaflet"
+            >
+              <ZoomControl position="bottomright" />
+
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+
+              <AjustarMapa datos={datosFiltrados} />
+
+              <GeoJSON
+                key={`${departamento}-${busqueda}`}
+                data={datosFiltrados}
+                style={(feature) =>
+                  obtenerEstilo(feature, departamento)
+                }
+                onEachFeature={(feature, capa) => {
+                  const nombre = obtenerNombre(feature);
+                  const valor = obtenerIPM(nombre);
+
+                  capa.bindTooltip(
+                    `<strong>${nombre}</strong><br/>IPM demostrativo: ${
+                      valor === null ? "Sin dato" : `${valor}%`
+                    }`,
+                    { sticky: true }
+                  );
+
+                  capa.on({
+                    click: () => seleccionarTerritorio(feature),
+
+                    mouseover: (evento) => {
+                      evento.target.setStyle({
+                        weight: 2.5,
+                        color: "#173c34",
+                        fillOpacity: 0.9,
+                      });
+                    },
+
+                    mouseout: (evento) => {
+                      evento.target.setStyle(
+                        obtenerEstilo(feature, departamento)
+                      );
+                    },
+                  });
+                }}
+              />
+            </MapContainer>
+          </div>
+
+          <div className="leyenda-mapa">
+            <strong>Nivel del IPM</strong>
+
+            <div className="elementos-leyenda-mapa">
+              <span><i style={{ background: "#dce9d8" }} />Menor de 15%</span>
+              <span><i style={{ background: "#b8d0b0" }} />15–24%</span>
+              <span><i style={{ background: "#8db18d" }} />25–34%</span>
+              <span><i style={{ background: "#d7c58b" }} />35–44%</span>
+              <span><i style={{ background: "#c99b62" }} />45–54%</span>
+              <span><i style={{ background: "#a85f45" }} />55% o más</span>
+            </div>
+          </div>
+        </section>
+
+        {territorio && (
+          <section
+            className="detalle-territorio-mapa"
+            aria-live="polite"
+          >
+            <div>
+              <span className="sobretitulo-indicadores">
+                TERRITORIO SELECCIONADO
               </span>
 
-              <h3>
-                {seleccionado.nombre}
-              </h3>
-
-              <div className="valor-pdet">
-
-                {seleccionado.valor !== null
-                  ? `${seleccionado.valor}%`
-                  : "Sin datos"}
-
-              </div>
-
-              <p>
-                Valor del IPM registrado para el
-                territorio.
-              </p>
-
-            </div>
-          )}
-
-        </aside>
-
-      </div>
-
-      {/* ========================================
-          COMPARACIÓN DEL INDICADOR
-      ======================================== */}
-
-      <section className="seccion-estadisticas">
-
-        <div className="encabezado-estadisticas">
-
-          <p className="estadistica-etiqueta">
-            COMPARACIÓN DEL INDICADOR
-          </p>
-
-          <h2>
-            Departamentos con mayor IPM
-          </h2>
-
-          <p>
-            Comparación del Índice de Pobreza
-            Multidimensional entre departamentos.
-          </p>
-
-        </div>
-
-        <div className="tarjetas-comparacion">
-
-          {departamentosComparacion.map(
-            (departamento) => (
-
-              <div
-                className="tarjeta-comparacion"
-                key={departamento.nombre}
-              >
-
-                <div className="comparacion-superior">
-
-                  <span>
-                    {departamento.nombre}
-                  </span>
-
-                  <strong>
-                    {departamento.valor}%
-                  </strong>
-
-                </div>
-
-                <div className="barra-comparacion">
-
-                  <div
-                    className="barra-comparacion__relleno"
-                    style={{
-                      width: `${Math.min(
-                        departamento.valor,
-                        100
-                      )}%`,
-                      backgroundColor:
-                        obtenerColor(
-                          departamento.valor
-                        ),
-                    }}
-                  />
-
-                </div>
-
-              </div>
-
-            )
-          )}
-
-        </div>
-
-      </section>
-
-      {/* ========================================
-          EVOLUCIÓN DEL IPM
-      ======================================== */}
-
-      <section className="seccion-evolucion">
-
-        <div className="encabezado-estadisticas">
-
-          <p className="estadistica-etiqueta">
-            EVOLUCIÓN
-          </p>
-
-          <h2>
-            Evolución del IPM
-          </h2>
-
-          <p>
-            Comportamiento del promedio nacional
-            durante el periodo seleccionado.
-          </p>
-
-        </div>
-
-        <div className="tarjeta-evolucion">
-
-          {/* RESUMEN */}
-
-          <div className="resumen-evolucion">
-
-            <span>
-              Promedio nacional
-            </span>
-
-            <strong>
-              23.8%
-            </strong>
-
-          </div>
-
-          {/* GRÁFICO */}
-
-          <div className="grafico-evolucion">
-
-            <div className="linea-grafico">
-
-              {evolucionIPM.map(
-                (dato, index) => {
-
-                  const maximo = 30;
-                  const minimo = 20;
-
-                  const porcentaje =
-                    ((dato.valor - minimo) /
-                      (maximo - minimo)) *
-                    100;
-
-                  return (
-                    <div
-                      className="punto-evolucion"
-                      key={dato.periodo}
-                    >
-
-                      <div
-                        className="valor-evolucion"
-                        style={{
-                          bottom: `${Math.max(
-                            15,
-                            Math.min(
-                              porcentaje,
-                              90
-                            )
-                          )}%`,
-                        }}
-                      >
-                        {dato.valor}%
-                      </div>
-
-                      <div
-                        className="punto-evolucion__circulo"
-                        style={{
-                          bottom: `${Math.max(
-                            15,
-                            Math.min(
-                              porcentaje,
-                              90
-                            )
-                          )}%`,
-                        }}
-                      />
-
-                      {index <
-                        evolucionIPM.length -
-                          1 && (
-                        <div
-                          className="linea-conexion"
-                          style={{
-                            bottom: `${Math.max(
-                              15,
-                              Math.min(
-                                porcentaje,
-                                90
-                              )
-                            )}%`,
-                          }}
-                        />
-                      )}
-
-                      <span className="periodo-evolucion">
-                        {dato.periodo}
-                      </span>
-
-                    </div>
-                  );
-                }
-              )}
-
+              <h2>{territorio.nombre}</h2>
+              <p>Índice de Pobreza Multidimensional (IPM)</p>
             </div>
 
-          </div>
+            <div className="valor-ipm-mapa">
+              {territorio.ipm === null
+                ? "Sin dato"
+                : `${territorio.ipm}%`}
+            </div>
+          </section>
+        )}
 
-          {/* VALORES */}
-
-          <div className="valores-evolucion">
-
-            {evolucionIPM.map(
-              (dato) => (
-                <div
-                  key={dato.periodo}
-                  className="dato-evolucion"
-                >
-                  <span>
-                    {dato.periodo}
-                  </span>
-
-                  <strong>
-                    {dato.valor}%
-                  </strong>
-                </div>
-              )
-            )}
-
-          </div>
-
-        </div>
-
+        <p className="nota-datos-mapa">
+          Nota: los valores representados son demostrativos y no
+          corresponden a estadísticas oficiales. El periodo es un
+          filtro visual; los datos reales deberán conectarse al
+          microservicio de indicadores.
+        </p>
       </section>
 
-    </section>
+      <footer className="pie-indicadores">
+        <div className="pie-indicadores-contenido">
+          <Link to="/app" className="marca-pie-indicadores">
+            <img src={logoDataVida} alt="" />
+            <span>DATAVIDA</span>
+          </Link>
+
+          <p>
+            Información para comprender la pobreza multidimensional
+            en los territorios PDET de Colombia.
+          </p>
+        </div>
+
+        <div className="pie-indicadores-final">
+          Proyecto DATAVIDA · Proyecto Integrador II · UPB
+        </div>
+      </footer>
+    </main>
   );
 }
