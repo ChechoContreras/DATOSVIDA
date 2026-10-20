@@ -47,22 +47,23 @@
 .pagina-indicadores a:focus-visible,
 .pagina-indicadores input:focus-visible,
 .pagina-indicadores select:focus-visible {
-  outline: 2px solid var(--dorado);
+  outline: 2px solid #ffffff;
   outline-offset: 3px;
 }
 
 /* ========================================
-   PORTADA
+   PORTADA E IMAGEN
 ======================================== */
 
 .pagina-indicadores .hero-indicadores {
   position: relative;
+  isolation: isolate;
   display: flex;
   flex-direction: column;
+  justify-content: flex-start;
   width: 100%;
   min-height: clamp(510px, 72vh, 720px);
   overflow: hidden;
-  isolation: isolate;
   background: #263d32;
 }
 
@@ -86,13 +87,13 @@
   background:
     linear-gradient(
       180deg,
-      rgb(15 37 29 / 54%),
-      rgb(19 44 33 / 13%) 30%,
-      rgb(12 35 26 / 76%) 100%
+      rgb(15 37 29 / 60%) 0%,
+      rgb(19 44 33 / 27%) 38%,
+      rgb(12 35 26 / 68%) 100%
     ),
     linear-gradient(
       90deg,
-      rgb(16 43 32 / 30%),
+      rgb(16 43 32 / 22%),
       transparent 75%
     );
 }
@@ -111,17 +112,20 @@
 
 /* ========================================
    BARRA SUPERIOR
+   Compatible con el JSX compartido
 ======================================== */
 
+.pagina-indicadores .barra-superior-inicio,
 .pagina-indicadores .barra-superior-indicadores {
   position: relative;
   z-index: 20;
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   width: 100%;
-  padding: 27px 5.5%;
+  padding: 25px 5.5%;
   background: linear-gradient(
     180deg,
     rgb(15 39 31 / 35%),
@@ -129,17 +133,21 @@
   );
 }
 
+.pagina-indicadores .marca-inicio,
 .pagina-indicadores .marca-indicadores {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   gap: 11px;
-  color: #fff;
+  color: #ffffff;
+  font-family: "DM Sans", sans-serif;
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: 2.3px;
+  letter-spacing: 2px;
+  white-space: nowrap;
 }
 
+.pagina-indicadores .marca-inicio img,
 .pagina-indicadores .logo-indicadores {
   display: block;
   flex-shrink: 0;
@@ -149,165 +157,197 @@
   filter: brightness(0) invert(1);
 }
 
+.pagina-indicadores .marca-inicio span,
 .pagina-indicadores .nombre-marca-indicadores {
-  color: #fff;
+  color: #ffffff;
   font-family: "DM Sans", sans-serif;
   font-size: 22px;
   font-weight: 700;
-  letter-spacing: 2.3px;
+  letter-spacing: 2px;
 }
 
 /* ========================================
-   BUSCADOR
+   ACCIONES SUPERIORES
 ======================================== */
 
-.pagina-indicadores .buscador-indicadores {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: clamp(190px, 23vw, 285px);
-  height: 48px;
-  margin-left: auto;
-  padding: 0 16px;
-  border: 1px solid rgb(255 255 255 / 65%);
-  border-radius: 30px;
-  background: rgb(255 255 255 / 14%);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background 0.2s ease, border-color 0.2s ease;
-}
-
-.pagina-indicadores .buscador-indicadores:focus-within {
-  border-color: #fff;
-  background: rgb(255 255 255 / 23%);
-}
-
-.pagina-indicadores .icono-busqueda-indicadores {
-  display: block;
-  flex-shrink: 0;
-  width: 19px;
-  height: 19px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.pagina-indicadores .buscador-indicadores > .icono-busqueda-indicadores {
-  color: #fff;
-}
-
-.pagina-indicadores .buscador-indicadores input {
-  width: 100%;
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  outline: 0;
-  background: transparent;
-  color: #fff;
-  font-family: "DM Sans", sans-serif;
-  font-size: 12px;
-}
-
-.pagina-indicadores .buscador-indicadores input::placeholder {
-  color: rgb(255 255 255 / 94%);
-}
-
-.pagina-indicadores .buscador-indicadores input::-webkit-search-cancel-button {
-  display: none;
-}
-
-.pagina-indicadores .limpiar-busqueda-indicadores {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 25px;
-  height: 25px;
-  padding: 3px;
-  border: 0;
-  border-radius: 50%;
-  background: transparent;
-  color: #fff;
-  cursor: pointer;
-}
-
-.pagina-indicadores .limpiar-busqueda-indicadores:hover {
-  background: rgb(255 255 255 / 15%);
-}
-
-.pagina-indicadores .limpiar-busqueda-indicadores svg {
-  width: 17px;
-  height: 17px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
-  stroke-linecap: round;
-}
-
-/* ========================================
-   PERFIL Y MENÚ
-======================================== */
-
+.pagina-indicadores .acciones-superiores-inicio,
 .pagina-indicadores .acciones-superiores-indicadores {
   display: flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: flex-end;
   gap: 13px;
+  margin-left: auto;
 }
 
+/* ========================================
+   BUSCADOR DEL MENÚ
+======================================== */
+
+.pagina-indicadores .busqueda-territorio-inicio,
+.pagina-indicadores .buscador-indicadores {
+  position: relative;
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  gap: 10px;
+  width: clamp(190px, 23vw, 285px);
+  height: 46px;
+  margin-left: auto;
+  padding: 0 15px;
+  border: 1px solid rgb(255 255 255 / 65%);
+  border-radius: 30px;
+  background: rgb(255 255 255 / 14%);
+  color: #ffffff;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio:focus-within,
+.pagina-indicadores .buscador-indicadores:focus-within {
+  border-color: #ffffff;
+  background: rgb(255 255 255 / 24%);
+}
+
+.pagina-indicadores .icono-busqueda-inicio {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  color: #ffffff;
+  font-size: 23px;
+  line-height: 1;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input,
+.pagina-indicadores .buscador-indicadores input {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: #ffffff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 12px;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input::placeholder,
+.pagina-indicadores .buscador-indicadores input::placeholder {
+  color: rgb(255 255 255 / 94%);
+  opacity: 1;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input::-webkit-search-cancel-button,
+.pagina-indicadores .buscador-indicadores input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.pagina-indicadores .busqueda-territorio-inicio input:focus-visible {
+  outline: none;
+}
+
+/* ========================================
+   PERFIL DE USUARIO
+======================================== */
+
+.pagina-indicadores .boton-perfil-inicio,
 .pagina-indicadores .perfil-indicadores {
   display: inline-flex;
   flex-shrink: 0;
   align-items: center;
   justify-content: center;
+  width: 46px;
+  height: 46px;
+  padding: 0;
+  border: 1px solid rgb(255 255 255 / 72%);
   border-radius: 50%;
+  background: rgb(255 255 255 / 17%);
+  color: #ffffff;
+  text-decoration: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
+.pagina-indicadores .boton-perfil-inicio span,
 .pagina-indicadores .avatar-indicadores {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border: 1px solid rgb(255 255 255 / 70%);
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
-  background: rgb(255 255 255 / 17%);
-  color: #fff;
-  font-size: 14px;
+  color: #ffffff;
+  font-size: 13px;
   font-weight: 700;
-  backdrop-filter: blur(12px);
-  transition: background 0.2s ease, color 0.2s ease;
 }
 
-.pagina-indicadores .perfil-indicadores:hover .avatar-indicadores {
-  background: #fff;
+.pagina-indicadores .boton-perfil-inicio:hover,
+.pagina-indicadores .perfil-indicadores:hover {
+  transform: translateY(-1px);
+  background: #ffffff;
   color: var(--verde-oscuro);
 }
 
+.pagina-indicadores .boton-perfil-inicio:hover span {
+  color: var(--verde-oscuro);
+}
+
+/* ========================================
+   BOTÓN DE LAS TRES RAYAS
+======================================== */
+
+.pagina-indicadores .boton-menu-inicio,
 .pagina-indicadores .boton-menu-indicadores {
   display: inline-flex;
   flex-shrink: 0;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
+  gap: 5px;
+  width: 46px;
+  height: 46px;
   padding: 0;
-  border: 1px solid rgb(255 255 255 / 65%);
+  border: 1px solid rgb(255 255 255 / 72%);
   border-radius: 50%;
-  background: rgb(255 255 255 / 14%);
-  color: #fff;
+  background: rgb(255 255 255 / 17%);
+  color: #ffffff;
   cursor: pointer;
   backdrop-filter: blur(12px);
-  transition: background 0.2s ease;
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
+.pagina-indicadores .boton-menu-inicio span {
+  display: block;
+  width: 19px;
+  height: 2px;
+  border-radius: 3px;
+  background: #ffffff;
+  transition:
+    width 0.2s ease,
+    transform 0.2s ease;
+}
+
+.pagina-indicadores .boton-menu-inicio:hover,
+.pagina-indicadores .boton-menu-inicio.activo,
 .pagina-indicadores .boton-menu-indicadores:hover,
 .pagina-indicadores .boton-menu-indicadores[aria-expanded="true"] {
-  background: rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 30%);
+  transform: translateY(-1px);
+}
+
+.pagina-indicadores .boton-menu-inicio:hover span {
+  width: 22px;
 }
 
 .pagina-indicadores .icono-menu-indicadores,
@@ -322,82 +362,82 @@
   stroke-linejoin: round;
 }
 
-/* Compatibilidad con los nombres de clase del JSX local */
+/* ========================================
+   CONTENIDO CENTRADO DE LA PORTADA
+======================================== */
 
-.pagina-indicadores .barra-superior-inicio {
+.pagina-indicadores .hero-indicadores-contenido {
   position: relative;
-  z-index: 20;
+  z-index: 2;
   display: flex;
+  flex: 1;
+  flex-direction: column;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  justify-content: center;
   width: 100%;
-  padding: 27px 5.5%;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 30px 35px 100px;
+  color: #ffffff;
+  text-align: center;
 }
 
-.pagina-indicadores .marca-inicio {
-  display: inline-flex;
-  flex-shrink: 0;
-  align-items: center;
-  gap: 11px;
-  color: #fff;
-  font-size: 22px;
+.pagina-indicadores .etiqueta-hero-indicadores {
+  display: block;
+  max-width: 100%;
+  margin: 0 0 20px;
+  color: #ffffff;
+  font-family: "DM Sans", sans-serif;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 2px;
+  letter-spacing: 4px;
+  line-height: 1.7;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 35%);
 }
 
-.pagina-indicadores .marca-inicio img {
-  width: 43px;
-  height: 43px;
-  object-fit: contain;
-  filter: brightness(0) invert(1);
+.pagina-indicadores .hero-indicadores-contenido h1 {
+  max-width: 100%;
+  margin: 0;
+  color: #ffffff;
+  font-family: "Newsreader", Georgia, serif;
+  font-size: clamp(52px, 7vw, 86px);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -1.5px;
+  text-align: center;
+  text-shadow: 0 3px 22px rgb(0 0 0 / 30%);
 }
 
-.pagina-indicadores .acciones-superiores-inicio {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 13px;
+.pagina-indicadores .hero-indicadores-contenido p {
+  max-width: 680px;
+  margin: 22px auto 0;
+  color: rgb(255 255 255 / 96%);
+  font-family: "DM Sans", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.9;
+  text-align: center;
+  text-shadow: 0 2px 12px rgb(0 0 0 / 35%);
 }
 
-.pagina-indicadores .busqueda-territorio-inicio {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: clamp(190px, 23vw, 285px);
-  height: 48px;
-  margin-left: auto;
-  padding: 0 16px;
-  border: 1px solid rgb(255 255 255 / 65%);
-  border-radius: 30px;
-  background: rgb(255 255 255 / 14%);
-  color: #fff;
-  backdrop-filter: blur(12px);
-}
+/* ========================================
+   MENÚ DESPLEGABLE
+======================================== */
 
-.pagina-indicadores .busqueda-territorio-inicio input {
+.pagina-indicadores .fondo-menu-inicio {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: block;
   width: 100%;
-  min-width: 0;
+  height: 100%;
   padding: 0;
   border: 0;
-  outline: 0;
-  background: transparent;
-  color: #fff;
-  font-size: 12px;
-}
-
-.pagina-indicadores .busqueda-territorio-inicio input::placeholder {
-  color: rgb(255 255 255 / 94%);
-}
-
-.pagina-indicadores .busqueda-territorio-inicio svg {
-  flex-shrink: 0;
-  width: 19px;
-  height: 19px;
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.8;
+  background: rgb(11 26 21 / 48%);
+  cursor: pointer;
+  animation: aparecer-fondo-menu-indicadores 0.2s ease both;
 }
 
 .pagina-indicadores .menu-desplegable-inicio {
@@ -410,24 +450,230 @@
   width: min(410px, 92vw);
   height: 100vh;
   height: 100dvh;
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 28px 24px 22px;
   border-left: 1px solid rgb(23 60 52 / 8%);
   background: #f9faf7;
+  color: var(--texto);
   box-shadow: -15px 0 50px rgb(10 31 23 / 17%);
   animation: entrar-menu-indicadores 0.25s ease both;
 }
 
-.pagina-indicadores .fondo-menu-inicio {
-  position: fixed;
-  z-index: 30;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  border: 0;
-  background: rgb(11 26 21 / 40%);
-  cursor: pointer;
+@keyframes entrar-menu-indicadores {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
+
+@keyframes aparecer-fondo-menu-indicadores {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.pagina-indicadores .menu-desplegable-encabezado {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid var(--borde);
+}
+
+.pagina-indicadores .menu-desplegable-encabezado > span {
+  color: var(--verde-oscuro);
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.pagina-indicadores .menu-desplegable-encabezado button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 50%;
+  background: #ffffff;
+  color: var(--verde-oscuro);
+  font-size: 25px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.pagina-indicadores .menu-desplegable-encabezado button:hover {
+  transform: rotate(90deg);
+  background: var(--verde-claro);
+}
+
+.pagina-indicadores .menu-usuario-inicio {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 22px 0;
+  padding: 17px;
+  border: 1px solid #e4eae1;
+  border-radius: 13px;
+  background: #ffffff;
+}
+
+.pagina-indicadores .menu-avatar-inicio {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--verde-oscuro);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pagina-indicadores .menu-usuario-inicio > div:last-child {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 5px;
+}
+
+.pagina-indicadores .menu-usuario-inicio strong {
+  overflow-wrap: anywhere;
+  color: var(--verde-oscuro);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.pagina-indicadores .menu-usuario-inicio span {
+  color: var(--texto-secundario);
+  font-size: 11px;
+}
+
+.pagina-indicadores .menu-enlaces-inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  width: 100%;
+}
+
+.pagina-indicadores .enlace-menu-inicio {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  min-height: 65px;
+  padding: 11px 12px;
+  border: 1px solid transparent;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--texto);
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.pagina-indicadores .enlace-menu-inicio:hover {
+  transform: translateX(-2px);
+  border-color: #d9e4d6;
+  background: #eaf0e8;
+}
+
+.pagina-indicadores .enlace-menu-icono {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: #e9efe7;
+  color: var(--verde-oscuro);
+  font-size: 20px;
+}
+
+.pagina-indicadores .enlace-menu-contenido {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  gap: 4px;
+}
+
+.pagina-indicadores .enlace-menu-contenido strong {
+  color: var(--verde-oscuro);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.pagina-indicadores .enlace-menu-contenido small {
+  color: var(--texto-secundario);
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.pagina-indicadores .enlace-menu-flecha {
+  flex-shrink: 0;
+  color: #718176;
+  font-size: 23px;
+  transition: transform 0.2s ease;
+}
+
+.pagina-indicadores .enlace-menu-inicio:hover .enlace-menu-flecha {
+  transform: translateX(3px);
+  color: var(--verde-oscuro);
+}
+
+.pagina-indicadores .menu-enlaces-inicio > p {
+  margin: 15px 0;
+  padding: 15px;
+  border-radius: 10px;
+  background: #ffffff;
+  color: var(--texto-secundario);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.pagina-indicadores .menu-pie-inicio {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-top: auto;
+  padding-top: 25px;
+  text-align: center;
+}
+
+.pagina-indicadores .menu-pie-inicio > span {
+  color: var(--verde-oscuro);
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.pagina-indicadores .menu-pie-inicio small {
+  color: var(--texto-secundario);
+  font-size: 10px;
+}
+
+/* Compatibilidad con nombres de clases de versiones anteriores */
 
 .pagina-indicadores .encabezado-menu-inicio {
   display: flex;
@@ -458,11 +704,6 @@
   background: #e7eee5;
 }
 
-.pagina-indicadores .menu-desplegable-inicio .avatar-indicadores {
-  background: #e6eee5;
-  color: var(--verde-oscuro);
-}
-
 /* ========================================
    CONTENIDO PRINCIPAL
 ======================================== */
@@ -472,7 +713,7 @@
   width: 100%;
   max-width: 1220px;
   margin: 0 auto;
-  padding: 78px 35px 0;
+  padding: 65px 35px 0;
 }
 
 .pagina-indicadores .encabezado-indicadores {
@@ -494,7 +735,7 @@
 .pagina-indicadores .etiqueta-pagina-indicadores {
   display: inline-block;
   margin-bottom: 9px;
-  color: var(--dorado);
+  color: var(--verde-medio);
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.8px;
@@ -521,7 +762,7 @@
 }
 
 /* ========================================
-   FILTROS
+   PANEL DE FILTROS
 ======================================== */
 
 .pagina-indicadores .panel-filtros-indicadores {
@@ -531,7 +772,7 @@
   padding: 27px 28px;
   border: 1px solid var(--borde);
   border-radius: 12px;
-  background: #fff;
+  background: #ffffff;
   box-shadow: var(--sombra);
 }
 
@@ -576,8 +817,6 @@
   line-height: 1.5;
 }
 
-/* Acepta los dos nombres utilizados en las versiones del JSX */
-
 .pagina-indicadores .formulario-filtros-indicadores {
   width: 100%;
 }
@@ -614,7 +853,7 @@
   border: 1px solid #d5dfd5;
   border-radius: 8px;
   outline: 0;
-  background: #fff;
+  background: #ffffff;
   color: var(--texto);
   font-family: "DM Sans", sans-serif;
   font-size: 12px;
@@ -638,12 +877,12 @@
 }
 
 .pagina-indicadores .campo-indicadores select option {
-  background: #fff;
+  background: #ffffff;
   color: var(--texto);
 }
 
 /* ========================================
-   BOTONES
+   BOTONES DE CONSULTA
 ======================================== */
 
 .pagina-indicadores .acciones-filtros-indicadores {
@@ -669,13 +908,16 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .pagina-indicadores .boton-consultar-indicadores {
   border-color: var(--verde-oscuro);
   background: var(--verde-oscuro);
-  color: #fff;
+  color: #ffffff;
 }
 
 .pagina-indicadores .boton-consultar-indicadores:hover:not(:disabled) {
@@ -690,7 +932,7 @@
 
 .pagina-indicadores .boton-limpiar-indicadores {
   border-color: #d5dfd5;
-  background: #fff;
+  background: #ffffff;
   color: var(--verde-oscuro);
 }
 
@@ -700,7 +942,7 @@
 }
 
 /* ========================================
-   ESTADOS Y RESULTADOS
+   RESULTADOS Y ESTADOS
 ======================================== */
 
 .pagina-indicadores .resultados-indicadores {
@@ -719,7 +961,7 @@
   padding: 34px 25px;
   border: 1px solid rgb(36 80 71 / 10%);
   border-radius: 12px;
-  background: #fff;
+  background: #ffffff;
   box-shadow: var(--sombra);
   text-align: center;
   overflow: hidden;
@@ -739,9 +981,6 @@
   background: #edf3ec;
   color: var(--verde-medio);
 }
-
-/* Cuando el icono de alerta está en un contenedor propio,
-   evita convertir el SVG en una caja de 53px. */
 
 .pagina-indicadores svg.icono-alerta-indicadores {
   width: 24px;
@@ -793,9 +1032,9 @@
 
 .pagina-indicadores .estado-sin-resultados .icono-estado-indicadores,
 .pagina-indicadores .estado-sin-resultados-indicadores .icono-estado-indicadores {
-  border-color: #e7d8c4;
-  background: #f7efe5;
-  color: var(--dorado);
+  border-color: #dce7dc;
+  background: #edf3ec;
+  color: var(--verde-medio);
 }
 
 .pagina-indicadores .estado-cargando-indicadores {
@@ -820,7 +1059,18 @@
   }
 }
 
-/* Contenedores de gráficos y tarjetas */
+/* Mensaje y componentes de resultados */
+
+.pagina-indicadores .mensaje-resultado {
+  margin: 0 0 18px;
+  padding: 14px 17px;
+  border: 1px solid #dce7dc;
+  border-radius: 9px;
+  background: #ffffff;
+  color: var(--texto);
+  font-size: 12px;
+  line-height: 1.7;
+}
 
 .pagina-indicadores .graficos-indicadores,
 .pagina-indicadores .contenedor-grafico-indicadores,
@@ -853,7 +1103,7 @@
       transparent 65%
     ),
     var(--verde-oscuro);
-  color: #fff;
+  color: #ffffff;
   text-align: center;
 }
 
@@ -874,7 +1124,7 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: #fff;
+  color: #ffffff;
   font-size: 21px;
   font-weight: 700;
   letter-spacing: 2px;
@@ -889,7 +1139,7 @@
 }
 
 .pagina-indicadores .marca-pie-indicadores span {
-  color: #fff;
+  color: #ffffff;
   font-family: "DM Sans", sans-serif;
   font-size: 21px;
   font-weight: 700;
@@ -922,37 +1172,38 @@
     min-height: 640px;
   }
 
-  .pagina-indicadores .barra-superior-indicadores,
-  .pagina-indicadores .barra-superior-inicio {
+  .pagina-indicadores .barra-superior-inicio,
+  .pagina-indicadores .barra-superior-indicadores {
     padding-right: 4%;
     padding-left: 4%;
   }
 
-  .pagina-indicadores .marca-indicadores,
-  .pagina-indicadores .marca-inicio {
+  .pagina-indicadores .marca-inicio,
+  .pagina-indicadores .marca-indicadores {
     gap: 8px;
     font-size: 19px;
     letter-spacing: 1.7px;
   }
 
-  .pagina-indicadores .logo-indicadores,
-  .pagina-indicadores .marca-inicio img {
+  .pagina-indicadores .marca-inicio img,
+  .pagina-indicadores .logo-indicadores {
     width: 38px;
     height: 38px;
   }
 
+  .pagina-indicadores .marca-inicio span,
   .pagina-indicadores .nombre-marca-indicadores {
     font-size: 19px;
     letter-spacing: 1.7px;
   }
 
-  .pagina-indicadores .acciones-superiores-indicadores,
-  .pagina-indicadores .acciones-superiores-inicio {
+  .pagina-indicadores .acciones-superiores-inicio,
+  .pagina-indicadores .acciones-superiores-indicadores {
     gap: 9px;
   }
 
-  .pagina-indicadores .buscador-indicadores,
-  .pagina-indicadores .busqueda-territorio-inicio {
+  .pagina-indicadores .busqueda-territorio-inicio,
+  .pagina-indicadores .buscador-indicadores {
     width: 205px;
   }
 
@@ -977,85 +1228,93 @@
 @media (max-width: 640px) {
   .pagina-indicadores .hero-indicadores {
     min-height: 88svh;
+    min-height: 88vh;
   }
 
   .pagina-indicadores .hero-indicadores-imagen {
     object-position: center;
   }
 
-  .pagina-indicadores .barra-superior-indicadores,
-  .pagina-indicadores .barra-superior-inicio {
+  .pagina-indicadores .barra-superior-inicio,
+  .pagina-indicadores .barra-superior-indicadores {
     gap: 10px;
     padding: 19px 4%;
   }
 
-  .pagina-indicadores .marca-indicadores,
-  .pagina-indicadores .marca-inicio {
+  .pagina-indicadores .marca-inicio,
+  .pagina-indicadores .marca-indicadores {
     gap: 6px;
     font-size: 15px;
     letter-spacing: 1px;
   }
 
-  .pagina-indicadores .logo-indicadores,
-  .pagina-indicadores .marca-inicio img {
+  .pagina-indicadores .marca-inicio img,
+  .pagina-indicadores .logo-indicadores {
     width: 31px;
     height: 31px;
   }
 
+  .pagina-indicadores .marca-inicio span,
   .pagina-indicadores .nombre-marca-indicadores {
     font-size: 15px;
     letter-spacing: 1px;
   }
 
-  .pagina-indicadores .acciones-superiores-indicadores,
-  .pagina-indicadores .acciones-superiores-inicio {
+  .pagina-indicadores .acciones-superiores-inicio,
+  .pagina-indicadores .acciones-superiores-indicadores {
     gap: 7px;
   }
 
-  .pagina-indicadores .buscador-indicadores,
-  .pagina-indicadores .busqueda-territorio-inicio {
+  .pagina-indicadores .busqueda-territorio-inicio,
+  .pagina-indicadores .buscador-indicadores {
     gap: 5px;
-    width: clamp(105px, 34vw, 160px);
-    height: 41px;
+    width: clamp(95px, 29vw, 160px);
+    height: 39px;
     margin: 0;
     padding: 0 9px;
   }
 
-  .pagina-indicadores .buscador-indicadores input,
-  .pagina-indicadores .busqueda-territorio-inicio input {
+  .pagina-indicadores .busqueda-territorio-inicio input,
+  .pagina-indicadores .buscador-indicadores input {
     font-size: 10px;
   }
 
-  .pagina-indicadores .boton-menu-indicadores,
-  .pagina-indicadores .avatar-indicadores {
-    width: 40px;
-    height: 40px;
+  .pagina-indicadores .boton-perfil-inicio,
+  .pagina-indicadores .perfil-indicadores,
+  .pagina-indicadores .boton-menu-inicio,
+  .pagina-indicadores .boton-menu-indicadores {
+    width: 39px;
+    height: 39px;
   }
 
-  .pagina-indicadores .boton-menu-indicadores .icono-menu-indicadores,
-  .pagina-indicadores .boton-menu-indicadores .icono-cerrar-indicadores {
-    width: 20px;
-    height: 20px;
+  .pagina-indicadores .boton-menu-inicio {
+    gap: 4px;
+  }
+
+  .pagina-indicadores .boton-menu-inicio span {
+    width: 17px;
   }
 
   .pagina-indicadores .hero-indicadores-contenido {
-    padding: 30px 20px 75px;
+    padding: 30px 20px 65px;
   }
 
   .pagina-indicadores .etiqueta-hero-indicadores {
     max-width: 300px;
-    margin-bottom: 17px;
+    margin-bottom: 16px;
     font-size: 9px;
-    letter-spacing: 3px;
+    letter-spacing: 2.7px;
   }
 
   .pagina-indicadores .hero-indicadores-contenido h1 {
-    margin-bottom: 15px;
-    font-size: clamp(35px, 9vw, 49px);
+    font-size: clamp(40px, 9vw, 58px);
     line-height: 1.12;
+    letter-spacing: -0.5px;
   }
 
   .pagina-indicadores .hero-indicadores-contenido p {
+    max-width: 500px;
+    margin-top: 17px;
     font-size: 12px;
     line-height: 1.8;
   }
@@ -1090,7 +1349,6 @@
     gap: 19px 14px;
   }
 
-  .pagina-indicadores .panel-menu-indicadores,
   .pagina-indicadores .menu-desplegable-inicio {
     padding: 22px 18px;
   }
@@ -1126,60 +1384,67 @@
 ======================================== */
 
 @media (max-width: 520px) {
-  .pagina-indicadores .barra-superior-indicadores,
-  .pagina-indicadores .barra-superior-inicio {
+  .pagina-indicadores .barra-superior-inicio,
+  .pagina-indicadores .barra-superior-indicadores {
     gap: 5px;
-    padding: 19px 4%;
+    padding: 19px 3%;
   }
 
-  .pagina-indicadores .marca-indicadores,
-  .pagina-indicadores .marca-inicio {
+  .pagina-indicadores .marca-inicio,
+  .pagina-indicadores .marca-indicadores {
     gap: 4px;
     font-size: 13px;
     letter-spacing: 0.6px;
   }
 
-  .pagina-indicadores .logo-indicadores,
-  .pagina-indicadores .marca-inicio img {
+  .pagina-indicadores .marca-inicio img,
+  .pagina-indicadores .logo-indicadores {
     width: 27px;
     height: 27px;
   }
 
+  .pagina-indicadores .marca-inicio span,
   .pagina-indicadores .nombre-marca-indicadores {
     font-size: 13px;
     letter-spacing: 0.6px;
   }
 
-  .pagina-indicadores .acciones-superiores-indicadores,
-  .pagina-indicadores .acciones-superiores-inicio {
+  .pagina-indicadores .acciones-superiores-inicio,
+  .pagina-indicadores .acciones-superiores-indicadores {
     gap: 5px;
   }
 
-  .pagina-indicadores .buscador-indicadores,
-  .pagina-indicadores .busqueda-territorio-inicio {
+  .pagina-indicadores .busqueda-territorio-inicio,
+  .pagina-indicadores .buscador-indicadores {
     width: 108px;
-    height: 37px;
+    height: 36px;
     padding: 0 7px;
   }
 
-  .pagina-indicadores .buscador-indicadores input,
-  .pagina-indicadores .busqueda-territorio-inicio input {
+  .pagina-indicadores .busqueda-territorio-inicio input,
+  .pagina-indicadores .buscador-indicadores input {
     font-size: 9px;
   }
 
-  .pagina-indicadores .buscador-indicadores .icono-busqueda-indicadores {
-    width: 16px;
-    height: 16px;
-  }
-
-  .pagina-indicadores .avatar-indicadores,
+  .pagina-indicadores .boton-perfil-inicio,
+  .pagina-indicadores .perfil-indicadores,
+  .pagina-indicadores .boton-menu-inicio,
   .pagina-indicadores .boton-menu-indicadores {
     width: 35px;
     height: 35px;
   }
 
+  .pagina-indicadores .boton-menu-inicio {
+    gap: 4px;
+  }
+
+  .pagina-indicadores .boton-menu-inicio span {
+    width: 16px;
+    height: 2px;
+  }
+
   .pagina-indicadores .hero-indicadores-contenido {
-    padding: 30px 16px 65px;
+    padding: 30px 16px 55px;
   }
 
   .pagina-indicadores .hero-indicadores-contenido h1 {
@@ -1191,9 +1456,9 @@
   }
 
   .pagina-indicadores .etiqueta-hero-indicadores {
-    margin-bottom: 17px;
+    margin-bottom: 15px;
     font-size: 9px;
-    letter-spacing: 2.5px;
+    letter-spacing: 2.2px;
   }
 
   .pagina-indicadores .contenido-indicadores {
@@ -1254,7 +1519,6 @@
     font-size: 11px;
   }
 
-  .pagina-indicadores .panel-menu-indicadores,
   .pagina-indicadores .menu-desplegable-inicio {
     padding: 22px 18px;
   }
@@ -1265,52 +1529,69 @@
 ======================================== */
 
 @media (max-width: 380px) {
-  .pagina-indicadores .barra-superior-indicadores,
-  .pagina-indicadores .barra-superior-inicio {
+  .pagina-indicadores .barra-superior-inicio,
+  .pagina-indicadores .barra-superior-indicadores {
     gap: 4px;
     padding-right: 3%;
     padding-left: 3%;
   }
 
-  .pagina-indicadores .marca-indicadores,
-  .pagina-indicadores .marca-inicio {
+  .pagina-indicadores .marca-inicio,
+  .pagina-indicadores .marca-indicadores {
     gap: 3px;
     font-size: 12px;
     letter-spacing: 0.3px;
   }
 
-  .pagina-indicadores .logo-indicadores,
-  .pagina-indicadores .marca-inicio img {
+  .pagina-indicadores .marca-inicio img,
+  .pagina-indicadores .logo-indicadores {
     width: 25px;
     height: 25px;
   }
 
+  .pagina-indicadores .marca-inicio span,
   .pagina-indicadores .nombre-marca-indicadores {
     font-size: 12px;
     letter-spacing: 0.3px;
   }
 
-  .pagina-indicadores .acciones-superiores-indicadores,
-  .pagina-indicadores .acciones-superiores-inicio {
+  .pagina-indicadores .acciones-superiores-inicio,
+  .pagina-indicadores .acciones-superiores-indicadores {
     gap: 4px;
   }
 
-  .pagina-indicadores .buscador-indicadores,
-  .pagina-indicadores .busqueda-territorio-inicio {
-    width: 98px;
-    height: 35px;
+  .pagina-indicadores .busqueda-territorio-inicio,
+  .pagina-indicadores .buscador-indicadores {
+    width: 90px;
+    height: 34px;
     padding: 0 6px;
   }
 
-  .pagina-indicadores .buscador-indicadores input,
-  .pagina-indicadores .busqueda-territorio-inicio input {
+  .pagina-indicadores .busqueda-territorio-inicio input,
+  .pagina-indicadores .buscador-indicadores input {
     font-size: 8px;
   }
 
-  .pagina-indicadores .avatar-indicadores,
+  .pagina-indicadores .boton-perfil-inicio,
+  .pagina-indicadores .perfil-indicadores,
+  .pagina-indicadores .boton-menu-inicio,
   .pagina-indicadores .boton-menu-indicadores {
     width: 32px;
     height: 32px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido {
+    padding-right: 13px;
+    padding-left: 13px;
+  }
+
+  .pagina-indicadores .hero-indicadores-contenido h1 {
+    font-size: 35px;
+  }
+
+  .pagina-indicadores .etiqueta-hero-indicadores {
+    font-size: 8px;
+    letter-spacing: 1.8px;
   }
 }
 
